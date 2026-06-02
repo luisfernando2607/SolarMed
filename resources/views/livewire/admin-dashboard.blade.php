@@ -66,6 +66,13 @@
         <p style="font-size:10px;color:#888780;margin-top:6px">* Escala logarítmica — hover para ver nombre completo del diagnóstico</p>
     </div>
 
+        {{-- Ciudad: barras top 10 --}}
+    <div class="chart-card">
+        <p class="chart-label">Geografía</p>
+        <p class="chart-title">Top ciudades</p>
+        <div class="chart-wrap" style="height:160px"><canvas id="chartCiudad"></canvas></div>
+    </div>
+    
     {{-- ── Row 3: Sexo + Edad + Ciudad ── --}}
     <div class="chart-card">
         <p class="chart-label">Distribución</p>
@@ -92,13 +99,6 @@
             <span><i style="background:#7F77DD"></i>Pacientes</span>
             <span><i style="background:#BA7517;border-radius:50%"></i>Acumulado %</span>
         </div>
-    </div>
-
-    {{-- Ciudad: barras top 10 --}}
-    <div class="chart-card">
-        <p class="chart-label">Geografía</p>
-        <p class="chart-title">Top ciudades</p>
-        <div class="chart-wrap" style="height:160px"><canvas id="chartCiudad"></canvas></div>
     </div>
 
     {{-- ── Row 5: Heatmap (span3) ── --}}
