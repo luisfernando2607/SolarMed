@@ -130,4 +130,12 @@ Route::get('sri/configuracion', \App\Livewire\SriConfigPage::class)
     ->middleware(['auth'])
     ->name('sri.config');
 
+// Historial paciente PDF
+Route::get('pacientes/pdf/{paciente}', function (App\Models\Paciente $paciente) {
+    $paciente->load('consultas.medico', 'consultas.especialidad');
+    return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.historial-paciente', ['paciente' => $paciente])
+        ->setPaper('a4', 'portrait')
+        ->stream("historial_{$paciente->id}.pdf");
+})->middleware(['auth'])->name('pacientes.pdf');
+
 require __DIR__.'/auth.php';

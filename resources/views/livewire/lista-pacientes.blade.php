@@ -539,27 +539,13 @@
 
                             {{-- Botones de acción --}}
                             <div class="mt-6 pt-4 border-t flex flex-wrap gap-3">
-                                @can('expediente.crear')
-                                    <a href="{{ route('expedientes') }}" wire:navigate class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">+ Nueva consulta</a>
-                                @endcan
-                                @can('pacientes.editar')
-                                    <button wire:click="editar({{ $selected->id }})" class="px-4 py-2 bg-amber-500 text-white text-sm font-medium rounded-lg hover:bg-amber-600 transition">Editar paciente</button>
-                                @endcan
-                                @can('pacientes.eliminar')
-                                    <button x-data
-                                        x-on:click="Swal.fire({
-                                            icon: 'warning', title: '¿Eliminar paciente?',
-                                            text: '{{ $selected->nombre_completo }}. Esta acción no se puede deshacer.',
-                                            showCancelButton: true, confirmButtonColor: '#dc2626', cancelButtonColor: '#6b7280',
-                                            confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar'
-                                        }).then((result) => { if (result.isConfirmed) $wire.eliminarPaciente({{ $selected->id }}) })"
-                                        class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition">Eliminar paciente</button>
-                                @endcan
-                                @if ($turnoActivo)
-                                    <a href="{{ route('turno.atender', $turnoActivo->id) }}" wire:navigate class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">Atender turno #{{ $turnoActivo->codigo }}</a>
-                                @else
-                                    <a href="{{ route('turno.form') }}" wire:navigate class="px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition">Registrar nuevo turno</a>
-                                @endif
+                                <a href="{{ route('pacientes.pdf', $selected->id) }}"
+                                   class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    Descargar historial PDF
+                                </a>
                             </div>
                         </div>
                     @endif
