@@ -35,7 +35,7 @@ class UsuariosSeeder extends Seeder
         $medico2 = User::firstOrCreate(
             ['email' => 'dr.bury@clinica.ec'],
             [
-                'name' => 'Dr. Jorge Bury',
+                'name' => 'Sistema Médico',
                 'password' => Hash::make('medico123'),
             ]
         );

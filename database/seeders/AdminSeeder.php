@@ -10,7 +10,7 @@ class AdminSeeder extends Seeder {
         $admin = User::firstOrCreate(
             ['email' => 'admin@clinica.ec'],
             [
-                'name'     => 'Dr. Jorge Bury',
+                'name'     => 'Sistema Médico',
                 'password' => Hash::make('CambiarEsto123!'),
             ]
         );

@@ -35,8 +35,8 @@
                 <div class="w-12 h-12 mx-auto mb-3 bg-white/15 rounded-2xl flex items-center justify-center backdrop-blur-sm">
                     <x-application-logo class="w-7 h-7 opacity-90" />
                 </div>
-                <h1 class="text-lg font-bold tracking-tight">Clínica Santa Martha</h1>
-                <p class="text-xs mt-1 font-medium" style="opacity: 0.80;">Dr. Jorge Bury — Ginecología & Medicina General</p>
+                <h1 class="text-lg font-bold tracking-tight">SolarMed Software</h1>
+                <p class="text-xs mt-1 font-medium" style="opacity: 0.80;">Sistema Médico — Ginecología & Medicina General</p>
             </div>
 
             {{-- Barra de progreso --}}
@@ -442,7 +442,7 @@
         </div>
 
         <p class="text-center text-xs text-gray-400 pb-5">
-            Clínica Santa Martha &mdash; Dr. Jorge Bury &mdash; Tel: 044619253
+            SolarMed Software &mdash; Sistema Médico &mdash; Tel: 044619253
         </p>
 
     @endif

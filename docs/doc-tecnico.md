@@ -1,18 +1,18 @@
-# 📋 Documento Técnico — Sistema de Gestión Clínica Santa Martha
+# 📋 Documento Técnico — Sistema de Gestión SolarMed Software
 **Versión:** 3.0  
 **Fecha:** Mayo 2026  
-**Cliente:** Clínica Santa Martha — Dr. Jorge Bury  
+**Cliente:** SolarMed Software — Sistema Médico  
 **Elaborado por:** Equipo de Desarrollo  
 
 ---
 
 ## 1. Resumen Ejecutivo
 
-El presente documento describe el diseño técnico completo del **Sistema de Gestión para la Clínica Santa Martha**, una solución web desarrollada en Laravel 12 orientada a optimizar los procesos operativos diarios de la clínica: gestión de turnos por QR, expedientes clínicos multi-especialidad, agenda de citas, generación de informes médicos en PDF y facturación local.
+El presente documento describe el diseño técnico completo del **Sistema de Gestión para la SolarMed Software**, una solución web desarrollada en Laravel 12 orientada a optimizar los procesos operativos diarios de la clínica: gestión de turnos por QR, expedientes clínicos multi-especialidad, agenda de citas, generación de informes médicos en PDF y facturación local.
 
 La clínica opera con **dos especialidades simultáneas**:
 - 🏥 **Medicina General** — consultas generales abiertas a todo público
-- 👶 **Ginecología y Obstetricia** — a cargo del Dr. Jorge Bury, con servicios especializados como ecografías, controles prenatales, partos y cesáreas
+- 👶 **Ginecología y Obstetricia** — a cargo del Sistema Médico, con servicios especializados como ecografías, controles prenatales, partos y cesáreas
 
 El sistema está diseñado para funcionar **completamente en red local (LAN)**, con hasta **5 usuarios simultáneos**, sin dependencia de servicios en la nube externos para su operación principal.
 
@@ -22,9 +22,9 @@ El sistema está diseñado para funcionar **completamente en red local (LAN)**, 
 
 | Campo | Detalle |
 |-------|---------|
-| **Nombre** | Clínica Santa Martha |
+| **Nombre** | SolarMed Software |
 | **Especialidades** | Medicina General + Ginecología y Obstetricia |
-| **Médico especialista** | Dr. Jorge Bury (Gineco-Obstetra) |
+| **Médico especialista** | Sistema Médico (Gineco-Obstetra) |
 | **Médicos generales** | Uno o más (registrables en el sistema) |
 | **Ubicación** | Ecuador |
 | **Contacto** | 044619253 |
@@ -41,7 +41,7 @@ El sistema está diseñado para funcionar **completamente en red local (LAN)**, 
 ## 3. Objetivos del Sistema
 
 ### 3.1 Objetivo General
-Desarrollar un sistema de gestión clínica integral y **multi-especialidad** que digitalice y optimice todos los procesos operativos de la Clínica Santa Martha, desde la asignación de turnos hasta la facturación, con un expediente clínico que se adapta al tipo de consulta realizada.
+Desarrollar un sistema de gestión clínica integral y **multi-especialidad** que digitalice y optimice todos los procesos operativos de la SolarMed Software, desde la asignación de turnos hasta la facturación, con un expediente clínico que se adapta al tipo de consulta realizada.
 
 ### 3.2 Objetivos Específicos
 - Eliminar el registro manual en papel de pacientes y consultas
@@ -122,7 +122,7 @@ Servidor:      Local (Laragon recomendado para Windows)
 
 ```
 ┌─────────────────────────┐
-│   Clínica Santa Martha  │
+│   SolarMed Software  │
 │                         │
 │  Nombre:   __________   │
 │  Cédula:   __________   │
@@ -379,8 +379,8 @@ CONTROL PRENATAL
 
 ```
 ENCABEZADO
-├── Logo Clínica Santa Martha
-├── Datos del Dr. Jorge Bury (especialidad, colegiatura)
+├── Logo SolarMed Software
+├── Datos del Sistema Médico (especialidad, colegiatura)
 └── Fecha del estudio
 
 DATOS DEL ESTUDIO
@@ -958,4 +958,4 @@ DENTRO DEL EXPEDIENTE DEL PACIENTE:
 ---
 
 *Documento sujeto a revisión y actualización conforme avance el desarrollo.*  
-*Versión 3.0 — Clínica Santa Martha — Dr. Jorge Bury*
+*Versión 3.0 — SolarMed Software — Sistema Médico*

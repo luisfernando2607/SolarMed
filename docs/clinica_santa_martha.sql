@@ -1,5 +1,5 @@
 -- ============================================================
---  BASE DE DATOS — CLÍNICA SANTA MARTHA
+--  BASE DE DATOS — SOLARMED
 --  Sistema de Gestión Multi-especialidad v3.0
 --  Laravel 12 + MySQL 8.0
 --  Elaborado según documento técnico — Mayo 2026
@@ -531,7 +531,7 @@ INSERT INTO especialidades (nombre, codigo, color_agenda, activo) VALUES
 
 -- Configuración base de la clínica
 INSERT INTO configuracion (clave, valor, descripcion) VALUES
-('clinica_nombre',      'Clínica Santa Martha',         'Nombre de la clínica'),
+('clinica_nombre',      'Clínica',         'Nombre de la clínica'),
 ('clinica_telefono',    '044619253',                    'Teléfono principal'),
 ('clinica_ciudad',      'Ecuador',                      'Ciudad/país'),
 ('clinica_logo',        NULL,                           'Ruta al logo (storage/private/clinica/logo.png)'),
@@ -557,5 +557,5 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================================
 --  FIN DEL SCRIPT
---  Clínica Santa Martha — v3.0 — Mayo 2026
+--  SOLARMED — v3.0 — Mayo 2026
 -- ============================================================

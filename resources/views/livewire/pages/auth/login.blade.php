@@ -20,7 +20,7 @@ new #[Layout('layouts.guest')] class extends Component
 
 <div>
     <div class="text-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">Clínica Santa Martha</h1>
+        <h1 class="text-2xl font-bold text-gray-900">SolarMed Software</h1>
         <p class="text-sm text-gray-500 mt-1">Inicia sesión en el sistema</p>
     </div>
 

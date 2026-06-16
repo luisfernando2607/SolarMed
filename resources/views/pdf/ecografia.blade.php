@@ -20,8 +20,9 @@
 </head>
 <body>
     <div class="header">
+        <img src="{{ public_path('images/SolarMed.jpg') }}" alt="SolarMed" style="height: 50px; margin-bottom: 6px;">
         <h1>INFORME DE ECOGRAFÍA</h1>
-        <p>Clínica Santa Martha</p>
+        <p>SolarMed Software</p>
     </div>
 
     <div class="section">
@@ -67,7 +68,7 @@
 
     <div class="footer">
         <p>Documento generado electrónicamente el {{ now()->format('d/m/Y H:i') }}</p>
-        <p>Clínica Santa Martha &mdash; {{ config('app.url') }}</p>
+        <p>SolarMed Software &mdash; {{ config('app.url') }}</p>
     </div>
 </body>
 </html>

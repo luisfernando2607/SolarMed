@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 class ConfiguracionSeeder extends Seeder {
     public function run(): void {
         $config = [
-            ['clave' => 'clinica_nombre',     'valor' => 'Clínica Santa Martha',   'descripcion' => 'Nombre de la clínica'],
+            ['clave' => 'clinica_nombre',     'valor' => 'SolarMed Software',   'descripcion' => 'Nombre de la clínica'],
             ['clave' => 'clinica_telefono',   'valor' => '044619253',              'descripcion' => 'Teléfono principal'],
             ['clave' => 'clinica_ciudad',     'valor' => 'Ecuador',                'descripcion' => 'Ciudad/país'],
             ['clave' => 'clinica_logo',       'valor' => null,                     'descripcion' => 'Ruta al logo'],

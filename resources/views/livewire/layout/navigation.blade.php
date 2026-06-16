@@ -19,7 +19,7 @@ new class extends Component
                 <div class="shrink-0 flex items-center">
                     <a href="{{ auth()->user()->can('configuracion.editar') ? route('admin.dashboard') : route('dashboard') }}" wire:navigate class="flex items-center gap-2">
                         <x-application-logo class="block h-9 w-auto" />
-                        <span class="text-lg font-bold text-blue-900 hidden sm:block">CSM</span>
+                        <span class="text-lg font-bold text-blue-900 hidden sm:block">SolarMed</span>
                     </a>
                 </div>
                 <div class="hidden space-x-1 sm:-my-px sm:ms-6 sm:flex">
