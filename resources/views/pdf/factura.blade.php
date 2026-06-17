@@ -26,6 +26,7 @@
 </head>
 <body>
     <div class="encabezado center">
+        <img src="{{ public_path('images/SolarMed-bn.jpg') }}" alt="Solar Med" style="height: 50px; margin-bottom: 4px;">
         <h1>{{ config('app.name', 'CLÍNICA') }}</h1>
         <p>RUC: {{ $factura->medico?->user?->cedula ?? config('app.ruc', '1234567890001') }}</p>
         <p>Tel: {{ config('app.telefono', '044619253') }}</p>
