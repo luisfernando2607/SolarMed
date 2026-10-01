@@ -1,63 +1,92 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
+
+<img src="docs/SolarMed1.jpg" alt="SolarMed" width="220"/>
 
 # SolarMed
 
-Sistema de gestión clínica integral para **SolarMed Software**, una consulta privada de Ginecología y Medicina General en Ecuador. Desarrollado con Laravel 12 y Livewire 3.
+**Sistema de gestión clínica integral para consultorios privados en Ecuador**
 
-## Funcionalidades
+Turnos · Historia clínica · Control prenatal · Ecografías · Facturación electrónica SRI
 
-- **Módulo de turnos** — Sistema de colas en tiempo real con auto-registro del paciente (kiosco virtual), numeración secuencial por especialidad y seguimiento de estados (esperando, en atención, completado, cancelado).
-- **Atención médica** — Panel del doctor para gestionar pacientes desde la sala de espera, crear consultas clínicas, diagnósticos CIE-10, solicitar ecografías y recetar medicamentos.
-- **Historia clínica (Expedientes)** — Registro completo de consultas del paciente con búsqueda, anamnesis, examen físico, diagnóstico, tratamiento y referencias.
-- **Módulo de control prenatal** — Seguimiento especializado de embarazos con semanas de gestación, FPP, peso materno, presión arterial, altura uterina, latidos fetales y checklists.
-- **Ecografías** — Reportes detallados con mediciones biométricas estándar (DBP, CC, CA, LF), peso fetal estimado y generación de PDF.
-- **Agendamiento de citas** — Calendario interactivo FullCalendar con citas por especialidad codificadas por color.
-- **Facturación electrónica SRI** — Facturación completa con integración SRI: generación de XML, firma digital con certificado .p12, envío vía SOAP, numeración autorizada y PDF en formato ticket (226x400pts).
-- **Gestión de archivos** — Carga y categorización de documentos del paciente (resultados de laboratorio, imágenes, referencias, fotos).
-- **Dashboard administrativo** — Estadísticas con gráficos (pacientes por sexo/edad/ciudad, tendencias de turnos, facturación mensual, mapa de calor de atención, diagnósticos más frecuentes).
-- **Control de usuarios y permisos** — RBAC completo con roles (admin, secretaria, médico) y permisos granulares vía Spatie.
+![Laravel](https://img.shields.io/badge/Laravel_12-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![Livewire](https://img.shields.io/badge/Livewire_3-4E56A6?style=for-the-badge&logo=livewire&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP_8.2-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL_8-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![License](https://img.shields.io/badge/licencia-MIT-2ea44f?style=for-the-badge)
 
-## Tecnologías
+</div>
 
-| Componente | Tecnología |
+---
+
+## 🩺 El problema
+
+Muchos consultorios pequeños aún trabajan con **historias clínicas en papel, agendas manuales y facturación improvisada**: expedientes perdidos, salas de espera desordenadas, riesgo de multas del SRI y cero visibilidad del negocio.
+
+**SolarMed** reúne todo en un solo sistema que funciona **en red local**, sin depender de internet ni de mensualidades.
+
+---
+
+## ✨ Funcionalidades
+
+| Módulo | Qué hace |
 |---|---|
-| Backend | PHP ^8.2, Laravel ^12 |
-| Frontend | Livewire 3, Volt, Alpine.js, Tailwind CSS |
-| Base de datos | MySQL |
+| 🎫 **Turnos** | Cola en tiempo real con kiosco de auto-registro, numeración por especialidad y estados (esperando, en atención, completado, cancelado) |
+| 👩‍⚕️ **Atención médica** | Panel del doctor: consulta clínica, diagnósticos **CIE-10**, solicitud de ecografías y recetas |
+| 📂 **Historia clínica** | Anamnesis, examen físico, diagnóstico, tratamiento y referencias, con búsqueda |
+| 🤰 **Control prenatal** | Semanas de gestación, FPP, peso, presión, altura uterina, latidos fetales y checklists |
+| 🔬 **Ecografías** | Biometría estándar (DBP, CC, CA, LF), peso fetal estimado y reporte PDF |
+| 📅 **Agenda** | Calendario interactivo (FullCalendar) con citas por especialidad |
+| 🧾 **Facturación SRI** | XML, firma digital `.p12`, envío SOAP, numeración autorizada y PDF tipo ticket |
+| 📎 **Archivos** | Carga y categorización de laboratorios, imágenes y referencias |
+| 📊 **Dashboard** | Pacientes por sexo/edad/ciudad, tendencia de turnos, facturación mensual, mapa de calor y top diagnósticos |
+| 🔐 **Usuarios y permisos** | RBAC con roles admin, secretaria y médico (Spatie) |
+
+---
+
+## 🛠️ Stack
+
+| Capa | Tecnología |
+|---|---|
+| Backend | PHP 8.2 · Laravel 12 |
+| Frontend | Livewire 3 · Volt · Alpine.js · Tailwind CSS |
+| Base de datos | MySQL 8 |
 | Build | Vite 7 |
-| PDF | barryvdh/laravel-dompdf |
-| QR | simplesoftwareio/simple-qrcode |
-| Facturación SRI | XML + SOAP + Firma digital PKCS#12 |
-| Roles/Permisos | spatie/laravel-permission |
+| PDF / QR | barryvdh/laravel-dompdf · simple-qrcode |
+| Facturación | XML + SOAP + firma PKCS#12 |
+| Permisos | spatie/laravel-permission |
 
-## Requisitos
+---
 
-- PHP ^8.2
-- Composer
-- Node.js ^18
-- MySQL 8.x
+## 🚀 Instalación
 
-## Instalación
+**Requisitos:** PHP 8.2+, Composer, Node.js 18+, MySQL 8
 
 ```bash
-git clone <repo-url>
-cd solarmed
+git clone https://github.com/luisfernando2607/SolarMed.git
+cd SolarMed
 composer install
 npm install
-cp .env.example .env
+cp .env.example .env          # configura la base de datos
 php artisan key:generate
 php artisan migrate --seed
 npm run build
 ```
 
-## Desarrollo
+**Modo desarrollo** (servidor, colas, logs y Vite HMR en paralelo):
 
 ```bash
 composer dev
 ```
 
-Ejecuta simultáneamente: servidor Laravel, listener de colas, logs y Vite HMR.
+📄 Documentación técnica: [`docs/doc-tecnico.md`](docs/doc-tecnico.md)
 
-## Licencia
+---
 
-MIT
+<div align="center">
+
+Desarrollado por **[Luis Fernando Flores](https://github.com/luisfernando2607)** · DevStar · Guayaquil, Ecuador 🇪🇨
+
+<sub>Licencia MIT</sub>
+
+</div>
