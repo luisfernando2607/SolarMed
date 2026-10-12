@@ -1,803 +1,301 @@
-<div class="sw-page">
+<div>
+    <div class="max-w-7xl mx-auto py-8 px-4">
+        @php
+            $estados = [
+                'esperando' => ['Esperando', 'bg-sky-50 text-sky-700', 'bg-sky-500'],
+                'en_atencion' => ['En atención', 'bg-amber-50 text-amber-700', 'bg-amber-500'],
+                'completado' => ['Completado', 'bg-emerald-50 text-emerald-700', 'bg-emerald-500'],
+                'cancelado' => ['Cancelado', 'bg-red-50 text-red-700', 'bg-red-500'],
+            ];
+            $iniciales = function ($turno) {
+                $nombre = trim((string) ($turno->paciente?->nombre_completo ?? $turno->nombre_temporal));
+                $partes = preg_split('/\s+/', $nombre) ?: [];
+                return mb_strtoupper(mb_substr($partes[0] ?? '', 0, 1) . mb_substr($partes[1] ?? '', 0, 1)) ?: '?';
+            };
+        @endphp
 
-    {{-- ===== ESTILOS INTEGRADOS ===== --}}
-    <style>
-        .sw-page {
-            background: #f1f5f9;
-            min-height: 100vh;
-            padding: 1.5rem;
-            font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-        }
-
-        /* Header */
-        .sw-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.25rem;
-        }
-        .sw-header h1 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #0f172a;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .sw-header p {
-            font-size: 0.75rem;
-            color: #64748b;
-            margin-top: 2px;
-        }
-        .sw-tabs {
-            display: flex;
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 3px;
-            gap: 2px;
-        }
-        .sw-tab {
-            padding: 6px 16px;
-            font-size: 0.8125rem;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            background: transparent;
-            color: #64748b;
-            font-weight: 400;
-            transition: all 0.15s;
-        }
-        .sw-tab-active {
-            background: #1e40af;
-            color: #fff;
-            font-weight: 500;
-        }
-        .sw-date-input {
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 6px 10px;
-            font-size: 0.8125rem;
-            color: #374151;
-            background: #fff;
-        }
-
-        /* Stats row */
-        .sw-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 1.25rem;
-        }
-        .sw-stat {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 12px 14px;
-        }
-        .sw-stat-label {
-            font-size: 0.6875rem;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .sw-stat-dot {
-            display: inline-block;
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        .sw-stat-number {
-            font-size: 1.375rem;
-            font-weight: 600;
-            color: #0f172a;
-        }
-
-        /* Grid de colas */
-        .sw-colas-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-        }
-
-        /* Cola card */
-        .sw-cola-card {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        .sw-color-bar {
-            height: 3px;
-            width: 100%;
-        }
-        .sw-cola-header {
-            padding: 13px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .sw-cola-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-        .sw-cola-badge {
-            font-size: 0.6875rem;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-weight: 500;
-        }
-
-        /* Bloque en atención */
-        .sw-en-atencion {
-            margin: 12px;
-            border-radius: 10px;
-            padding: 12px 14px;
-            border: 1px solid;
-        }
-        .sw-en-atencion-vacio {
-            background: #f8fafc;
-            border-color: #e2e8f0;
-            text-align: center;
-            padding: 20px;
-        }
-        .sw-ea-label {
-            font-size: 0.6875rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .sw-pulse {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            animation: sw-pulse 1.5s ease-in-out infinite;
-            flex-shrink: 0;
-        }
-        @keyframes sw-pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.35; }
-        }
-        .sw-ea-codigo {
-            font-size: 1.125rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 4px;
-        }
-        .sw-ea-badge {
-            font-size: 0.6875rem;
-            padding: 2px 9px;
-            border-radius: 20px;
-            font-weight: 500;
-        }
-        .sw-ea-nombre {
-            font-size: 0.8125rem;
-            font-weight: 600;
-            color: #1e293b;
-        }
-        .sw-ea-meta {
-            font-size: 0.6875rem;
-            color: #64748b;
-            margin-top: 3px;
-        }
-        .sw-ea-actions {
-            display: flex;
-            gap: 6px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-
-        /* Botones */
-        .sw-btn {
-            border: none;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 500;
-            padding: 5px 12px;
-            border-radius: 7px;
-            transition: opacity 0.15s, transform 0.1s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-        .sw-btn:hover { opacity: 0.85; }
-        .sw-btn:active { transform: scale(0.97); }
-        .sw-btn-purple { background: #6d28d9; color: #fff; }
-        .sw-btn-green  { background: #065f46; color: #fff; }
-        .sw-btn-blue   { background: #1e40af; color: #fff; }
-        .sw-btn-ghost  { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
-        .sw-btn-red    { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-
-        /* Sección espera */
-        .sw-espera-section { padding: 0 12px 12px; }
-        .sw-espera-title {
-            font-size: 0.6875rem;
-            font-weight: 600;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin: 10px 0 8px;
-        }
-
-        /* Fila paciente */
-        .sw-paciente-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 10px;
-            border-radius: 8px;
-            border: 1px solid #f1f5f9;
-            margin-bottom: 5px;
-            background: #fff;
-            transition: background 0.1s, border-color 0.1s;
-        }
-        .sw-paciente-row:hover {
-            background: #f8fafc;
-            border-color: #e2e8f0;
-        }
-        .sw-p-num {
-            font-size: 0.8125rem;
-            font-weight: 700;
-            min-width: 40px;
-        }
-        .sw-p-info { flex: 1; min-width: 0; }
-        .sw-p-nombre {
-            font-size: 0.8125rem;
-            font-weight: 500;
-            color: #1e293b;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .sw-p-meta {
-            font-size: 0.6875rem;
-            color: #94a3b8;
-            margin-top: 1px;
-        }
-        .sw-tiempo {
-            font-size: 0.6875rem;
-            color: #94a3b8;
-            min-width: 32px;
-            text-align: right;
-            white-space: nowrap;
-        }
-        .sw-p-actions { display: flex; gap: 4px; }
-
-        /* Empty */
-        .sw-empty {
-            font-size: 0.8125rem;
-            color: #94a3b8;
-            text-align: center;
-            padding: 18px 0;
-        }
-
-        /* Historial tabla */
-        .sw-historial-card {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 1rem;
-        }
-        .sw-historial-header {
-            padding: 13px 16px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .sw-historial-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-        .sw-table { width: 100%; font-size: 0.8125rem; border-collapse: collapse; }
-        .sw-table thead th {
-            text-align: left;
-            padding: 9px 14px;
-            font-size: 0.6875rem;
-            font-weight: 600;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            background: #f8fafc;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .sw-table tbody tr { border-bottom: 1px solid #f8fafc; transition: background 0.1s; }
-        .sw-table tbody tr:last-child { border-bottom: none; }
-        .sw-table tbody tr:hover { background: #f8fafc; }
-        .sw-table td { padding: 10px 14px; color: #374151; vertical-align: middle; }
-        .sw-table td.sw-td-bold { font-weight: 700; color: #0f172a; }
-        .sw-table td.sw-td-muted { color: #94a3b8; }
-
-        /* Badges de estado */
-        .sw-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.6875rem;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-        .sw-badge-blue    { background: #eff6ff; color: #1d4ed8; }
-        .sw-badge-amber   { background: #fffbeb; color: #92400e; }
-        .sw-badge-green   { background: #f0fdf4; color: #14532d; }
-        .sw-badge-red     { background: #fef2f2; color: #991b1b; }
-
-        /* Modal */
-        .sw-modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15,23,42,0.45);
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            backdrop-filter: blur(2px);
-        }
-        .sw-modal {
-            background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-            max-width: 480px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .sw-modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 20px 20px 14px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .sw-modal-title { font-size: 1rem; font-weight: 600; color: #0f172a; }
-        .sw-modal-sub   { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
-        .sw-modal-close {
-            background: #f1f5f9; border: none; border-radius: 6px;
-            width: 28px; height: 28px; cursor: pointer; font-size: 1rem;
-            display: flex; align-items: center; justify-content: center;
-            color: #64748b; transition: background 0.15s;
-        }
-        .sw-modal-close:hover { background: #e2e8f0; }
-        .sw-modal-body { padding: 16px 20px; }
-        .sw-modal-section-title {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin: 16px 0 8px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .sw-modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .sw-modal-field label { font-size: 0.6875rem; color: #94a3b8; margin-bottom: 2px; display: block; }
-        .sw-modal-field p { font-size: 0.8125rem; font-weight: 500; color: #1e293b; }
-        .sw-modal-actions {
-            display: flex;
-            gap: 8px;
-            padding: 14px 20px 20px;
-            border-top: 1px solid #f1f5f9;
-            flex-wrap: wrap;
-        }
-        .sw-modal-actions .sw-btn { flex: 1; justify-content: center; padding: 8px 14px; font-size: 0.8125rem; }
-    </style>
-
-    {{-- ===== HEADER ===== --}}
-    <div class="sw-header">
-        <div>
-            <h1>
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="color:#1e40af">
-                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-                    <rect x="9" y="3" width="6" height="4" rx="2"/>
-                    <path d="M9 12h6M9 16h4"/>
-                </svg>
-                Sala de espera
-            </h1>
-            <p>{{ now()->isoFormat('dddd D [de] MMMM [de] YYYY') }} &nbsp;·&nbsp; Actualiza cada 10s</p>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-            @if ($vista === 'historial')
-                <input type="date" wire:model.live="fecha" class="sw-date-input">
-            @endif
-            <div class="sw-tabs">
-                <button wire:click="$set('vista', 'activos')"
-                    class="sw-tab {{ $vista === 'activos' ? 'sw-tab-active' : '' }}">
-                    Activos
-                </button>
-                @can('expediente.ver')
-                    <button wire:click="$set('vista', 'historial')"
-                        class="sw-tab {{ $vista === 'historial' ? 'sw-tab-active' : '' }}">
-                        Historial
-                    </button>
+        {{-- Encabezado --}}
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Sala de espera</h1>
+                <p class="text-sm text-gray-500 mt-1 first-letter:uppercase">
+                    {{ now()->isoFormat('dddd D [de] MMMM [de] YYYY') }}
+                    <span class="inline-flex items-center gap-1.5 ml-2 text-xs text-gray-400">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Se actualiza cada 10 s
+                    </span>
+                </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+                @if ($vista === 'historial')
+                    <input type="date" wire:model.live="fecha" class="rounded-xl border-gray-200 bg-white shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500">
+                @endif
+                <div class="inline-flex rounded-xl border border-gray-200 bg-white p-1 text-sm">
+                    <button wire:click="$set('vista', 'activos')" class="px-3 py-1.5 rounded-lg transition {{ $vista === 'activos' ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:text-gray-900' }}">Activos</button>
+                    @can('expediente.ver')
+                        <button wire:click="$set('vista', 'historial')" class="px-3 py-1.5 rounded-lg transition {{ $vista === 'historial' ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:text-gray-900' }}">Historial</button>
+                    @endcan
+                </div>
+                @can('turnos.ver')
+                    <a href="{{ route('turnos.crear') }}" wire:navigate class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-sm transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                        Registrar turno
+                    </a>
                 @endcan
             </div>
         </div>
-    </div>
 
-    @if ($vista === 'activos')
+        @if ($vista === 'activos')
+            @php
+                $totalEsperando = collect($colas)->sum(fn ($c) => $c['esperando']->count());
+                $totalAtencion = collect($colas)->filter(fn ($c) => $c['en_atencion'])->count();
+                $kpis = [
+                    ['En atención', $totalAtencion, 'bg-amber-500'],
+                    ['En espera', $totalEsperando, 'bg-sky-500'],
+                    ['Completados hoy', \App\Models\Turno::whereDate('created_at', today())->where('estado', 'completado')->count(), 'bg-emerald-500'],
+                    ['Cancelados hoy', \App\Models\Turno::whereDate('created_at', today())->where('estado', 'cancelado')->count(), 'bg-red-500'],
+                ];
+            @endphp
 
-        {{-- ===== STATS ROW ===== --}}
-        @php
-            $totalEsperando  = collect($colas)->sum(fn($c) => $c['esperando']->count());
-            $totalAtencion   = collect($colas)->filter(fn($c) => $c['en_atencion'])->count();
-        @endphp
-        <div class="sw-stats">
-            <div class="sw-stat">
-                <div class="sw-stat-label">
-                    <span class="sw-stat-dot" style="background:#f59e0b"></span> En atención
-                </div>
-                <div class="sw-stat-number">{{ $totalAtencion }}</div>
-            </div>
-            <div class="sw-stat">
-                <div class="sw-stat-label">
-                    <span class="sw-stat-dot" style="background:#1e40af"></span> En espera
-                </div>
-                <div class="sw-stat-number">{{ $totalEsperando }}</div>
-            </div>
-            <div class="sw-stat">
-                <div class="sw-stat-label">
-                    <span class="sw-stat-dot" style="background:#065f46"></span> Completados hoy
-                </div>
-                <div class="sw-stat-number">
-                    {{ \App\Models\Turno::whereDate('created_at', today())->where('estado', 'completado')->count() }}
-                </div>
-            </div>
-            <div class="sw-stat">
-                <div class="sw-stat-label">
-                    <span class="sw-stat-dot" style="background:#b91c1c"></span> Cancelados hoy
-                </div>
-                <div class="sw-stat-number">
-                    {{ \App\Models\Turno::whereDate('created_at', today())->where('estado', 'cancelado')->count() }}
-                </div>
-            </div>
-        </div>
-
-        {{-- ===== VISTA ACTIVOS ===== --}}
-        <div class="sw-colas-grid">
-            @foreach ($colas as $cola)
-                @php $color = $cola['especialidad']->color_agenda; @endphp
-                <div class="sw-cola-card">
-
-                    {{-- Barra de color delgada --}}
-                    <div class="sw-color-bar" style="background:{{ $color }}"></div>
-
-                    {{-- Header cola --}}
-                    <div class="sw-cola-header">
-                        <div class="sw-cola-title" style="color:{{ $color }}">
-                            {{ $cola['especialidad']->nombre }}
-                        </div>
-                        <span class="sw-cola-badge"
-                            style="background:{{ $color }}18; color:{{ $color }};">
-                            {{ $cola['esperando']->count() }} en espera
-                        </span>
-                    </div>
-
-                    {{-- Bloque en atención --}}
-                    @if ($cola['en_atencion'])
-                        <div class="sw-en-atencion"
-                            style="background:{{ $color }}0f; border-color:{{ $color }}30; margin:12px;">
-                            <div class="sw-ea-label" style="color:{{ $color }}cc;">
-                                <span class="sw-pulse" style="background:{{ $color }}"></span>
-                                En atención ahora
-                            </div>
-                            <div class="sw-ea-codigo" style="color:{{ $color }};">
-                                #{{ $cola['en_atencion']->codigo }}
-                                <span class="sw-ea-badge"
-                                    style="background:{{ $color }}20; color:{{ $color }};">
-                                    Llamado
-                                </span>
-                            </div>
-                            <div class="sw-ea-nombre">
-                                {{ $cola['en_atencion']->paciente?->nombre_completo ?? $cola['en_atencion']->nombre_temporal }}
-                            </div>
-                            <div class="sw-ea-meta">
-                                C.I. {{ $cola['en_atencion']->cedula }}
-                                &nbsp;·&nbsp; {{ $cola['en_atencion']->motivo }}
-                                &nbsp;·&nbsp; {{ $cola['en_atencion']->hora_registro->format('H:i') }}
-                                &nbsp;·&nbsp; Tel: {{ $cola['en_atencion']->paciente?->telefono ?? $cola['en_atencion']->telefono }}
-                            </div>
-                            <div class="sw-ea-actions">
-                                @can('expediente.crear')
-                                    <a href="{{ route('turno.atender', $cola['en_atencion']->id) }}" wire:navigate
-                                        class="sw-btn sw-btn-purple">
-                                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                        Atender
-                                    </a>
-                                @endcan
-                                @can('turnos.gestionar')
-                                    <button wire:click="completar({{ $cola['en_atencion']->id }})"
-                                        class="sw-btn sw-btn-green">
-                                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                                        Completar
-                                    </button>
-                                @endcan
-                            </div>
-                        </div>
-                    @else
-                        <div class="sw-en-atencion sw-en-atencion-vacio">
-                            <p class="sw-empty" style="padding:0">Sin paciente en atención</p>
-                        </div>
-                    @endif
-
-                    {{-- Lista en espera --}}
-                    <div class="sw-espera-section">
-                        @if ($cola['esperando']->count() > 0)
-                            <div class="sw-espera-title">En espera ({{ $cola['esperando']->count() }})</div>
-                            <div style="max-height:22rem;overflow-y:auto;">
-                                @foreach ($cola['esperando'] as $turno)
-                                    <div class="sw-paciente-row">
-                                        <div class="sw-p-num" style="color:{{ $color }}">
-                                            #{{ $turno->codigo }}
-                                        </div>
-                                        <div class="sw-p-info">
-                                            <div class="sw-p-nombre">
-                                                {{ $turno->paciente?->nombre_completo ?? $turno->nombre_temporal }}
-                                            </div>
-                                            <div class="sw-p-meta">
-                                                {{ $turno->cedula }} &nbsp;·&nbsp; {{ $turno->motivo }}
-                                            </div>
-                                        </div>
-                                        <div class="sw-tiempo">
-                                            {{ $turno->hora_registro->diffForHumans(null, true, true, 1) }}
-                                        </div>
-                                        <div class="sw-p-actions">
-                                            <button wire:click="verDetalle({{ $turno->id }})"
-                                                title="Ver detalle"
-                                                style="background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:6px;color:#94a3b8;font-size:0.75rem;transition:color 0.1s;"
-                                                onmouseover="this.style.color='#1e40af'"
-                                                onmouseout="this.style.color='#94a3b8'">
-                                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                            </button>
-                                            @can('turnos.gestionar')
-                                                <button wire:click="llamar({{ $turno->id }})"
-                                                    class="sw-btn sw-btn-blue"
-                                                    style="background:{{ $color }};">
-                                                    Llamar
-                                                </button>
-                                                <button wire:click="cancelar({{ $turno->id }})"
-                                                    class="sw-btn sw-btn-ghost"
-                                                    title="Cancelar turno">
-                                                    ✕
-                                                </button>
-                                            @endcan
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <p class="sw-empty">No hay pacientes en espera</p>
-                        @endif
-                    </div>
-
-                </div>
-            @endforeach
-        </div>
-
-    @else
-
-        {{-- ===== VISTA HISTORIAL ===== --}}
-        @can('expediente.ver')
-            <div style="display:flex;flex-direction:column;gap:1rem;">
-                @foreach ($historial as $h)
-                    @php $color = $h['especialidad']->color_agenda; @endphp
-                    <div class="sw-historial-card">
-                        <div class="sw-historial-header" style="border-left:3px solid {{ $color }}; padding-left:13px;">
-                            <div class="sw-historial-title" style="color:{{ $color }}">
-                                {{ $h['especialidad']->nombre }}
-                                <span style="font-size:0.8125rem;font-weight:400;color:#64748b;">
-                                    — {{ \Carbon\Carbon::parse($fecha)->format('d/m/Y') }}
-                                </span>
-                            </div>
-                        </div>
-                        <div style="overflow-x:auto;">
-                            <table class="sw-table">
-                                <thead>
-                                    <tr>
-                                        <th>Turno</th>
-                                        <th>Paciente</th>
-                                        <th>Cédula</th>
-                                        <th>Motivo</th>
-                                        <th>Teléfono</th>
-                                        <th>Hora</th>
-                                        <th>Estado</th>
-                                        <th style="text-align:center">Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($h['turnos'] as $turno)
-                                        <tr>
-                                            <td class="sw-td-bold">#{{ $turno->codigo }}</td>
-                                            <td>{{ $turno->paciente?->nombre_completo ?? $turno->nombre_temporal }}</td>
-                                            <td class="sw-td-muted">{{ $turno->cedula }}</td>
-                                            <td class="sw-td-muted">{{ $turno->motivo }}</td>
-                                            <td class="sw-td-muted">{{ $turno->paciente?->telefono ?? $turno->telefono }}</td>
-                                            <td class="sw-td-muted">{{ $turno->hora_registro->format('H:i') }}</td>
-                                            <td>
-                                                @switch($turno->estado)
-                                                    @case('esperando')
-                                                        <span class="sw-badge sw-badge-blue">
-                                                            <span style="width:5px;height:5px;border-radius:50%;background:#1d4ed8;display:inline-block;"></span>
-                                                            Esperando
-                                                        </span>
-                                                        @break
-                                                    @case('en_atencion')
-                                                        <span class="sw-badge sw-badge-amber">
-                                                            <span style="width:5px;height:5px;border-radius:50%;background:#d97706;display:inline-block;"></span>
-                                                            En atención
-                                                        </span>
-                                                        @break
-                                                    @case('completado')
-                                                        <span class="sw-badge sw-badge-green">
-                                                            <span style="width:5px;height:5px;border-radius:50%;background:#15803d;display:inline-block;"></span>
-                                                            Completado
-                                                        </span>
-                                                        @break
-                                                    @case('cancelado')
-                                                        <span class="sw-badge sw-badge-red">
-                                                            <span style="width:5px;height:5px;border-radius:50%;background:#dc2626;display:inline-block;"></span>
-                                                            Cancelado
-                                                        </span>
-                                                        @break
-                                                @endswitch
-                                            </td>
-                                            <td style="text-align:center">
-                                                <button wire:click="verDetalle({{ $turno->id }})"
-                                                    style="background:none;border:none;cursor:pointer;font-size:0.75rem;font-weight:500;color:#1e40af;padding:4px 8px;border-radius:6px;transition:background 0.1s;"
-                                                    onmouseover="this.style.background='#eff6ff'"
-                                                    onmouseout="this.style.background='none'">
-                                                    Ver ficha
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+            {{-- Indicadores --}}
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+                @foreach ($kpis as [$etiqueta, $valor, $punto])
+                    <div class="bg-white rounded-2xl border border-gray-200/80 px-4 py-3.5">
+                        <p class="flex items-center gap-2 text-xs text-gray-500"><span class="w-2 h-2 rounded-full {{ $punto }}"></span>{{ $etiqueta }}</p>
+                        <p class="text-2xl font-semibold text-gray-900 mt-1 tabular-nums">{{ $valor }}</p>
                     </div>
                 @endforeach
             </div>
-        @endcan
 
-    @endif
+            {{-- Colas por especialidad --}}
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                @forelse ($colas as $cola)
+                    @php $color = $cola['especialidad']->color_agenda ?: '#64748b'; @endphp
+                    <section class="bg-white rounded-2xl border border-gray-200/80 overflow-hidden">
+                        <header class="flex items-center justify-between gap-3 px-5 py-4 border-b border-gray-100">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background: {{ $color }}"></span>
+                                <h2 class="font-semibold text-gray-900 truncate">{{ $cola['especialidad']->nombre }}</h2>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 whitespace-nowrap">{{ $cola['esperando']->count() }} en espera</span>
+                        </header>
 
-    {{-- ===== MODAL DETALLE ===== --}}
-    @if ($detalle)
-        <div class="sw-modal-overlay" wire:click.self="cerrarDetalle">
-            <div class="sw-modal">
+                        {{-- En atención --}}
+                        <div class="p-4">
+                            @if ($t = $cola['en_atencion'])
+                                <div class="rounded-xl border border-amber-200 bg-amber-50/60 p-4">
+                                    <p class="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-amber-700">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                        En atención ahora
+                                    </p>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <span class="flex items-center justify-center min-w-[3rem] h-10 px-2 rounded-xl bg-white border border-amber-200 font-bold text-gray-900 tabular-nums">{{ $t->codigo }}</span>
+                                        <div class="min-w-0">
+                                            <p class="font-medium text-gray-900 truncate">{{ $t->paciente?->nombre_completo ?? $t->nombre_temporal }}</p>
+                                            <p class="text-xs text-gray-500 truncate">
+                                                <span class="font-mono">{{ $t->cedula }}</span> · {{ $t->motivo }} · {{ $t->hora_registro->format('H:i') }}
+                                                @if ($tel = $t->paciente?->telefono ?? $t->telefono) · {{ $tel }} @endif
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2 mt-3">
+                                        @can('expediente.crear')
+                                            <a href="{{ route('turno.atender', $t->id) }}" wire:navigate class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0"/></svg>
+                                                Atender
+                                            </a>
+                                        @endcan
+                                        @can('turnos.gestionar')
+                                            <button wire:click="completar({{ $t->id }})" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-50 transition">
+                                                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                                                Completar
+                                            </button>
+                                        @endcan
+                                    </div>
+                                </div>
+                            @else
+                                <div class="rounded-xl border border-dashed border-gray-200 py-5 text-center text-sm text-gray-400">Sin paciente en atención</div>
+                            @endif
+                        </div>
 
-                <div class="sw-modal-header">
-                    <div>
-                        <div class="sw-modal-title">Turno #{{ $detalle->codigo }}</div>
-                        <div class="sw-modal-sub">{{ $detalle->especialidad->nombre }}</div>
+                        {{-- En espera --}}
+                        <div class="px-4 pb-4">
+                            @if ($cola['esperando']->count() > 0)
+                                <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-2">Próximos</p>
+                                <ul class="space-y-1.5 max-h-[22rem] overflow-y-auto">
+                                    @foreach ($cola['esperando'] as $turno)
+                                        <li wire:key="espera-{{ $turno->id }}" class="flex items-center gap-3 px-3 py-2 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50/70 transition">
+                                            <span class="text-sm font-semibold text-gray-900 tabular-nums min-w-[2.75rem]">{{ $turno->codigo }}</span>
+                                            <button wire:click="verDetalle({{ $turno->id }})" class="flex-1 min-w-0 text-left group">
+                                                <span class="block text-sm font-medium text-gray-900 group-hover:text-blue-700 truncate">{{ $turno->paciente?->nombre_completo ?? $turno->nombre_temporal }}</span>
+                                                <span class="block text-xs text-gray-500 truncate"><span class="font-mono">{{ $turno->cedula }}</span> · {{ $turno->motivo }}</span>
+                                            </button>
+                                            <span class="text-xs text-gray-400 whitespace-nowrap hidden sm:inline" title="Tiempo de espera">{{ $turno->hora_registro->diffForHumans(null, true, true, 1) }}</span>
+                                            @can('turnos.gestionar')
+                                                <div class="flex items-center gap-1 shrink-0">
+                                                    <button wire:click="llamar({{ $turno->id }})" class="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition">Llamar</button>
+                                                    <button x-data
+                                                        x-on:click="Swal.fire({
+                                                            icon: 'warning',
+                                                            title: '¿Cancelar turno?',
+                                                            text: {{ \Illuminate\Support\Js::from(($turno->codigo . ' · ' . ($turno->paciente?->nombre_completo ?? $turno->nombre_temporal))) }},
+                                                            showCancelButton: true,
+                                                            confirmButtonColor: '#dc2626',
+                                                            cancelButtonColor: '#6b7280',
+                                                            confirmButtonText: 'Sí, cancelar',
+                                                            cancelButtonText: 'Volver'
+                                                        }).then((r) => { if (r.isConfirmed) $wire.cancelar({{ $turno->id }}) })"
+                                                        class="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition" title="Cancelar turno" aria-label="Cancelar turno">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                    </button>
+                                                </div>
+                                            @endcan
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <p class="py-4 text-center text-sm text-gray-400">No hay pacientes en espera</p>
+                            @endif
+                        </div>
+                    </section>
+                @empty
+                    <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-200/80 px-5 py-14 text-center">
+                        <p class="text-sm font-medium text-gray-700">No hay especialidades activas</p>
+                        <p class="text-xs text-gray-400 mt-1">Active una especialidad para abrir su cola de turnos.</p>
                     </div>
-                    <button wire:click="cerrarDetalle" class="sw-modal-close" aria-label="Cerrar">✕</button>
+                @endforelse
+            </div>
+        @else
+            {{-- Historial del día --}}
+            @can('expediente.ver')
+                <div class="space-y-4">
+                    @foreach ($historial as $h)
+                        @php $color = $h['especialidad']->color_agenda ?: '#64748b'; @endphp
+                        <section class="bg-white rounded-2xl border border-gray-200/80 overflow-hidden">
+                            <header class="flex items-center justify-between gap-3 px-5 py-4 border-b border-gray-100">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background: {{ $color }}"></span>
+                                    <h2 class="font-semibold text-gray-900 truncate">{{ $h['especialidad']->nombre }}</h2>
+                                </div>
+                                <span class="text-xs text-gray-500 whitespace-nowrap">{{ \Carbon\Carbon::parse($fecha)->format('d/m/Y') }} · {{ $h['turnos']->count() }} {{ $h['turnos']->count() === 1 ? 'turno' : 'turnos' }}</span>
+                            </header>
+                            <div class="relative overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead class="text-xs text-gray-500 border-b border-gray-100">
+                                        <tr>
+                                            <th class="text-left font-medium px-5 py-3">Turno</th>
+                                            <th class="text-left font-medium px-5 py-3">Paciente</th>
+                                            <th class="text-left font-medium px-5 py-3 hidden md:table-cell">Motivo</th>
+                                            <th class="text-left font-medium px-5 py-3 hidden lg:table-cell">Teléfono</th>
+                                            <th class="text-left font-medium px-5 py-3">Hora</th>
+                                            <th class="text-left font-medium px-5 py-3">Estado</th>
+                                            <th class="px-5 py-3"><span class="sr-only">Ver</span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        @forelse ($h['turnos'] as $turno)
+                                            @php [$estTexto, $estClase, $estPunto] = $estados[$turno->estado] ?? [ucfirst((string) $turno->estado), 'bg-gray-100 text-gray-600', 'bg-gray-400']; @endphp
+                                            <tr class="hover:bg-gray-50/70 transition">
+                                                <td class="px-5 py-3 font-semibold text-gray-900 tabular-nums">{{ $turno->codigo }}</td>
+                                                <td class="px-5 py-3">
+                                                    <div class="flex items-center gap-3">
+                                                        <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold shrink-0">{{ $iniciales($turno) }}</span>
+                                                        <span class="min-w-0">
+                                                            <span class="block font-medium text-gray-900 truncate max-w-[200px]">{{ $turno->paciente?->nombre_completo ?? $turno->nombre_temporal }}</span>
+                                                            <span class="block text-xs text-gray-500 font-mono">{{ $turno->cedula }}</span>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-5 py-3 hidden md:table-cell text-gray-600 max-w-[220px] truncate">{{ $turno->motivo }}</td>
+                                                <td class="px-5 py-3 hidden lg:table-cell text-gray-600">{{ $turno->paciente?->telefono ?? $turno->telefono }}</td>
+                                                <td class="px-5 py-3 text-gray-600 tabular-nums">{{ $turno->hora_registro->format('H:i') }}</td>
+                                                <td class="px-5 py-3">
+                                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap {{ $estClase }}"><span class="w-1.5 h-1.5 rounded-full {{ $estPunto }}"></span>{{ $estTexto }}</span>
+                                                </td>
+                                                <td class="px-5 py-3 text-right">
+                                                    <button wire:click="verDetalle({{ $turno->id }})" class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-blue-700 hover:bg-blue-50 transition whitespace-nowrap">Ver ficha</button>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr><td colspan="7" class="px-5 py-8 text-center text-sm text-gray-400">Sin turnos en esta fecha</td></tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    @endforeach
+                </div>
+            @endcan
+        @endif
+    </div>
+
+    {{-- Detalle del turno --}}
+    @if ($detalle)
+        @php [$estTexto, $estClase, $estPunto] = $estados[$detalle->estado] ?? [ucfirst((string) $detalle->estado), 'bg-gray-100 text-gray-600', 'bg-gray-400']; @endphp
+        <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" wire:click.self="cerrarDetalle">
+            <div class="bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+                <div class="flex items-start justify-between gap-4 px-6 pt-6 pb-4 border-b border-gray-100">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900">Turno {{ $detalle->codigo }}</h2>
+                        <p class="text-sm text-gray-500">{{ $detalle->especialidad->nombre }}</p>
+                    </div>
+                    <button wire:click="cerrarDetalle" class="p-1.5 -m-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition" aria-label="Cerrar">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
                 </div>
 
-                <div class="sw-modal-body">
-
-                    <div class="sw-modal-section-title">Información del turno</div>
-                    <div class="sw-modal-grid">
-                        <div class="sw-modal-field">
-                            <label>Paciente</label>
-                            <p>{{ $detalle->paciente?->nombre_completo ?? $detalle->nombre_temporal }}</p>
-                        </div>
-                        <div class="sw-modal-field">
-                            <label>Cédula</label>
-                            <p>{{ $detalle->cedula }}</p>
-                        </div>
-                        <div class="sw-modal-field">
-                            <label>Teléfono</label>
-                            <p>{{ $detalle->paciente?->telefono ?? $detalle->telefono }}</p>
-                        </div>
-                        <div class="sw-modal-field">
-                            <label>Motivo</label>
-                            <p>{{ $detalle->motivo }}</p>
-                        </div>
-                        <div class="sw-modal-field">
-                            <label>Hora de registro</label>
-                            <p>{{ $detalle->hora_registro->format('H:i') }}</p>
-                        </div>
-                        <div class="sw-modal-field">
-                            <label>Estado</label>
-                            <p>
-                                @switch($detalle->estado)
-                                    @case('esperando')
-                                        <span class="sw-badge sw-badge-blue">Esperando</span> @break
-                                    @case('en_atencion')
-                                        <span class="sw-badge sw-badge-amber">En atención</span> @break
-                                    @case('completado')
-                                        <span class="sw-badge sw-badge-green">Completado</span> @break
-                                    @case('cancelado')
-                                        <span class="sw-badge sw-badge-red">Cancelado</span> @break
-                                @endswitch
-                            </p>
-                        </div>
+                <div class="px-6 py-5 space-y-5">
+                    <div>
+                        <h3 class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-3">Turno</h3>
+                        <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                            <div><dt class="text-xs text-gray-500">Paciente</dt><dd class="font-medium text-gray-900">{{ $detalle->paciente?->nombre_completo ?? $detalle->nombre_temporal }}</dd></div>
+                            <div><dt class="text-xs text-gray-500">Cédula</dt><dd class="font-medium text-gray-900 font-mono">{{ $detalle->cedula }}</dd></div>
+                            <div><dt class="text-xs text-gray-500">Teléfono</dt><dd class="font-medium text-gray-900">{{ $detalle->paciente?->telefono ?? $detalle->telefono ?: '—' }}</dd></div>
+                            <div><dt class="text-xs text-gray-500">Motivo</dt><dd class="font-medium text-gray-900">{{ $detalle->motivo }}</dd></div>
+                            <div><dt class="text-xs text-gray-500">Hora de registro</dt><dd class="font-medium text-gray-900 tabular-nums">{{ $detalle->hora_registro->format('H:i') }}</dd></div>
+                            <div><dt class="text-xs text-gray-500">Estado</dt><dd><span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium {{ $estClase }}"><span class="w-1.5 h-1.5 rounded-full {{ $estPunto }}"></span>{{ $estTexto }}</span></dd></div>
+                        </dl>
                     </div>
 
                     @if ($detalle->paciente)
-                        <div class="sw-modal-section-title">Datos clínicos</div>
-                        <div class="sw-modal-grid">
-                            <div class="sw-modal-field">
-                                <label>Edad</label>
-                                <p>{{ $detalle->paciente->edad ?? '--' }} años</p>
-                            </div>
-                            <div class="sw-modal-field">
-                                <label>Sexo</label>
-                                <p style="text-transform:capitalize">{{ $detalle->paciente->sexo }}</p>
-                            </div>
-                            <div class="sw-modal-field">
-                                <label>Peso</label>
-                                <p>{{ $detalle->paciente->peso ? $detalle->paciente->peso . ' kg' : '--' }}</p>
-                            </div>
-                            <div class="sw-modal-field">
-                                <label>Altura</label>
-                                <p>{{ $detalle->paciente->altura ? $detalle->paciente->altura . ' m' : '--' }}</p>
-                            </div>
-                            <div class="sw-modal-field" style="grid-column:span 2">
-                                <label>Dirección</label>
-                                <p>{{ $detalle->paciente->direccion ?? '--' }}</p>
-                            </div>
-                            <div class="sw-modal-field">
-                                <label>Email</label>
-                                <p>{{ $detalle->paciente->email ?? '--' }}</p>
-                            </div>
-                            <div class="sw-modal-field">
-                                <label>Alergias</label>
-                                <p>{{ $detalle->paciente->alergias ?? '--' }}</p>
-                            </div>
+                        <div class="pt-5 border-t border-gray-100">
+                            <h3 class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-3">Datos clínicos</h3>
+                            <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                                <div><dt class="text-xs text-gray-500">Edad</dt><dd class="font-medium text-gray-900">{{ $detalle->paciente->edad !== null ? $detalle->paciente->edad . ' años' : '—' }}</dd></div>
+                                <div><dt class="text-xs text-gray-500">Sexo</dt><dd class="font-medium text-gray-900 capitalize">{{ $detalle->paciente->sexo ?: '—' }}</dd></div>
+                                <div><dt class="text-xs text-gray-500">Peso</dt><dd class="font-medium text-gray-900">{{ $detalle->paciente->peso ? $detalle->paciente->peso . ' kg' : '—' }}</dd></div>
+                                <div><dt class="text-xs text-gray-500">Altura</dt><dd class="font-medium text-gray-900">{{ $detalle->paciente->altura ? $detalle->paciente->altura . ' m' : '—' }}</dd></div>
+                                <div class="col-span-2"><dt class="text-xs text-gray-500">Dirección</dt><dd class="font-medium text-gray-900">{{ $detalle->paciente->direccion ?: '—' }}</dd></div>
+                                <div><dt class="text-xs text-gray-500">Email</dt><dd class="font-medium text-gray-900 break-all">{{ $detalle->paciente->email ?: '—' }}</dd></div>
+                                <div>
+                                    <dt class="text-xs text-gray-500">Alergias</dt>
+                                    <dd class="font-medium {{ $detalle->paciente->alergias ? 'text-red-700' : 'text-gray-900' }}">{{ $detalle->paciente->alergias ?: '—' }}</dd>
+                                </div>
+                            </dl>
                         </div>
                     @endif
                 </div>
 
-                <div class="sw-modal-actions">
+                <div class="flex flex-wrap justify-end gap-2 px-6 py-4 border-t border-gray-100 bg-gray-50/60 rounded-b-2xl">
                     @if ($detalle->estado === 'esperando')
                         @can('turnos.gestionar')
-                            <button wire:click="llamar({{ $detalle->id }})" wire:click="cerrarDetalle"
-                                class="sw-btn sw-btn-blue">
-                                Llamar paciente
-                            </button>
-                            <button wire:click="cancelar({{ $detalle->id }})" wire:click="cerrarDetalle"
-                                class="sw-btn sw-btn-red">
-                                Cancelar turno
-                            </button>
+                            <button wire:click="cancelar({{ $detalle->id }})" class="px-4 py-2 rounded-xl border border-red-200 bg-white text-sm font-medium text-red-700 hover:bg-red-50 transition">Cancelar turno</button>
+                            <button wire:click="llamar({{ $detalle->id }})" class="px-4 py-2 rounded-xl bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 shadow-sm transition">Llamar paciente</button>
                         @endcan
                     @endif
                     @if ($detalle->estado === 'en_atencion')
                         @can('turnos.gestionar')
-                            <button wire:click="completar({{ $detalle->id }})" wire:click="cerrarDetalle"
-                                class="sw-btn sw-btn-green">
-                                Marcar completado
-                            </button>
+                            <button wire:click="completar({{ $detalle->id }})" class="px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">Marcar completado</button>
                         @endcan
                     @endif
                     @can('expediente.crear')
-                        <a href="{{ route('turno.atender', $detalle->id) }}" wire:navigate
-                            class="sw-btn sw-btn-purple">
-                            Atender (médico)
-                        </a>
+                        <a href="{{ route('turno.atender', $detalle->id) }}" wire:navigate class="px-4 py-2 rounded-xl bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 shadow-sm transition">Atender (médico)</a>
                     @endcan
                 </div>
-
             </div>
         </div>
     @endif
 
-    {{-- Poll automático cada 10s --}}
+    {{-- Actualización automática cada 10 s --}}
     <div wire:poll.10s></div>
-
 </div>

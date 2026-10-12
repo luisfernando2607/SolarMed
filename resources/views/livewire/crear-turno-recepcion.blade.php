@@ -1,33 +1,40 @@
 <div>
     <div class="max-w-5xl mx-auto py-8 px-4">
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">Registrar turno</h1>
-                <p class="text-sm text-gray-500">Para pacientes que llegan sin turno previo</p>
+                <p class="text-sm text-gray-500 mt-1">Para pacientes que llegan sin cita previa</p>
             </div>
-            @if ($turnoCreado)
-                <div class="bg-green-50 border border-green-200 rounded-xl px-5 py-3 flex items-center gap-3">
-                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <div>
-                        <p class="text-sm font-semibold text-green-800">Turno creado</p>
-                        <p class="text-lg font-bold text-green-700">{{ $turnoCreado }}</p>
-                    </div>
-                </div>
-            @endif
+            <a href="{{ route('sala-espera') }}" wire:navigate class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 shadow-sm transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+                Sala de espera
+            </a>
         </div>
+
+        @if ($turnoCreado)
+            <div class="mb-6 flex items-center gap-4 rounded-2xl border border-emerald-200 bg-emerald-50/70 px-5 py-4">
+                <span class="flex items-center justify-center w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                </span>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-emerald-800">Turno registrado</p>
+                    <p class="text-xs text-emerald-700">Entregue este código al paciente; aparecerá en la sala de espera.</p>
+                </div>
+                <span class="text-2xl font-bold text-emerald-700 tabular-nums">{{ $turnoCreado }}</span>
+            </div>
+        @endif
 
         <form wire:submit.prevent="registrar" class="space-y-6">
 
             {{-- Búsqueda de paciente --}}
-            <div class="bg-white rounded-xl shadow-sm border p-5">
-                <h2 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                    Buscar paciente por cédula o nombre
-                </h2>
+            <div class="bg-white rounded-2xl border border-gray-200/80 p-5 sm:p-6">
+                <div class="flex items-start gap-3 mb-5">
+                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold shrink-0">1</span>
+                    <div>
+                        <h2 class="text-sm font-semibold text-gray-900">Paciente</h2>
+                        <p class="text-xs text-gray-500">Busque por cédula o nombre; si es nuevo, complete sus datos.</p>
+                    </div>
+                </div>
                 <div class="flex gap-2">
                     <div class="relative flex-1">
                         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -36,18 +43,20 @@
                                placeholder="Escriba cédula o nombre...">
                     </div>
                     <button type="button" wire:click="nuevoPaciente"
-                            class="px-4 py-2 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition whitespace-nowrap">
-                        + Nuevo
+                            class="inline-flex items-center gap-1.5 px-4 py-2 border border-gray-200 bg-white rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition whitespace-nowrap">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                        Nuevo
                     </button>
                 </div>
 
                 @if ($pacientes->isNotEmpty())
-                    <div class="mt-2 divide-y divide-gray-100 border rounded-xl overflow-hidden">
+                    <div class="mt-3 divide-y divide-gray-100 border border-gray-200 rounded-xl overflow-hidden">
                         @foreach ($pacientes as $p)
                             <button type="button" wire:click="seleccionarPaciente({{ $p->id }})"
-                                    class="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition flex items-center justify-between">
-                                <span class="font-medium text-gray-700">{{ $p->nombre_completo }}</span>
-                                <span class="text-gray-400 text-xs">{{ $p->cedula }}</span>
+                                    class="w-full text-left px-4 py-2.5 text-sm hover:bg-blue-50/50 transition flex items-center gap-3 group">
+                                <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold shrink-0">{{ mb_strtoupper(mb_substr((string) $p->nombres, 0, 1) . mb_substr((string) $p->apellidos, 0, 1)) }}</span>
+                                <span class="flex-1 min-w-0 font-medium text-gray-900 group-hover:text-blue-700 truncate">{{ $p->nombre_completo }}</span>
+                                <span class="text-gray-500 text-xs font-mono">{{ $p->cedula }}</span>
                             </button>
                         @endforeach
                     </div>
@@ -55,13 +64,14 @@
             </div>
 
             {{-- Datos del paciente --}}
-            <div class="bg-white rounded-xl shadow-sm border p-5">
-                <h2 class="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                    </svg>
-                    Datos del paciente
-                </h2>
+            <div class="bg-white rounded-2xl border border-gray-200/80 p-5 sm:p-6">
+                <div class="flex items-start gap-3 mb-5">
+                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold shrink-0">2</span>
+                    <div>
+                        <h2 class="text-sm font-semibold text-gray-900">Datos del paciente</h2>
+                        <p class="text-xs text-gray-500">Los campos con * son obligatorios.</p>
+                    </div>
+                </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
@@ -171,13 +181,14 @@
             </div>
 
             {{-- Información médica rápida --}}
-            <div class="bg-white rounded-xl shadow-sm border p-5">
-                <h2 class="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 016.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"/>
-                    </svg>
-                    Antecedentes médicos (opcional)
-                </h2>
+            <div class="bg-white rounded-2xl border border-gray-200/80 p-5 sm:p-6">
+                <div class="flex items-start gap-3 mb-5">
+                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold shrink-0">3</span>
+                    <div>
+                        <h2 class="text-sm font-semibold text-gray-900">Antecedentes médicos</h2>
+                        <p class="text-xs text-gray-500">Opcional. Ayuda al médico a preparar la consulta.</p>
+                    </div>
+                </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -219,13 +230,14 @@
             </div>
 
             {{-- Turno --}}
-            <div class="bg-white rounded-xl shadow-sm border p-5">
-                <h2 class="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
-                    </svg>
-                    Asignar turno
-                </h2>
+            <div class="bg-white rounded-2xl border border-gray-200/80 p-5 sm:p-6">
+                <div class="flex items-start gap-3 mb-5">
+                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold shrink-0">4</span>
+                    <div>
+                        <h2 class="text-sm font-semibold text-gray-900">Asignar turno</h2>
+                        <p class="text-xs text-gray-500">Elija la especialidad y el motivo de la visita.</p>
+                    </div>
+                </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -266,14 +278,13 @@
             </div>
 
             {{-- Botones --}}
-            <div class="flex justify-end gap-3">
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
                 <a href="{{ route('sala-espera') }}" wire:navigate
-                   class="px-6 py-3 rounded-xl border-2 border-gray-200 text-gray-600 font-semibold text-sm hover:bg-gray-50 transition">
+                   class="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 font-medium text-sm text-center hover:bg-gray-50 transition">
                     Cancelar
                 </a>
                 <button type="submit" wire:loading.attr="disabled"
-                    class="px-8 py-3 rounded-xl font-semibold text-white text-sm flex items-center gap-2 shadow-lg shadow-green-700/20 transition"
-                    style="background: #1D9E75;">
+                    class="px-6 py-2.5 rounded-xl font-medium text-white text-sm flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 shadow-sm transition disabled:opacity-60">
                     <span wire:loading.remove>
                         <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
