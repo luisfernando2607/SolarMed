@@ -91,7 +91,7 @@
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Duración (min) *</label>
                         <select wire:model="duracion_min" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
-                            @foreach ([15, 20, 30, 40, 45, 60, 90] as $d)
+                            @foreach ($duraciones as $d)
                                 <option value="{{ $d }}">{{ $d }}</option>
                             @endforeach
                         </select>
@@ -99,7 +99,7 @@
                     <div class="col-span-2">
                         <label class="block text-xs font-medium text-gray-600 mb-1">Tipo *</label>
                         <select wire:model="tipo" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
-                            @foreach (\App\Livewire\Agenda::TIPOS as $t)
+                            @foreach ($tipos as $t)
                                 <option value="{{ $t }}">{{ $t }}</option>
                             @endforeach
                         </select>
@@ -177,13 +177,13 @@
         locale: window.FullCalendar.esLocale,
         initialView: window.innerWidth < 768 ? 'timeGridDay' : 'timeGridWeek',
         headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
-        slotMinTime: '07:00:00',
-        slotMaxTime: '20:00:00',
+        slotMinTime: @js($calendario['inicio']),
+        slotMaxTime: @js($calendario['fin']),
         slotDuration: '00:15:00',
         allDaySlot: false,
         nowIndicator: true,
         height: 'auto',
-        businessHours: { daysOfWeek: [1, 2, 3, 4, 5, 6], startTime: '08:00', endTime: '18:00' },
+        businessHours: { daysOfWeek: @js($calendario['dias']), startTime: @js($calendario['inicio']), endTime: @js($calendario['fin']) },
         selectable: puedeGestionar,
         editable: puedeGestionar,
         events: (info, ok, error) => $wire.eventos(info.startStr, info.endStr).then(ok).catch(error),

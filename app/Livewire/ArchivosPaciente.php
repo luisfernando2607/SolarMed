@@ -32,12 +32,12 @@ class ArchivosPaciente extends Component
     {
         $this->authorize('expediente.crear');
         $this->validate([
-            'archivo' => 'required|file|max:' . ArchivoService::MAX_KB . '|mimetypes:' . implode(',', array_keys(ArchivoService::MIME_PERMITIDOS)),
+            'archivo' => 'required|file|max:' . ArchivoService::maxKb() . '|mimetypes:' . implode(',', array_keys(ArchivoService::MIME_PERMITIDOS)),
             'categoria' => ['required', Rule::in(array_keys(ArchivoService::CATEGORIAS))],
             'descripcion' => 'nullable|string|max:255',
         ], [
             'archivo.required' => 'Seleccione un archivo.',
-            'archivo.max' => 'El archivo supera el límite de 5 MB.',
+            'archivo.max' => 'El archivo supera el límite de ' . round(ArchivoService::maxKb() / 1024, 1) . ' MB.',
             'archivo.mimetypes' => 'Formato no permitido. Solo PDF, JPG y PNG.',
         ]);
 

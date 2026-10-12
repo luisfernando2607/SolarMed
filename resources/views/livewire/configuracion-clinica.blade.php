@@ -1,0 +1,148 @@
+<div x-data x-on:notify.window="Swal.fire({
+    icon: $event.detail.type, title: $event.detail.type === 'success' ? 'Listo' : 'Error',
+    text: $event.detail.message, timer: 3000, showConfirmButton: false, toast: true, position: 'top-end'
+})">
+<div class="max-w-5xl mx-auto py-8 px-4">
+    <h1 class="text-2xl font-bold text-gray-900">Configuración</h1>
+    <p class="text-sm text-gray-500 mb-6">Agenda, alertas del control prenatal y horario de tareas automáticas. Los datos tributarios están en <a href="{{ route('sri.config') }}" wire:navigate class="text-blue-600 hover:underline">SRI</a> y en cada médico; las especialidades en <a href="{{ route('especialidades') }}" wire:navigate class="text-blue-600 hover:underline">Especialidades</a>.</p>
+
+    <form wire:submit="guardar" class="space-y-6">
+        <section class="bg-white rounded-xl shadow-sm border p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Agenda</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:row-span-3">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Tipos de cita <span class="font-normal text-gray-400">(uno por línea)</span></label>
+                    <textarea wire:model="tiposTexto" rows="8" class="w-full rounded-lg border-gray-300 shadow-sm text-sm"></textarea>
+                    @error('tiposTexto') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Duraciones disponibles (minutos)</label>
+                    <input wire:model="duracionesTexto" type="text" placeholder="15, 20, 30, 45, 60" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    @error('duracionesTexto') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Duración por defecto (minutos)</label>
+                    <input wire:model="duracion_defecto" type="number" step="1" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    
+                    @error('duracion_defecto') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Atención desde</label>
+                        <input wire:model="hora_inicio" type="time" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        @error('hora_inicio') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Hasta</label>
+                        <input wire:model="hora_fin" type="time" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        @error('hora_fin') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Días de atención</label>
+                    <div class="flex flex-wrap gap-3">
+                        @foreach (\App\Livewire\ConfiguracionClinica::DIAS as $n => $dia)
+                            <label class="flex items-center gap-1.5 text-sm text-gray-700">
+                                <input type="checkbox" wire:model="dias" value="{{ $n }}" class="rounded border-gray-300"> {{ $dia }}
+                            </label>
+                        @endforeach
+                    </div>
+                    @error('dias') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm border p-6">
+            <div class="flex items-start justify-between gap-4 mb-1">
+                <h2 class="text-lg font-semibold text-gray-900">Alertas del control prenatal</h2>
+                <button type="button" wire:click="restaurarPrenatal" class="text-xs text-blue-600 hover:underline shrink-0">Restaurar valores sugeridos</button>
+            </div>
+            <p class="text-xs text-gray-500 mb-4">Son apoyo a la decisión clínica, no diagnósticos. Ajústelos según la guía que siga la consulta.</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Hipertensión: sistólica ≥</label>
+                    <input wire:model="pa_sistolica" type="number" step="1" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    <p class="text-xs text-gray-400 mt-0.5">mmHg</p>
+                    @error('pa_sistolica') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Hipertensión: diastólica ≥</label>
+                    <input wire:model="pa_diastolica" type="number" step="1" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    <p class="text-xs text-gray-400 mt-0.5">mmHg</p>
+                    @error('pa_diastolica') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Severa: sistólica ≥</label>
+                    <input wire:model="pa_severa_sistolica" type="number" step="1" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    <p class="text-xs text-gray-400 mt-0.5">mmHg</p>
+                    @error('pa_severa_sistolica') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Severa: diastólica ≥</label>
+                    <input wire:model="pa_severa_diastolica" type="number" step="1" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    <p class="text-xs text-gray-400 mt-0.5">mmHg</p>
+                    @error('pa_severa_diastolica') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">FCF mínima</label>
+                    <input wire:model="fcf_min" type="number" step="1" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    <p class="text-xs text-gray-400 mt-0.5">lpm</p>
+                    @error('fcf_min') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">FCF máxima</label>
+                    <input wire:model="fcf_max" type="number" step="1" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    <p class="text-xs text-gray-400 mt-0.5">lpm</p>
+                    @error('fcf_max') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Tolerancia altura uterina</label>
+                    <input wire:model="au_tolerancia_cm" type="number" step="0.5" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    <p class="text-xs text-gray-400 mt-0.5">± cm vs. semanas (20–36)</p>
+                    @error('au_tolerancia_cm') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Alertar sin movimientos desde</label>
+                    <input wire:model="movimientos_desde_semana" type="number" step="1" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    <p class="text-xs text-gray-400 mt-0.5">semana</p>
+                    @error('movimientos_desde_semana') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Alertar sin control tras</label>
+                    <input wire:model="dias_sin_control" type="number" step="1" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    <p class="text-xs text-gray-400 mt-0.5">días</p>
+                    @error('dias_sin_control') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Avisar FPP con</label>
+                    <input wire:model="aviso_fpp_dias" type="number" step="1" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    <p class="text-xs text-gray-400 mt-0.5">días de anticipación</p>
+                    @error('aviso_fpp_dias') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm border p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Tareas automáticas</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Hora de envío de recordatorios de citas</label>
+                    <input wire:model="hora_recordatorios" type="time" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    <p class="text-xs text-gray-400 mt-0.5">Se envían a las pacientes con cita al día siguiente.</p>
+                    @error('hora_recordatorios') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Hora del respaldo diario</label>
+                    <input wire:model="hora_respaldo" type="time" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    <p class="text-xs text-gray-400 mt-0.5">Elija una hora sin atención (la base se copia completa).</p>
+                    @error('hora_respaldo') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+        </section>
+
+        <div class="flex justify-end">
+            <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">Guardar configuración</button>
+        </div>
+    </form>
+</div>
+</div>

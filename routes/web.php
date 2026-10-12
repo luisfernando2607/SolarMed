@@ -191,6 +191,15 @@ Route::get('tarifario', GestionTarifario::class)
     ->middleware(['auth', 'can:configuracion.editar'])
     ->name('tarifario');
 
+// Especialidades y configuración general (solo admin)
+Route::get('especialidades', \App\Livewire\GestionEspecialidades::class)
+    ->middleware(['auth', 'can:configuracion.editar'])
+    ->name('especialidades');
+
+Route::get('configuracion', \App\Livewire\ConfiguracionClinica::class)
+    ->middleware(['auth', 'can:configuracion.editar'])
+    ->name('configuracion');
+
 // SRI (solo admin)
 Route::get('sri/configuracion', \App\Livewire\SriConfigPage::class)
     ->middleware(['auth', 'can:configuracion.editar'])

@@ -12,7 +12,7 @@ Artisan::command('inspire', function () {
 Schedule::command('sri:reintentar')->everyFifteenMinutes()->withoutOverlapping();
 
 // Respaldo diario de la base de datos y los archivos privados
-Schedule::command('respaldo:crear')->dailyAt('02:30')->withoutOverlapping();
+Schedule::command('respaldo:crear')->dailyAt(app(\App\Services\AjustesService::class)->get('tareas.hora_respaldo'))->withoutOverlapping();
 
 // Recordatorio por correo de las citas del día siguiente
-Schedule::command('citas:recordatorios')->dailyAt('17:00')->withoutOverlapping();
+Schedule::command('citas:recordatorios')->dailyAt(app(\App\Services\AjustesService::class)->get('tareas.hora_recordatorios'))->withoutOverlapping();

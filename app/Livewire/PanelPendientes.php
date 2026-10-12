@@ -86,11 +86,11 @@ class PanelPendientes extends Component
                 }
             }
             $diasSinControl = (int) ($ultimo?->fecha ?? $e->fum)->diffInDays(today());
-            if ($diasSinControl > 28) {
+            if ($diasSinControl > (int) app(\App\Services\AjustesService::class)->get('prenatal.dias_sin_control')) {
                 $motivos[] = ['nivel' => 'media', 'texto' => "{$diasSinControl} días sin control"];
             }
             $diasFpp = (int) today()->diffInDays($e->fpp, false);
-            if ($diasFpp <= 14) {
+            if ($diasFpp <= (int) app(\App\Services\AjustesService::class)->get('prenatal.aviso_fpp_dias')) {
                 $motivos[] = ['nivel' => $diasFpp < 0 ? 'alta' : 'media', 'texto' => $diasFpp < 0 ? 'FPP superada hace ' . abs($diasFpp) . ' días' : "FPP en {$diasFpp} días"];
             }
 

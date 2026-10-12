@@ -138,30 +138,9 @@ class CrearTurnoRecepcion extends Component
 
     public function updatedEspecialidadId($value): void
     {
-        $this->motivosDisponibles = match ((int) $value) {
-            1 => [
-                'consulta_general' => 'Consulta general',
-                'control' => 'Control de seguimiento',
-                'dolor_cabeza' => 'Dolor de cabeza / fiebre',
-                'dolor_abdominal' => 'Dolor abdominal',
-                'infeccion' => 'Infección respiratoria',
-                'vacunacion' => 'Vacunación',
-                'certificado' => 'Certificado médico',
-                'otro' => 'Otro',
-            ],
-            2 => [
-                'consulta_ginecologica' => 'Consulta ginecológica',
-                'ecografia' => 'Ecografía obstétrica',
-                'control_prenatal' => 'Control prenatal',
-                'planificacion' => 'Planificación familiar',
-                'infertilidad' => 'Estudio de infertilidad',
-                'menopausia' => 'Control de menopausia',
-                'infeccion_gineco' => 'Infección ginecológica',
-                'papanicolaou' => 'Papanicolaou / tamizaje',
-                'otro' => 'Otro',
-            ],
-            default => [],
-        };
+        // Motivos configurados en la especialidad (Especialidades); la clave y el texto son el mismo
+        $motivos = Especialidad::where('activo', true)->find((int) $value)?->motivos ?? [];
+        $this->motivosDisponibles = array_combine($motivos, $motivos) ?: [];
         $this->motivo = '';
     }
 
@@ -177,7 +156,7 @@ class CrearTurnoRecepcion extends Component
             'cedula' => 'required|string|max:13',
             'telefono' => 'required|string|max:15',
             'especialidad_id' => 'required|exists:especialidades,id',
-            'motivo' => 'required|string|max:100',
+            'motivo' => ['required', 'string', 'max:100', \Illuminate\Validation\Rule::in(array_keys($this->motivosDisponibles ?? []))],
         ]);
 
         try {

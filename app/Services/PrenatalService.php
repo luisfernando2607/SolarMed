@@ -32,31 +32,37 @@ class PrenatalService
     {
         $alertas = [];
         $semanas = $control->semanas_gestacion;
+        $a = app(AjustesService::class);
+        [$paS, $paD] = [(int) $a->get('prenatal.pa_sistolica'), (int) $a->get('prenatal.pa_diastolica')];
+        [$sevS, $sevD] = [(int) $a->get('prenatal.pa_severa_sistolica'), (int) $a->get('prenatal.pa_severa_diastolica')];
+        [$fcfMin, $fcfMax] = [(int) $a->get('prenatal.fcf_min'), (int) $a->get('prenatal.fcf_max')];
+        $tolAu = (float) $a->get('prenatal.au_tolerancia_cm');
+        $semanaMov = (int) $a->get('prenatal.movimientos_desde_semana');
         [$sistolica, $diastolica] = $this->presion($control->presion_arterial);
 
         if ($sistolica !== null) {
-            if ($sistolica >= 160 || $diastolica >= 110) {
+            if ($sistolica >= $sevS || $diastolica >= $sevD) {
                 $alertas[] = ['nivel' => 'alta', 'mensaje' => "PA {$control->presion_arterial}: hipertensión severa"];
-            } elseif ($sistolica >= 140 || $diastolica >= 90) {
+            } elseif ($sistolica >= $paS || $diastolica >= $paD) {
                 $alertas[] = ['nivel' => 'alta', 'mensaje' => "PA {$control->presion_arterial}: hipertensión, descartar preeclampsia"];
             }
         }
 
-        if ($control->fcf !== null && ($control->fcf < 110 || $control->fcf > 160)) {
-            $alertas[] = ['nivel' => 'alta', 'mensaje' => "FCF {$control->fcf} lpm fuera de 110–160"];
+        if ($control->fcf !== null && ($control->fcf < $fcfMin || $control->fcf > $fcfMax)) {
+            $alertas[] = ['nivel' => 'alta', 'mensaje' => "FCF {$control->fcf} lpm fuera de {$fcfMin}–{$fcfMax}"];
         }
 
-        // Entre las 20 y 36 semanas la altura uterina (cm) ≈ semanas de gestación ± 3
+        // Entre las 20 y 36 semanas la altura uterina (cm) ≈ semanas de gestación ± tolerancia
         if ($control->altura_uterina !== null && $semanas !== null && $semanas >= 20 && $semanas <= 36
-            && abs((float) $control->altura_uterina - $semanas) > 3) {
+            && abs((float) $control->altura_uterina - $semanas) > $tolAu) {
             $alertas[] = ['nivel' => 'media', 'mensaje' => "Altura uterina {$control->altura_uterina} cm no acorde a {$semanas} semanas"];
         }
 
-        if ($control->movimientos_fetales === false && $semanas !== null && $semanas >= 28) {
-            $alertas[] = ['nivel' => 'alta', 'mensaje' => 'Sin movimientos fetales después de las 28 semanas'];
+        if ($control->movimientos_fetales === false && $semanas !== null && $semanas >= $semanaMov) {
+            $alertas[] = ['nivel' => 'alta', 'mensaje' => "Sin movimientos fetales después de las {$semanaMov} semanas"];
         }
 
-        if ($control->edemas && $control->edemas !== 'Ausentes' && $sistolica !== null && ($sistolica >= 140 || $diastolica >= 90)) {
+        if ($control->edemas && $control->edemas !== 'Ausentes' && $sistolica !== null && ($sistolica >= $paS || $diastolica >= $paD)) {
             $alertas[] = ['nivel' => 'alta', 'mensaje' => 'Edemas con hipertensión'];
         }
 

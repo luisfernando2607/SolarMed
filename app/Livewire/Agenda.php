@@ -6,6 +6,7 @@ use App\Exceptions\TurnoException;
 use App\Models\Cita;
 use App\Models\Medico;
 use App\Models\Paciente;
+use App\Services\AjustesService;
 use App\Services\TurnoService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -16,8 +17,6 @@ use Livewire\Component;
 
 class Agenda extends Component
 {
-    public const TIPOS = ['Consulta general', 'Consulta ginecológica', 'Control prenatal', 'Ecografía', 'Control post-parto', 'Planificación familiar', 'Otro'];
-
     public $filtroMedico = '';
 
     // Modal
@@ -28,8 +27,8 @@ class Agenda extends Component
     // Formulario de cita
     public $fecha_hora;
     public $medico_id;
-    public $tipo = 'Consulta general';
-    public $duracion_min = 20;
+    public $tipo;
+    public $duracion_min;
     public $notas;
 
     // Paciente
@@ -84,6 +83,8 @@ class Agenda extends Component
     {
         $this->authorize('turnos.gestionar');
         $this->resetFormulario();
+        $this->tipo = $this->tipos()[0] ?? null;
+        $this->duracion_min = (int) app(AjustesService::class)->get('agenda.duracion_defecto');
         $this->fecha_hora = Carbon::parse($fechaHora)->setTimezone(config('app.timezone'))->format('Y-m-d\TH:i');
         $this->medico_id = $this->filtroMedico !== '' ? (int) $this->filtroMedico : null;
         $this->modal = 'crear';
@@ -121,7 +122,7 @@ class Agenda extends Component
         $reglas = [
             'fecha_hora' => 'required|date',
             'medico_id' => 'required|integer|exists:medicos,id',
-            'tipo' => ['required', Rule::in(self::TIPOS)],
+            'tipo' => ['required', Rule::in($this->tipos())],
             'duracion_min' => 'required|integer|min:10|max:240',
             'notas' => 'nullable|string|max:500',
         ];
@@ -240,6 +241,12 @@ class Agenda extends Component
         $this->dispatch('notify', message: "Llegada registrada. Turno {$turno->prefijo}{$turno->numero_turno} en sala de espera.", type: 'success');
     }
 
+    /** @return string[] */
+    public function tipos(): array
+    {
+        return app(AjustesService::class)->get('agenda.tipos');
+    }
+
     private function verificarDisponibilidad(int $medicoId, Carbon $inicio, int $duracion, ?int $excluir = null): void
     {
         $fin = $inicio->copy()->addMinutes($duracion);
@@ -278,7 +285,16 @@ class Agenda extends Component
                 ->limit(8)->get();
         }
 
+        $ajustes = app(AjustesService::class);
+
         return view('livewire.agenda', [
+            'tipos' => $this->tipos(),
+            'duraciones' => $ajustes->get('agenda.duraciones'),
+            'calendario' => [
+                'inicio' => $ajustes->get('agenda.hora_inicio') . ':00',
+                'fin' => $ajustes->get('agenda.hora_fin') . ':00',
+                'dias' => $ajustes->get('agenda.dias_laborables'),
+            ],
             'medicos' => Medico::where('activo', true)->with('especialidad')->orderBy('apellidos')->get(),
             'pacientes' => $pacientes,
             'pacienteSeleccionado' => $this->paciente_id ? Paciente::find($this->paciente_id) : null,
