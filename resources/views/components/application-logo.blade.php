@@ -1,1 +1,1 @@
-<img src="{{ asset('images/SolarMed.jpg') }}" alt="SolarMed" {{ $attributes->merge(['class' => 'object-contain']) }}>
+<img src="{{ $marca->logoUrl() }}" alt="{{ $marca->nombre() }}" {{ $attributes->merge(['class' => 'object-contain']) }}>

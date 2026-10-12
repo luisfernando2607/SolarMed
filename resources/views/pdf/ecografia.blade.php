@@ -20,9 +20,9 @@
 </head>
 <body>
     <div class="header">
-        <img src="{{ public_path('images/SolarMed.jpg') }}" alt="SolarMed" style="height: 50px; margin-bottom: 6px;">
+        <img src="{{ $marca->logoRuta() }}" alt="{{ $marca->nombre() }}" style="height: 50px; margin-bottom: 6px;">
         <h1>INFORME DE ECOGRAFÍA</h1>
-        <p>SolarMed Software</p>
+        <p>{{ $marca->nombre() }}</p>
     </div>
 
     <div class="section">
@@ -68,7 +68,7 @@
 
     <div class="footer">
         <p>Documento generado electrónicamente el {{ now()->format('d/m/Y H:i') }}</p>
-        <p>SolarMed Software &mdash; {{ config('app.url') }}</p>
+        <p>{{ $marca->nombre() }}@if ($marca->contacto()) &mdash; {{ $marca->contacto() }}@endif</p>
     </div>
 </body>
 </html>

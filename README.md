@@ -119,7 +119,7 @@ Casi todo se ajusta sin tocar código:
 
 | Dónde | Qué |
 |---|---|
-| **Configuración** (admin) | Tipos de cita, duraciones, horario y días de atención de la agenda; umbrales de las alertas prenatales; hora de los recordatorios y del respaldo |
+| **Configuración** (admin) | **Clínica:** nombre, subtítulo, logo (con versión en blanco y negro para tickets), dirección, teléfono, correo y color — se usan en el login, el menú, el formulario de turnos, los PDF y los correos. Tipos de cita, duraciones, horario y días de atención de la agenda; umbrales de las alertas prenatales; hora de los recordatorios y del respaldo |
 | **Especialidades** (admin) | Nombre, prefijo del número de turno, color en la agenda, motivos de consulta del registro de turnos, activar/desactivar |
 | **SRI** y **Usuarios** (admin) | Datos tributarios de la clínica y de cada médico, certificados `.p12`, ambiente de pruebas/producción |
 | **Tarifario** (admin) | Servicios y precios |

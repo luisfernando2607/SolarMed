@@ -12,6 +12,15 @@ use Illuminate\Support\Facades\DB;
 class AjustesService
 {
     public const DEFECTOS = [
+        // Marca de la clínica (login, menú, formulario público, PDF y correos)
+        'marca.nombre' => 'SolarMed',
+        'marca.subtitulo' => 'Sistema médico',
+        'marca.direccion' => '',
+        'marca.telefono' => '044619253',
+        'marca.email' => '',
+        'marca.color' => '#0F6E56',
+        'marca.logo' => null,      // ruta relativa a public/ (null = logo incluido)
+        'marca.logo_bn' => null,   // versión en blanco y negro para tickets
         // Agenda
         'agenda.tipos' => ['Consulta general', 'Consulta ginecológica', 'Control prenatal', 'Ecografía', 'Control post-parto', 'Planificación familiar', 'Otro'],
         'agenda.duraciones' => [15, 20, 30, 40, 45, 60, 90],

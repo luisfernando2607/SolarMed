@@ -28,7 +28,7 @@
     <div class="header">
         <table>
             <tr>
-                <td style="width: 70px;"><img src="{{ public_path('images/SolarMed.jpg') }}" alt="" style="height: 48px;"></td>
+                <td style="width: 70px;"><img src="{{ $marca->logoRuta() }}" alt="" style="height: 48px;"></td>
                 <td>
                     <div class="medico">{{ $receta->medico?->nombre_completo ?? '--' }}</div>
                     <div class="muted">{{ $receta->medico?->especialidad?->nombre }}</div>
@@ -40,7 +40,8 @@
                     @endif
                 </td>
                 <td style="text-align: right;" class="muted">
-                    {{ config('app.name') }}<br>
+                    {{ $marca->nombre() }}<br>
+                    @if ($marca->telefono())Tel: {{ $marca->telefono() }}<br>@endif
                     Fecha: {{ $receta->fecha->format('d/m/Y') }}<br>
                     Receta N.º {{ str_pad($receta->id, 6, '0', STR_PAD_LEFT) }}
                 </td>
@@ -91,6 +92,6 @@
         <span class="muted">Firma y sello</span>
     </div>
 
-    <div class="footer">Documento generado el {{ now()->format('d/m/Y H:i') }} · {{ config('app.name') }}</div>
+    <div class="footer">Documento generado el {{ now()->format('d/m/Y H:i') }} · {{ $marca->nombre() }}@if ($marca->direccion()) · {{ $marca->direccion() }}@endif</div>
 </body>
 </html>

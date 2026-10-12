@@ -22,7 +22,7 @@ class DosFactoresService
     /** QR en SVG para escanear con la app autenticadora */
     public function qrSvg(User $user, string $secreto): string
     {
-        $uri = $this->google2fa->getQRCodeUrl(config('app.name'), $user->email, $secreto);
+        $uri = $this->google2fa->getQRCodeUrl(app(MarcaService::class)->nombre(), $user->email, $secreto);
         return (string) QrCode::format('svg')->size(200)->margin(1)->generate($uri);
     }
 

@@ -25,5 +25,5 @@ Si no puede asistir, comuníquese con la consulta para reprogramar.
 @endif
 
 Gracias,<br>
-{{ config('app.name') }}
+{{ $marca->nombre() }}
 </x-mail::message>
