@@ -26,6 +26,7 @@ class Factura extends Model {
 
     public function paciente(): BelongsTo     { return $this->belongsTo(Paciente::class); }
     public function medico(): BelongsTo       { return $this->belongsTo(Medico::class); }
+    public function notaCredito(): \Illuminate\Database\Eloquent\Relations\HasOne { return $this->hasOne(NotaCredito::class); }
     public function especialidad(): BelongsTo { return $this->belongsTo(Especialidad::class); }
     public function turno(): BelongsTo        { return $this->belongsTo(Turno::class); }
     public function user(): BelongsTo         { return $this->belongsTo(User::class); }

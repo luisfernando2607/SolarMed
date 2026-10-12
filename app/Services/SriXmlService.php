@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\Models\Factura;
+use App\Models\NotaCredito;
 use DOMDocument;
 use DOMElement;
 use Illuminate\Support\Facades\Log;
@@ -19,28 +20,9 @@ class SriXmlService {
         $paciente = $factura->paciente;
         $config = app(SriConfigService::class);
 
-        $emisor = $config->emisor($medico);
-        $dondeConfigurar = $emisor['origen'] === 'medico' ? 'Usuarios > datos tributarios del médico' : 'SRI > Configuración';
-
+        $emisor = $this->emisorValidado($medico, $factura->ruc_emisor, 'La factura');
         $ruc = $emisor['ruc'];
-        if (!$ruc || !preg_match('/^\d{13}$/', $ruc)) {
-            throw new \RuntimeException("Configure un RUC válido (13 dígitos) en {$dondeConfigurar} antes de generar el XML.");
-        }
-
-        // La numeración de la factura pertenece al RUC con el que se emitió
-        if ($factura->ruc_emisor && $factura->ruc_emisor !== $ruc) {
-            throw new \RuntimeException("La factura se numeró con el RUC {$factura->ruc_emisor}, pero el emisor actual tiene RUC {$ruc}. Corrija el RUC del médico o emita una nueva factura.");
-        }
-
-        $razonSocial = $emisor['razon_social'];
-        if (!$razonSocial) {
-            throw new \RuntimeException("Configure la razón social en {$dondeConfigurar} antes de generar el XML.");
-        }
-
         $direccion = $emisor['direccion'];
-        if (!$direccion) {
-            throw new \RuntimeException("Configure la dirección matriz en {$dondeConfigurar} antes de generar el XML.");
-        }
 
         // Ambiente, establecimiento, punto de emisión y secuencial salen de la propia factura,
         // para que el XML no cambie si luego se modifica la configuración.
@@ -51,7 +33,7 @@ class SriXmlService {
         // La clave de acceso se genera una sola vez por factura: el SRI identifica el comprobante con ella
         $claveAcceso = $this->claveAccesoValida($factura->clave_acceso)
             ? $factura->clave_acceso
-            : $this->generarClaveAcceso($factura, $ruc, $ambiente, $estab, $ptoEmi, $secuencial);
+            : $this->claveAcceso($fechaEmision, '01', $ruc, $ambiente, $estab, $ptoEmi, $secuencial);
 
         $comprador = $this->comprador($paciente);
         $lineas = $this->lineasConDescuento($factura);
@@ -66,25 +48,7 @@ class SriXmlService {
         $facturaEl->setAttribute('version', '1.1.0');
         $doc->appendChild($facturaEl);
 
-        // infoTributaria
-        $infoTributaria = $doc->createElement('infoTributaria');
-        $facturaEl->appendChild($infoTributaria);
-        $this->addChild($doc, $infoTributaria, 'ambiente', $ambiente);
-        $this->addChild($doc, $infoTributaria, 'tipoEmision', '1');
-        $this->addChild($doc, $infoTributaria, 'razonSocial', mb_substr($razonSocial, 0, 300));
-        if ($nombreComercial = $emisor['nombre_comercial']) {
-            $this->addChild($doc, $infoTributaria, 'nombreComercial', mb_substr($nombreComercial, 0, 300));
-        }
-        $this->addChild($doc, $infoTributaria, 'ruc', $ruc);
-        $this->addChild($doc, $infoTributaria, 'claveAcceso', $claveAcceso);
-        $this->addChild($doc, $infoTributaria, 'codDoc', '01');
-        $this->addChild($doc, $infoTributaria, 'estab', $estab);
-        $this->addChild($doc, $infoTributaria, 'ptoEmi', $ptoEmi);
-        $this->addChild($doc, $infoTributaria, 'secuencial', $secuencial);
-        $this->addChild($doc, $infoTributaria, 'dirMatriz', mb_substr($direccion, 0, 300));
-        if ($emisor['regimen_rimpe']) {
-            $this->addChild($doc, $infoTributaria, 'contribuyenteRimpe', $emisor['regimen_rimpe']);
-        }
+        $this->agregarInfoTributaria($doc, $facturaEl, $emisor, $ambiente, $claveAcceso, '01', $estab, $ptoEmi, $secuencial);
 
         // infoFactura
         $infoFactura = $doc->createElement('infoFactura');
@@ -174,6 +138,99 @@ class SriXmlService {
         ];
     }
 
+    /**
+     * Genera el XML de la nota de crédito (codDoc 04, versión 1.1.0) que anula totalmente la factura.
+     *
+     * @return array{xml: string, clave_acceso: string}
+     */
+    public function generarNotaCredito(NotaCredito $nota): array
+    {
+        $factura = $nota->factura;
+        if (!$factura?->numero_factura || $factura->estado_sri !== 'autorizado') {
+            throw new \RuntimeException('Solo se puede emitir nota de crédito sobre una factura autorizada por el SRI.');
+        }
+
+        $emisor = $this->emisorValidado($nota->medico, $nota->ruc_emisor, 'La nota de crédito');
+        $ambiente = (string) ($nota->ambiente_sri ?: '1');
+        [$estab, $ptoEmi, $secuencial] = $this->partesNumero($nota->numero);
+        $fechaEmision = $nota->fecha ?? $nota->created_at;
+
+        $claveAcceso = $this->claveAccesoValida($nota->clave_acceso)
+            ? $nota->clave_acceso
+            : $this->claveAcceso($fechaEmision, '04', $emisor['ruc'], $ambiente, $estab, $ptoEmi, $secuencial);
+
+        $comprador = $this->comprador($factura->paciente);
+        $lineas = $this->lineasConDescuento($factura);
+        $totalSinImpuestos = array_sum(array_column($lineas, 'total'));
+
+        $doc = new DOMDocument('1.0', 'UTF-8');
+        $doc->formatOutput = true;
+
+        $raiz = $doc->createElement('notaCredito');
+        $raiz->setAttribute('id', 'comprobante');
+        $raiz->setAttribute('version', '1.1.0');
+        $doc->appendChild($raiz);
+
+        $this->agregarInfoTributaria($doc, $raiz, $emisor, $ambiente, $claveAcceso, '04', $estab, $ptoEmi, $secuencial);
+
+        $info = $doc->createElement('infoNotaCredito');
+        $raiz->appendChild($info);
+        $this->addChild($doc, $info, 'fechaEmision', $fechaEmision->format('d/m/Y'));
+        $this->addChild($doc, $info, 'dirEstablecimiento', mb_substr($emisor['direccion'], 0, 300));
+        $this->addChild($doc, $info, 'tipoIdentificacionComprador', $comprador['tipo']);
+        $this->addChild($doc, $info, 'razonSocialComprador', $comprador['nombre']);
+        $this->addChild($doc, $info, 'identificacionComprador', $comprador['identificacion']);
+        if ($emisor['contribuyente_especial']) {
+            $this->addChild($doc, $info, 'contribuyenteEspecial', $emisor['contribuyente_especial']);
+        }
+        $this->addChild($doc, $info, 'obligadoContabilidad', $emisor['obligado_contabilidad']);
+        $this->addChild($doc, $info, 'codDocModificado', '01');
+        $this->addChild($doc, $info, 'numDocModificado', $factura->numero_factura);
+        $this->addChild($doc, $info, 'fechaEmisionDocSustento', ($factura->fecha ?? $factura->created_at)->format('d/m/Y'));
+        $this->addChild($doc, $info, 'totalSinImpuestos', $this->monto($totalSinImpuestos));
+        $this->addChild($doc, $info, 'valorModificacion', $this->monto($totalSinImpuestos));
+        $this->addChild($doc, $info, 'moneda', 'DOLAR');
+
+        $totalConImpuestos = $doc->createElement('totalConImpuestos');
+        $info->appendChild($totalConImpuestos);
+        $totalImpuesto = $doc->createElement('totalImpuesto');
+        $totalConImpuestos->appendChild($totalImpuesto);
+        $this->addChild($doc, $totalImpuesto, 'codigo', '2');
+        $this->addChild($doc, $totalImpuesto, 'codigoPorcentaje', '0');
+        $this->addChild($doc, $totalImpuesto, 'baseImponible', $this->monto($totalSinImpuestos));
+        $this->addChild($doc, $totalImpuesto, 'valor', '0.00');
+
+        $this->addChild($doc, $info, 'motivo', mb_substr($nota->motivo, 0, 300));
+
+        $detalles = $doc->createElement('detalles');
+        $raiz->appendChild($detalles);
+        foreach ($lineas as $linea) {
+            $item = $linea['item'];
+            $detalle = $doc->createElement('detalle');
+            $detalles->appendChild($detalle);
+            $this->addChild($doc, $detalle, 'codigoInterno', (string) ($item->servicio_id ?? $item->id));
+            $this->addChild($doc, $detalle, 'descripcion', mb_substr($item->descripcion ?? '', 0, 300));
+            $this->addChild($doc, $detalle, 'cantidad', number_format($item->cantidad, 2, '.', ''));
+            $this->addChild($doc, $detalle, 'precioUnitario', $this->monto($item->precio_unitario));
+            $this->addChild($doc, $detalle, 'descuento', $this->monto($linea['descuento']));
+            $this->addChild($doc, $detalle, 'precioTotalSinImpuesto', $this->monto($linea['total']));
+            $impuestos = $doc->createElement('impuestos');
+            $detalle->appendChild($impuestos);
+            $impuesto = $doc->createElement('impuesto');
+            $impuestos->appendChild($impuesto);
+            $this->addChild($doc, $impuesto, 'codigo', '2');
+            $this->addChild($doc, $impuesto, 'codigoPorcentaje', '0');
+            $this->addChild($doc, $impuesto, 'tarifa', '0');
+            $this->addChild($doc, $impuesto, 'baseImponible', $this->monto($linea['total']));
+            $this->addChild($doc, $impuesto, 'valor', '0.00');
+        }
+
+        return [
+            'xml' => $doc->saveXML(),
+            'clave_acceso' => $claveAcceso,
+        ];
+    }
+
     /** "001-002-000000123" → ['001', '002', '000000123'] */
     private function partesNumero(?string $numeroFactura): array
     {
@@ -236,15 +293,59 @@ class SriXmlService {
         return number_format((float) $valor, 2, '.', '');
     }
 
-    public function generarClaveAcceso(Factura $factura, string $ruc, string $ambiente, string $estab, string $ptoEmi, string $secuencial): string
+    /** Clave de acceso de 49 dígitos (ficha técnica SRI): fecha, tipo, RUC, ambiente, serie, secuencial, código, emisión y verificador. */
+    public function claveAcceso(\DateTimeInterface $fecha, string $codDoc, string $ruc, string $ambiente, string $estab, string $ptoEmi, string $secuencial): string
     {
-        $fecha = ($factura->fecha ?? $factura->created_at)->format('dmY');
-        $codDoc = '01';
         $codNum = str_pad((string) random_int(0, 99999999), 8, '0', STR_PAD_LEFT);
-        $tipoEmision = '1';
-        $base = $fecha . $codDoc . $ruc . $ambiente . $estab . $ptoEmi . $secuencial . $codNum . $tipoEmision;
-        $mod = $this->mod11($base);
-        return $base . $mod;
+        $base = $fecha->format('dmY') . $codDoc . $ruc . $ambiente . $estab . $ptoEmi . $secuencial . $codNum . '1';
+        return $base . $this->mod11($base);
+    }
+
+    /**
+     * Datos del emisor listos para el XML. Lanza un error claro si falta algo, o si el documento
+     * se numeró con un RUC distinto al que el médico tiene ahora.
+     */
+    private function emisorValidado(?\App\Models\Medico $medico, ?string $rucDocumento, string $documento): array
+    {
+        $emisor = app(SriConfigService::class)->emisor($medico);
+        $donde = $emisor['origen'] === 'medico' ? 'Usuarios > datos tributarios del médico' : 'SRI > Configuración';
+
+        if (!$emisor['ruc'] || !preg_match('/^\d{13}$/', $emisor['ruc'])) {
+            throw new \RuntimeException("Configure un RUC válido (13 dígitos) en {$donde} antes de generar el XML.");
+        }
+        if ($rucDocumento && $rucDocumento !== $emisor['ruc']) {
+            throw new \RuntimeException("{$documento} se numeró con el RUC {$rucDocumento}, pero el emisor actual tiene RUC {$emisor['ruc']}. Corrija el RUC del médico o emita un nuevo documento.");
+        }
+        if (!$emisor['razon_social']) {
+            throw new \RuntimeException("Configure la razón social en {$donde} antes de generar el XML.");
+        }
+        if (!$emisor['direccion']) {
+            throw new \RuntimeException("Configure la dirección matriz en {$donde} antes de generar el XML.");
+        }
+
+        return $emisor;
+    }
+
+    private function agregarInfoTributaria(DOMDocument $doc, DOMElement $raiz, array $emisor, string $ambiente, string $claveAcceso, string $codDoc, string $estab, string $ptoEmi, string $secuencial): void
+    {
+        $info = $doc->createElement('infoTributaria');
+        $raiz->appendChild($info);
+        $this->addChild($doc, $info, 'ambiente', $ambiente);
+        $this->addChild($doc, $info, 'tipoEmision', '1');
+        $this->addChild($doc, $info, 'razonSocial', mb_substr($emisor['razon_social'], 0, 300));
+        if ($emisor['nombre_comercial']) {
+            $this->addChild($doc, $info, 'nombreComercial', mb_substr($emisor['nombre_comercial'], 0, 300));
+        }
+        $this->addChild($doc, $info, 'ruc', $emisor['ruc']);
+        $this->addChild($doc, $info, 'claveAcceso', $claveAcceso);
+        $this->addChild($doc, $info, 'codDoc', $codDoc);
+        $this->addChild($doc, $info, 'estab', $estab);
+        $this->addChild($doc, $info, 'ptoEmi', $ptoEmi);
+        $this->addChild($doc, $info, 'secuencial', $secuencial);
+        $this->addChild($doc, $info, 'dirMatriz', mb_substr($emisor['direccion'], 0, 300));
+        if ($emisor['regimen_rimpe']) {
+            $this->addChild($doc, $info, 'contribuyenteRimpe', $emisor['regimen_rimpe']);
+        }
     }
 
     public function claveAccesoValida(?string $clave): bool

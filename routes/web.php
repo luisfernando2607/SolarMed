@@ -128,6 +128,21 @@ Route::get('facturas/xml/{factura}', function (App\Models\Factura $factura) {
         ->download($factura->xml_autorizado_path, "factura_{$factura->numero_factura}.xml", ['Content-Type' => 'application/xml']);
 })->middleware(['auth', 'can:facturas.ver'])->name('facturas.xml');
 
+// Nota de crédito: PDF y XML autorizado
+Route::get('notas-credito/pdf/{notaCredito}', function (App\Models\NotaCredito $notaCredito) {
+    $notaCredito->load('factura.paciente', 'factura.items', 'medico');
+    $emisor = app(App\Services\SriConfigService::class)->emisor($notaCredito->medico);
+    return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.nota-credito', ['nota' => $notaCredito, 'emisor' => $emisor])
+        ->setPaper([0, 0, 226, 500], 'portrait')
+        ->stream("nota_credito_{$notaCredito->numero}.pdf");
+})->middleware(['auth', 'can:facturas.ver'])->name('notas-credito.pdf');
+
+Route::get('notas-credito/xml/{notaCredito}', function (App\Models\NotaCredito $notaCredito) {
+    abort_unless($notaCredito->estado_sri === 'autorizado' && $notaCredito->xml_autorizado_path, 404);
+    return Illuminate\Support\Facades\Storage::disk('private')
+        ->download($notaCredito->xml_autorizado_path, "nota_credito_{$notaCredito->numero}.xml", ['Content-Type' => 'application/xml']);
+})->middleware(['auth', 'can:facturas.ver'])->name('notas-credito.xml');
+
 // Tarifario (solo admin)
 Route::get('tarifario', GestionTarifario::class)
     ->middleware(['auth', 'can:configuracion.editar'])

@@ -157,6 +157,80 @@
                 </div>
             @endif
 
+            {{-- Nota de crédito (anulación de factura autorizada) --}}
+            @if ($factura->estado_sri === 'autorizado')
+                @php $nc = $factura->notaCredito; @endphp
+                <div class="p-6 border-b {{ $nc ? 'bg-orange-50' : '' }}">
+                    <h3 class="font-semibold text-gray-700 mb-2">Nota de crédito</h3>
+
+                    @if (!$nc)
+                        @if ($factura->estado === 'pagada')
+                            @can('facturas.anular')
+                                <p class="text-xs text-gray-500 mb-3">Una factura autorizada por el SRI solo se anula emitiendo una nota de crédito electrónica por el valor total.</p>
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <input wire:model="motivo_nota_credito" type="text" maxlength="300"
+                                        class="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                        placeholder="Motivo (ej.: error en el cobro, servicio no prestado)">
+                                    <button wire:click="emitirNotaCredito" wire:loading.attr="disabled" wire:target="emitirNotaCredito"
+                                        wire:confirm="Se emitirá una nota de crédito por ${{ number_format($factura->total, 2) }} y se enviará al SRI. ¿Continuar?"
+                                        class="px-5 py-2.5 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition disabled:opacity-50">
+                                        <span wire:loading.remove wire:target="emitirNotaCredito">Emitir nota de crédito</span>
+                                        <span wire:loading wire:target="emitirNotaCredito">Emitiendo...</span>
+                                    </button>
+                                </div>
+                                @error('motivo_nota_credito') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                            @endcan
+                        @endif
+                    @else
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                            <div><span class="text-gray-500">Número:</span> <span class="font-mono">{{ $nc->numero }}</span></div>
+                            <div><span class="text-gray-500">Estado SRI:</span> <span class="font-medium">{{ $nc->estado_sri }}</span></div>
+                            <div class="sm:col-span-2"><span class="text-gray-500">Motivo:</span> {{ $nc->motivo }}</div>
+                            @if ($nc->clave_acceso)
+                                <div class="sm:col-span-2"><span class="text-gray-500">Clave de acceso:</span>
+                                    <span class="font-mono text-xs break-all">{{ $nc->clave_acceso }}</span></div>
+                            @endif
+                            @if ($nc->fecha_autorizacion)
+                                <div><span class="text-gray-500">Autorizada:</span> {{ $nc->fecha_autorizacion->format('d/m/Y H:i') }}</div>
+                            @endif
+                        </div>
+
+                        @if (!empty($nc->mensajes_sri))
+                            <div class="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-800 space-y-1">
+                                @foreach ($nc->mensajes_sri as $m)
+                                    <p><span class="font-mono">[{{ $m['identificador'] ?? '' }}]</span> {{ $m['mensaje'] ?? '' }}
+                                        @if (!empty($m['informacionAdicional'])) — {{ $m['informacionAdicional'] }} @endif</p>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <a href="{{ route('notas-credito.pdf', $nc->id) }}" target="_blank"
+                               class="px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition">PDF nota de crédito</a>
+                            @if ($nc->estado_sri === 'autorizado' && $nc->xml_autorizado_path)
+                                <a href="{{ route('notas-credito.xml', $nc->id) }}"
+                                   class="px-4 py-2 bg-green-700 text-white text-sm font-medium rounded-lg hover:bg-green-800 transition">XML autorizado</a>
+                            @endif
+                            @can('facturas.anular')
+                                @if (in_array($nc->estado_sri, [...\App\Services\NotaCreditoService::ESTADOS_REGENERABLES, 'error_envio'], true))
+                                    <button wire:click="procesarNotaCredito" wire:loading.attr="disabled" wire:target="procesarNotaCredito"
+                                        class="px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition disabled:opacity-50">
+                                        <span wire:loading.remove wire:target="procesarNotaCredito">{{ $nc->estado_sri === 'pendiente' ? 'Enviar al SRI' : 'Reintentar envío al SRI' }}</span>
+                                        <span wire:loading wire:target="procesarNotaCredito">Enviando...</span>
+                                    </button>
+                                @elseif (in_array($nc->estado_sri, ['enviado', 'error_autorizacion'], true))
+                                    <button wire:click="autorizarNotaCredito" wire:loading.attr="disabled" wire:target="autorizarNotaCredito"
+                                        class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition disabled:opacity-50">
+                                        <span wire:loading.remove wire:target="autorizarNotaCredito">Consultar autorización</span>
+                                        <span wire:loading wire:target="autorizarNotaCredito">Consultando...</span>
+                                    </button>
+                                @endif
+                            @endcan
+                        </div>
+                    @endif
+                </div>
+            @endif
+
             {{-- Acciones --}}
                 <div class="p-6 border-t bg-gray-50 flex flex-wrap gap-3 justify-end">
                     <a href="{{ route('facturas.pdf', $factura->id) }}" target="_blank"

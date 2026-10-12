@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\Models\Factura;
+use App\Models\NotaCredito;
 use DOMDocument;
 use DOMElement;
 use Illuminate\Http\Client\ConnectionException;
@@ -35,13 +36,13 @@ class SriWebService {
      *
      * @return array{estado: string, mensajes: array}
      */
-    public function enviar(Factura $factura): array
+    public function enviar(Factura|NotaCredito $factura): array
     {
         $path = $factura->xml_firmado_path;
         $xmlFirmado = $path ? Storage::disk('private')->get($path) : null;
 
         if (!$xmlFirmado) {
-            throw new \RuntimeException('XML firmado no encontrado para la factura ' . $factura->numero_factura);
+            throw new \RuntimeException('XML firmado no encontrado para el comprobante ' . $this->numero($factura));
         }
 
         $body = '<ec:validarComprobante><xml>' . base64_encode($xmlFirmado) . '</xml></ec:validarComprobante>';
@@ -49,7 +50,7 @@ class SriWebService {
         try {
             $respuesta = $this->llamar($this->urls($factura->ambiente_sri ?? '1')['recepcion'], self::NS_RECEPCION, $body);
         } catch (\Throwable $e) {
-            Log::error('SRI Recepción error: ' . $e->getMessage(), ['factura' => $factura->id]);
+            Log::error('SRI Recepción error: ' . $e->getMessage(), ['comprobante' => $this->numero($factura)]);
             $factura->update(['estado_sri' => 'error_envio']);
             throw new \RuntimeException('No se pudo conectar con el SRI. Intente nuevamente en unos minutos.');
         }
@@ -74,12 +75,12 @@ class SriWebService {
      *
      * @return array{estado: string, numeroAutorizacion: string, fechaAutorizacion: string, mensajes: array}
      */
-    public function autorizar(Factura $factura): array
+    public function autorizar(Factura|NotaCredito $factura): array
     {
         $claveAcceso = $factura->clave_acceso;
 
         if (!$claveAcceso) {
-            throw new \RuntimeException('Clave de acceso no disponible para la factura ' . $factura->numero_factura);
+            throw new \RuntimeException('Clave de acceso no disponible para el comprobante ' . $this->numero($factura));
         }
 
         $body = '<ec:autorizacionComprobante><claveAccesoComprobante>' . $claveAcceso . '</claveAccesoComprobante></ec:autorizacionComprobante>';
@@ -87,7 +88,7 @@ class SriWebService {
         try {
             $respuesta = $this->llamar($this->urls($factura->ambiente_sri ?? '1')['autorizacion'], self::NS_AUTORIZACION, $body);
         } catch (\Throwable $e) {
-            Log::error('SRI Autorización error: ' . $e->getMessage(), ['factura' => $factura->id]);
+            Log::error('SRI Autorización error: ' . $e->getMessage(), ['comprobante' => $this->numero($factura)]);
             $factura->update(['estado_sri' => 'error_autorizacion']);
             throw new \RuntimeException('No se pudo conectar con el SRI. Intente nuevamente en unos minutos.');
         }
@@ -107,7 +108,9 @@ class SriWebService {
         ];
 
         if ($resultado['estado'] === 'AUTORIZADO') {
-            $path = "sri/xml_autorizado_{$factura->id}.xml";
+            $path = $factura instanceof NotaCredito
+                ? "sri/nota_credito_autorizada_{$factura->id}.xml"
+                : "sri/xml_autorizado_{$factura->id}.xml";
             Storage::disk('private')->put($path, $this->xmlAutorizado($autorizacion));
 
             $factura->update([
@@ -124,6 +127,11 @@ class SriWebService {
         }
 
         return $resultado;
+    }
+
+    private function numero(Factura|NotaCredito $comprobante): string
+    {
+        return $comprobante instanceof NotaCredito ? $comprobante->numero : $comprobante->numero_factura;
     }
 
     /** Envía un sobre SOAP 1.1 y devuelve el cuerpo de la respuesta como DOM. */

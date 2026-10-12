@@ -7,6 +7,7 @@ use App\Models\Factura;
 use App\Services\SriXmlService;
 use App\Services\SriSignService;
 use App\Services\SriWebService;
+use App\Services\NotaCreditoService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,10 +16,11 @@ class VerFactura extends Component
     public Factura $factura;
     public bool $enviando = false;
     public bool $autorizando = false;
+    public string $motivo_nota_credito = '';
 
     public function mount(Factura $factura): void
     {
-        $this->factura = $factura->loadMissing('paciente', 'medico.user', 'user', 'items.servicio', 'especialidad');
+        $this->factura = $factura->loadMissing('paciente', 'medico.user', 'user', 'items.servicio', 'especialidad', 'notaCredito');
     }
 
     /** Estados en los que el comprobante todavía no fue recibido por el SRI */
@@ -156,6 +158,61 @@ class VerFactura extends Component
         } finally {
             $this->autorizando = false;
         }
+    }
+
+    public function emitirNotaCredito(): void
+    {
+        $this->authorize('facturas.anular');
+        $this->validate(
+            ['motivo_nota_credito' => 'required|string|min:5|max:300'],
+            ['motivo_nota_credito.required' => 'Indique el motivo de la nota de crédito.']
+        );
+
+        app(NotaCreditoService::class)->crear($this->factura, $this->motivo_nota_credito, auth()->id());
+        $this->motivo_nota_credito = '';
+        $this->factura->refresh()->load('notaCredito');
+        $this->procesarNotaCredito();
+    }
+
+    public function procesarNotaCredito(): void
+    {
+        $this->authorize('facturas.anular');
+        $nota = $this->factura->notaCredito;
+        if (!$nota) return;
+
+        try {
+            $result = app(NotaCreditoService::class)->procesar($nota);
+            $msg = $result['estado'] === 'RECIBIDA'
+                ? 'Nota de crédito recibida por el SRI. Ahora consulte la autorización.'
+                : 'El SRI devolvió la nota de crédito: ' . $this->resumenMensajes($result['mensajes']);
+            $this->dispatch('notify', message: $msg, type: $result['estado'] === 'RECIBIDA' ? 'success' : 'warning');
+        } catch (\Exception $e) {
+            Log::error('Error procesando nota de crédito ' . $nota->id . ': ' . $e->getMessage());
+            $this->dispatch('notify', message: 'Nota de crédito: ' . $e->getMessage(), type: 'error');
+        }
+
+        $this->factura->refresh()->load('notaCredito');
+    }
+
+    public function autorizarNotaCredito(): void
+    {
+        $this->authorize('facturas.anular');
+        $nota = $this->factura->notaCredito;
+        if (!$nota) return;
+
+        try {
+            $result = app(NotaCreditoService::class)->autorizar($nota);
+            [$msg, $tipo] = match ($result['estado']) {
+                'AUTORIZADO' => ['Nota de crédito autorizada. La factura quedó anulada.', 'success'],
+                'EN PROCESO' => ['El SRI aún está procesando la nota de crédito. Consulte nuevamente en unos minutos.', 'info'],
+                default => ['Nota de crédito no autorizada: ' . $this->resumenMensajes($result['mensajes']), 'warning'],
+            };
+            $this->dispatch('notify', message: $msg, type: $tipo);
+        } catch (\Exception $e) {
+            $this->dispatch('notify', message: 'Nota de crédito: ' . $e->getMessage(), type: 'error');
+        }
+
+        $this->factura->refresh()->load('notaCredito');
     }
 
     private function resumenMensajes(array $mensajes): string
