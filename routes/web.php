@@ -94,6 +94,20 @@ Route::get('recetas/pdf/{receta}', function (App\Models\Receta $receta) {
         ->stream("receta_{$receta->id}.pdf");
 })->middleware(['auth', 'can:expediente.ver'])->name('recetas.pdf');
 
+// Archivos del paciente (laboratorios, imágenes, referencias)
+Route::get('pacientes/{paciente}/archivos', \App\Livewire\ArchivosPaciente::class)
+    ->middleware(['auth', 'can:expediente.ver'])
+    ->name('pacientes.archivos');
+
+Route::get('pacientes/archivos/{archivo}', function (App\Models\PacienteArchivo $archivo) {
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'archivo', $archivo->id, $archivo->paciente_id, $archivo->nombre_original);
+    return Illuminate\Support\Facades\Storage::disk('private')->response($archivo->ruta, $archivo->nombre_original, [
+        'Content-Type' => $archivo->mime_type,
+        'X-Content-Type-Options' => 'nosniff',
+        'Cache-Control' => 'private, no-store',
+    ], 'inline');
+})->middleware(['auth', 'can:expediente.ver'])->name('pacientes.archivo');
+
 // Control prenatal
 Route::get('prenatal/{paciente}', \App\Livewire\ControlPrenatalPaciente::class)
     ->middleware(['auth', 'can:expediente.ver'])
