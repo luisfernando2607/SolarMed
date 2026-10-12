@@ -5,17 +5,14 @@ use App\Models\Factura;
 use App\Models\NotaCredito;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 /**
  * Nota de crédito electrónica que anula totalmente una factura autorizada por el SRI.
  * Se emite con el mismo RUC (médico) de la factura y tiene su propia numeración por RUC.
+ * El envío y la autorización los realiza ComprobanteSriService.
  */
 class NotaCreditoService {
-
-    /** Estados en los que el XML se puede (re)generar porque el SRI aún no lo aceptó */
-    public const ESTADOS_REGENERABLES = ['pendiente', 'xml_generado', 'firmado', 'rechazado', 'no_autorizado'];
 
     public function crear(Factura $factura, string $motivo, int $userId): NotaCredito
     {
@@ -61,60 +58,5 @@ class NotaCreditoService {
         $n = $ultimo ? ((int) substr($ultimo, strrpos($ultimo, '-') + 1)) + 1 : 1;
 
         return "{$estab}-{$ptoEmi}-" . str_pad($n, 9, '0', STR_PAD_LEFT);
-    }
-
-    /**
-     * Genera, firma y envía la nota de crédito al SRI en un solo paso, retomando desde el estado en que quedó.
-     *
-     * @return array{estado: string, mensajes: array}
-     */
-    public function procesar(NotaCredito $nota): array
-    {
-        $nota->loadMissing('factura.paciente', 'factura.items', 'medico');
-
-        if (in_array($nota->estado_sri, self::ESTADOS_REGENERABLES, true) && $nota->estado_sri !== 'firmado') {
-            $resultado = app(SriXmlService::class)->generarNotaCredito($nota);
-            $path = "sri/nota_credito_{$nota->id}.xml";
-            Storage::disk('private')->put($path, $resultado['xml']);
-            $nota->update([
-                'xml_enviado_path' => $path,
-                'xml_firmado_path' => null,
-                'clave_acceso' => $resultado['clave_acceso'],
-                'estado_sri' => 'xml_generado',
-                'mensajes_sri' => null,
-            ]);
-        }
-
-        if ($nota->estado_sri === 'xml_generado') {
-            if (!$nota->medico) {
-                throw new \RuntimeException('La nota de crédito no tiene médico emisor.');
-            }
-            $firmado = app(SriSignService::class)->firmar(Storage::disk('private')->get($nota->xml_enviado_path), $nota->medico);
-            $path = "sri/nota_credito_firmada_{$nota->id}.xml";
-            Storage::disk('private')->put($path, $firmado);
-            $nota->update(['xml_firmado_path' => $path, 'estado_sri' => 'firmado']);
-        }
-
-        if (in_array($nota->estado_sri, ['firmado', 'error_envio'], true)) {
-            return app(SriWebService::class)->enviar($nota);
-        }
-
-        throw new \RuntimeException('La nota de crédito ya fue enviada al SRI; consulte su autorización.');
-    }
-
-    /**
-     * Consulta la autorización; si el SRI la autoriza, la factura queda anulada.
-     *
-     * @return array{estado: string, numeroAutorizacion: string, fechaAutorizacion: string, mensajes: array}
-     */
-    public function autorizar(NotaCredito $nota): array
-    {
-        $resultado = app(SriWebService::class)->autorizar($nota);
-
-        if ($resultado['estado'] === 'AUTORIZADO') {
-            $nota->factura->update(['estado' => 'anulada']);
-        }
-
-        return $resultado;
     }
 }

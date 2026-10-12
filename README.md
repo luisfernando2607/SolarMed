@@ -70,7 +70,7 @@ npm run build
 composer dev
 ```
 
-Ejecuta simultáneamente: servidor Laravel, listener de colas, logs y Vite HMR.
+Ejecuta simultáneamente: servidor Laravel, listener de colas, logs, Vite HMR y el programador de tareas.
 
 ### Pruebas
 
@@ -81,10 +81,14 @@ php artisan test
 Cubren permisos por rol, turnos, facturación, formulario de consulta y facturación electrónica SRI
 (XML, firma XAdES-BES y web services simulados). Usan SQLite en memoria; no tocan la base `solarmed`.
 
-## Historia clínica
+## Historia clínica y auditoría
 
 Una consulta solo la puede corregir el médico que la registró. Cada corrección exige un motivo y guarda la
 versión anterior, visible en el *Historial de correcciones* de la consulta.
+
+Cada vez que alguien ve la ficha de un paciente, abre una consulta, descarga un PDF o XML, o crea,
+corrige o elimina información clínica, queda registrado (usuario, IP y fecha). El administrador lo
+consulta en **Auditoría**.
 
 ## Usuarios y permisos
 
@@ -110,8 +114,10 @@ Cada médico factura con **su propio RUC** y su propia numeración (`001-001-000
    - Certificado `.p12` del médico y su contraseña. Se aceptan certificados *legacy*
      (Security Data, BCE) que OpenSSL 3 no abre por defecto.
 3. **Facturación > Nueva factura**: elegir el médico emisor (se sugiere el que atendió al paciente).
-4. En la factura: **Generar XML → Firmar → Enviar al SRI → Consultar autorización**.
-   Si el SRI devuelve el comprobante, sus mensajes se muestran en la factura y se puede regenerar.
+4. En la factura: **Emitir al SRI** genera el XML, lo firma y lo envía. La autorización se consulta
+   sola en segundo plano (cola `AutorizarComprobanteSri`), con reintentos si el SRI está caído o
+   "EN PROCESO"; la pantalla se actualiza sola. Si el SRI devuelve el comprobante, sus mensajes se
+   muestran en la factura y se puede corregir y reenviar.
 
 5. **Anular una factura autorizada**: en la factura, *Emitir nota de crédito* con el motivo. La nota de
    crédito electrónica (codDoc 04) se genera, firma y envía al SRI; al ser autorizada, la factura queda anulada.
@@ -125,6 +131,10 @@ Cada médico factura con **su propio RUC** y su propia numeración (`001-001-000
   `APP_URL` con `https://`.
 - Servir solo por HTTPS (la app maneja historias clínicas y certificados digitales).
 - `php artisan config:cache && php artisan route:cache && php artisan view:cache`
+- **Cola** (autorización automática del SRI) siempre activa, por ejemplo con Supervisor:
+  `php artisan queue:work --tries=1 --max-time=3600`
+- **Programador de tareas** (`sri:reintentar` cada 15 min) en el cron del servidor:
+  `* * * * * cd /ruta/SolarMed && php artisan schedule:run >> /dev/null 2>&1`
 - Respaldar la base `solarmed` **y** `storage/app/private` (certificados, XML del SRI, archivos de pacientes).
 - No versionar `.env` ni volcados de base de datos con datos reales.
 

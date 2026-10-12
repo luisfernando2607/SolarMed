@@ -35,7 +35,7 @@ class CrearConsulta extends Component
             return;
         }
 
-        ExpedienteConsulta::create($this->datosConsulta() + [
+        $consulta = ExpedienteConsulta::create($this->datosConsulta() + [
             'paciente_id' => $this->paciente_id,
             'medico_id' => $medico->id,
             'especialidad_id' => $this->turno->especialidad_id,
@@ -43,6 +43,7 @@ class CrearConsulta extends Component
             'fecha' => now(),
         ]);
 
+        app(\App\Services\AuditoriaService::class)->registrar('crear', 'consulta', $consulta->id, $consulta->paciente_id);
         $this->dispatch('notify', message: 'Consulta registrada exitosamente.', type: 'success');
         $this->redirect(route('turno.atender', $this->turno->id), navigate: true);
     }

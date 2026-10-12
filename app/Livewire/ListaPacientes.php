@@ -114,6 +114,7 @@ class ListaPacientes extends Component
     {
         $this->editMode = false;
         $this->selected = $paciente;
+        app(\App\Services\AuditoriaService::class)->registrar('ver', 'paciente', $paciente->id, $paciente->id, 'Ficha y últimas consultas');
         $this->turnoActivo = $paciente->turnos()
             ->whereIn('estado', ['esperando', 'en_atencion'])
             ->whereDate('fecha', today())
@@ -212,6 +213,7 @@ class ListaPacientes extends Component
             'metodo_anticonceptivo' => $this->metodo_anticonceptivo,
         ]);
 
+        app(\App\Services\AuditoriaService::class)->registrar('editar', 'paciente', $paciente->id, $paciente->id, 'Datos del paciente');
         $this->cerrarDetalle();
 
         $this->dispatch('notify', message: 'Paciente actualizado exitosamente.', type: 'success');
@@ -233,6 +235,7 @@ class ListaPacientes extends Component
             return;
         }
 
+        app(\App\Services\AuditoriaService::class)->registrar('eliminar', 'paciente', $paciente->id, null, "{$paciente->nombre_completo} ({$paciente->cedula})");
         $paciente->delete();
 
         if ($this->selected && $this->selected->id === $paciente->id) {
