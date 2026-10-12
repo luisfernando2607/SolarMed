@@ -25,6 +25,7 @@ class RolesPermisos extends Component
         'reportes' => 'Reportes',
         'configuracion' => 'Configuración',
         'usuarios' => 'Usuarios',
+        'auditoria' => 'Auditoría',
     ];
 
     const DESCRIPCIONES = [
@@ -46,6 +47,8 @@ class RolesPermisos extends Component
         'configuracion.editar' => 'Administrar la clínica (configuración, SRI, tarifario, roles)',
         'usuarios.ver' => 'Ver usuarios',
         'usuarios.gestionar' => 'Crear y editar usuarios',
+        'auditoria.ver' => 'Ver el registro de accesos y los indicadores de auditoría',
+        'auditoria.gestionar' => 'Evaluar historias clínicas y registrar planes de acción',
     ];
 
     /** Permisos que convierten a un rol en administrador de hecho: se avisa al marcarlos */

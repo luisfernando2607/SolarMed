@@ -254,7 +254,7 @@ Route::get('reportes/ventas', \App\Livewire\ReporteVentas::class)
 
 // Auditoría de accesos a datos clínicos (solo admin)
 Route::get('auditoria', \App\Livewire\Auditoria::class)
-    ->middleware(['auth', 'can:configuracion.editar'])
+    ->middleware(['auth', 'can:auditoria.ver'])
     ->name('auditoria');
 
 // Tarifario (solo admin)
