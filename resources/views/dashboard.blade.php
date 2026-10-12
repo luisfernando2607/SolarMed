@@ -46,27 +46,7 @@
                 @endcan
             </div>
 
-            {{-- 2. Estadísticas --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-white rounded-lg border-l-4 border-blue-500 shadow-sm p-5">
-                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Turnos hoy</p>
-                    <p class="text-3xl font-bold text-blue-700 mt-1">
-                        {{ \App\Models\Turno::whereDate('fecha', today())->count() }}
-                    </p>
-                </div>
-                <div class="bg-white rounded-lg border-l-4 border-pink-500 shadow-sm p-5">
-                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Pacientes en espera</p>
-                    <p class="text-3xl font-bold text-pink-700 mt-1">
-                        {{ \App\Models\Turno::whereDate('fecha', today())->where('estado', 'esperando')->count() }}
-                    </p>
-                </div>
-                <div class="bg-white rounded-lg border-l-4 border-green-500 shadow-sm p-5">
-                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total pacientes</p>
-                    <p class="text-3xl font-bold text-green-700 mt-1">
-                        {{ \App\Models\Paciente::count() }}
-                    </p>
-                </div>
-            </div>
+            <livewire:panel-pendientes />
 
             {{-- 3. Módulos --}}
             <div>
@@ -122,6 +102,24 @@
                             <div class="text-2xl mb-2">💰</div>
                             <h3 class="font-semibold text-sm text-gray-900 group-hover:text-blue-600">Facturación</h3>
                             <p class="text-xs text-gray-400 mt-1">Consultas y servicios</p>
+                        </a>
+                    @endcan
+
+                    @can('turnos.ver')
+                        <a href="{{ route('agenda') }}" wire:navigate
+                           class="bg-white rounded-xl border border-gray-200 p-5 hover:border-blue-400 hover:shadow-sm transition group">
+                            <div class="text-2xl mb-2">📅</div>
+                            <h3 class="font-semibold text-sm text-gray-900 group-hover:text-blue-600">Agenda</h3>
+                            <p class="text-xs text-gray-400 mt-1">Citas por médico</p>
+                        </a>
+                    @endcan
+
+                    @can('reportes.ver')
+                        <a href="{{ route('reportes.ventas') }}" wire:navigate
+                           class="bg-white rounded-xl border border-gray-200 p-5 hover:border-blue-400 hover:shadow-sm transition group">
+                            <div class="text-2xl mb-2">📊</div>
+                            <h3 class="font-semibold text-sm text-gray-900 group-hover:text-blue-600">Reportes</h3>
+                            <p class="text-xs text-gray-400 mt-1">Ventas del mes</p>
                         </a>
                     @endcan
 
