@@ -209,6 +209,8 @@
     function initCharts() {
         charts.forEach(c => c.destroy());
         charts = [];
+        // Solo en la página del dashboard (con navegación SPA el evento llega también a otras páginas)
+        if (!document.getElementById('chartFacturacion')) return;
         /* 1 · Facturación — Line + Área + Δ% anotado */
         charts.push(new Chart(document.getElementById('chartFacturacion'), {
             type: 'line',
@@ -529,9 +531,14 @@
 
     }
 
-    /* Boot */
-    document.addEventListener('DOMContentLoaded', initCharts);
-    document.addEventListener('livewire:navigated', initCharts);
+    /* Boot: el script se vuelve a ejecutar en cada visita; se registra un único escuchador
+       que siempre llama a la versión más reciente de initCharts */
+    window.__dashboardInitCharts = initCharts;
+    if (!window.__dashboardChartsRegistrado) {
+        window.__dashboardChartsRegistrado = true;
+        document.addEventListener('DOMContentLoaded', () => window.__dashboardInitCharts?.());
+        document.addEventListener('livewire:navigated', () => window.__dashboardInitCharts?.());
+    }
 
 })();
 </script>
