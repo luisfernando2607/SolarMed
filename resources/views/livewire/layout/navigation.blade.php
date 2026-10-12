@@ -71,82 +71,125 @@ new class extends Component
     $user = auth()->user();
 @endphp
 
-<div>
+@php
+    $iniciales = collect(preg_split('/\s+/', trim($user->name)))->filter()->take(2)->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('');
+    $c = $marca->color();
+@endphp
+
+<div style="--m: {{ $c }}; --m-suave: color-mix(in srgb, {{ $c }} 10%, white); --m-medio: color-mix(in srgb, {{ $c }} 22%, white);">
+    <style>
+        .sb-nav::-webkit-scrollbar { width: 6px; }
+        .sb-nav::-webkit-scrollbar-thumb { background: #e5e3de; border-radius: 9999px; }
+        .sb-nav { scrollbar-width: thin; scrollbar-color: #e5e3de transparent; }
+        .sb-item { position: relative; }
+        .sb-item.activo { background: var(--m-suave); color: var(--m); }
+        .sb-item.activo::before { content: ''; position: absolute; left: -8px; top: 8px; bottom: 8px; width: 3px; border-radius: 0 3px 3px 0; background: var(--m); }
+        .sb-tip { position: absolute; left: calc(100% + 12px); top: 50%; transform: translateY(-50%); white-space: nowrap; pointer-events: none;
+                  background: #1f1f1d; color: #fff; font-size: 12px; padding: 4px 10px; border-radius: 8px; opacity: 0; transition: opacity .15s; z-index: 60; }
+        .sb-item:hover .sb-tip { opacity: 1; }
+    </style>
+
     {{-- Barra superior en celular --}}
-    <div class="lg:hidden sticky top-0 z-30 flex items-center gap-3 h-14 px-4 bg-white border-b shadow-sm">
-        <button type="button" @click="menuAbierto = true" class="p-2 -ml-2 rounded-md text-gray-600 hover:bg-gray-100" aria-label="Abrir menú">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    <div class="lg:hidden sticky top-0 z-30 flex items-center gap-3 h-14 px-4 bg-white/95 backdrop-blur border-b">
+        <button type="button" @click="menuAbierto = true" class="p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100" aria-label="Abrir menú">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
         <x-application-logo class="h-8 w-auto max-w-[90px] object-contain" />
-        <span class="font-bold truncate" style="color: {{ $marca->color() }}">{{ $marca->nombre() }}</span>
+        <span class="font-semibold truncate" style="color: var(--m)">{{ $marca->nombre() }}</span>
     </div>
 
     {{-- Fondo oscuro del menú en celular --}}
-    <div x-show="menuAbierto" x-transition.opacity @click="menuAbierto = false" class="lg:hidden fixed inset-0 z-40 bg-black/40" style="display: none"></div>
+    <div x-show="menuAbierto" x-transition.opacity @click="menuAbierto = false" class="lg:hidden fixed inset-0 z-40 bg-gray-900/40 backdrop-blur-[1px]" style="display: none"></div>
 
     {{-- Barra lateral --}}
-    <aside class="fixed inset-y-0 left-0 z-50 flex flex-col bg-white border-r shadow-sm transition-all duration-200 w-64 -translate-x-full lg:translate-x-0"
-           :class="{ 'translate-x-0': menuAbierto, 'lg:w-16': colapsado, 'lg:w-64': !colapsado }"
+    <aside class="fixed inset-y-0 left-0 z-50 flex flex-col bg-white border-r border-gray-200/80 transition-all duration-200 w-64 -translate-x-full lg:translate-x-0"
+           :class="{ 'translate-x-0 shadow-2xl': menuAbierto, 'lg:w-[72px]': colapsado, 'lg:w-64': !colapsado }"
            @keydown.escape.window="menuAbierto = false">
-        <div class="flex items-center gap-2 h-16 px-4 border-b shrink-0">
-            <a href="{{ $user->can('configuracion.editar') ? route('admin.dashboard') : route('dashboard') }}" wire:navigate class="flex items-center gap-2 min-w-0">
-                <x-application-logo class="h-9 w-9 object-contain shrink-0" />
-                <span class="font-bold text-lg truncate" style="color: {{ $marca->color() }}" :class="colapsado && 'lg:hidden'">{{ $marca->nombre() }}</span>
+
+        {{-- Marca --}}
+        <div class="flex items-center gap-3 h-[72px] px-4 shrink-0">
+            <a href="{{ $user->can('configuracion.editar') ? route('admin.dashboard') : route('dashboard') }}" wire:navigate class="flex items-center gap-3 min-w-0">
+                <span class="flex items-center justify-center w-10 h-10 rounded-xl shrink-0 ring-1 ring-gray-200 bg-white overflow-hidden">
+                    <x-application-logo class="w-8 h-8 object-contain" />
+                </span>
+                <span class="min-w-0" :class="colapsado && 'lg:hidden'">
+                    <span class="block font-semibold text-gray-900 truncate leading-tight">{{ $marca->nombre() }}</span>
+                    @if ($marca->subtitulo())
+                        <span class="block text-[11px] text-gray-400 truncate">{{ $marca->subtitulo() }}</span>
+                    @endif
+                </span>
             </a>
-            <button type="button" @click="menuAbierto = false" class="lg:hidden ml-auto p-1.5 rounded-md text-gray-500 hover:bg-gray-100" aria-label="Cerrar menú">✕</button>
+            <button type="button" @click="menuAbierto = false" class="lg:hidden ml-auto p-1.5 rounded-lg text-gray-400 hover:bg-gray-100" aria-label="Cerrar menú">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
         </div>
 
-        <nav class="flex-1 overflow-y-auto py-3 px-2 space-y-4">
+        {{-- Botón contraer (borde derecho) --}}
+        <button type="button" @click="colapsado = !colapsado"
+                class="hidden lg:flex absolute -right-3 top-[60px] w-6 h-6 items-center justify-center rounded-full bg-white border border-gray-200 text-gray-400 shadow-sm hover:text-gray-700 hover:border-gray-300 transition"
+                :title="colapsado ? 'Expandir menú' : 'Contraer menú'" :aria-label="colapsado ? 'Expandir menú' : 'Contraer menú'">
+            <svg class="w-3.5 h-3.5 transition-transform" :class="colapsado && 'rotate-180'" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+        </button>
+
+        <nav class="sb-nav flex-1 overflow-y-auto overflow-x-visible px-3 pb-4 space-y-5" :class="colapsado && 'lg:overflow-visible'">
             @foreach ($secciones as [$titulo, $items])
                 @php $visibles = array_filter($items, fn ($i) => !$i[3] || $user->can($i[3])); @endphp
                 @if ($visibles)
-                    <div>
+                    <div class="space-y-0.5">
                         @if ($titulo)
-                            <p class="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400" :class="colapsado && 'lg:hidden'">{{ $titulo }}</p>
+                            <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400" :class="colapsado && 'lg:hidden'">{{ $titulo }}</p>
+                            <div class="hidden mx-3 mb-2 border-t border-gray-100" :class="colapsado && 'lg:block'"></div>
                         @endif
                         @foreach ($visibles as [$texto, $ruta, $activas, $permiso, $ic])
                             @php $activo = request()->routeIs(...explode('|', $activas)); @endphp
-                            <a href="{{ route($ruta) }}" wire:navigate title="{{ $texto }}"
-                               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ $activo ? 'text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900' }}"
-                               @if ($activo) style="background: {{ $marca->color() }}" @endif>
-                                {!! $icono($ic) !!}
+                            <a href="{{ route($ruta) }}" wire:navigate @if ($activo) aria-current="page" @endif
+                               class="sb-item group flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-colors {{ $activo ? 'activo font-semibold' : 'font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}"
+                               :class="colapsado && 'lg:justify-center lg:px-0'">
+                                <span class="{{ $activo ? '' : 'text-gray-400 group-hover:text-gray-600' }}">{!! $icono($ic) !!}</span>
                                 <span class="truncate" :class="colapsado && 'lg:hidden'">{{ $texto }}</span>
+                                <span class="sb-tip hidden" :class="colapsado && 'lg:block'">{{ $texto }}</span>
                             </a>
                         @endforeach
                     </div>
                 @endif
             @endforeach
 
-            <div>
-                <p class="px-3 mb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400" :class="colapsado && 'lg:hidden'">Público</p>
-                <a href="{{ route('home') }}" target="_blank" title="Portada de la clínica" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">
-                    {!! $icono('portada') !!}<span class="truncate" :class="colapsado && 'lg:hidden'">Portada</span>
+            <div class="space-y-0.5">
+                <p class="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400" :class="colapsado && 'lg:hidden'">Público</p>
+                <div class="hidden mx-3 mb-2 border-t border-gray-100" :class="colapsado && 'lg:block'"></div>
+                <a href="{{ route('home') }}" target="_blank" class="sb-item group flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900" :class="colapsado && 'lg:justify-center lg:px-0'">
+                    <span class="text-gray-400 group-hover:text-gray-600">{!! $icono('portada') !!}</span>
+                    <span class="truncate flex-1" :class="colapsado && 'lg:hidden'">Portada</span>
+                    <svg class="w-3.5 h-3.5 text-gray-300" :class="colapsado && 'lg:hidden'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+                    <span class="sb-tip hidden" :class="colapsado && 'lg:block'">Portada</span>
                 </a>
                 @can('turnos.ver')
-                    <a href="{{ route('turno.form') }}" target="_blank" title="Formulario de turnos para pacientes" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">
-                        {!! $icono('kiosco') !!}<span class="truncate" :class="colapsado && 'lg:hidden'">Formulario de turnos</span>
+                    <a href="{{ route('turno.form') }}" target="_blank" class="sb-item group flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900" :class="colapsado && 'lg:justify-center lg:px-0'">
+                        <span class="text-gray-400 group-hover:text-gray-600">{!! $icono('kiosco') !!}</span>
+                        <span class="truncate flex-1" :class="colapsado && 'lg:hidden'">Formulario de turnos</span>
+                        <svg class="w-3.5 h-3.5 text-gray-300" :class="colapsado && 'lg:hidden'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+                        <span class="sb-tip hidden" :class="colapsado && 'lg:block'">Formulario de turnos</span>
                     </a>
                 @endcan
             </div>
         </nav>
 
         {{-- Usuario --}}
-        <div class="border-t p-2 shrink-0">
-            <div class="px-3 py-2" :class="colapsado && 'lg:hidden'">
-                <p class="text-sm font-medium text-gray-800 truncate" x-data="{{ json_encode(['name' => $user->name]) }}" x-text="name" x-on:profile-updated.window="name = $event.detail.name"></p>
-                <p class="text-xs text-gray-500 truncate">{{ ucfirst($user->roles->first()?->name ?? 'usuario') }} · {{ $user->email }}</p>
+        <div class="p-3 border-t border-gray-100 shrink-0">
+            <div class="flex items-center gap-3 p-2 rounded-xl {{ request()->routeIs('profile') ? 'bg-gray-50' : '' }}" :class="colapsado && 'lg:flex-col lg:p-0 lg:gap-2'">
+                <a href="{{ route('profile') }}" wire:navigate class="sb-item flex items-center gap-3 min-w-0 flex-1" title="Mi perfil">
+                    <span class="flex items-center justify-center w-9 h-9 rounded-full text-sm font-semibold shrink-0" style="background: var(--m-medio); color: var(--m)">{{ $iniciales }}</span>
+                    <span class="min-w-0" :class="colapsado && 'lg:hidden'">
+                        <span class="block text-sm font-semibold text-gray-800 truncate" x-data="{{ json_encode(['name' => $user->name]) }}" x-text="name" x-on:profile-updated.window="name = $event.detail.name"></span>
+                        <span class="block text-xs text-gray-400 truncate">{{ ucfirst($user->roles->first()?->name ?? 'usuario') }}</span>
+                    </span>
+                    <span class="sb-tip hidden" :class="colapsado && 'lg:block'">Mi perfil</span>
+                </a>
+                <button type="button" wire:click="logout" class="sb-item p-2 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition" aria-label="Cerrar sesión" title="Cerrar sesión">
+                    {!! $icono('salir') !!}
+                    <span class="sb-tip hidden" :class="colapsado && 'lg:block'">Cerrar sesión</span>
+                </button>
             </div>
-            <a href="{{ route('profile') }}" wire:navigate title="Mi perfil"
-               class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('profile') ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-100' }}">
-                {!! $icono('perfil') !!}<span :class="colapsado && 'lg:hidden'">Mi perfil</span>
-            </a>
-            <button type="button" wire:click="logout" title="Cerrar sesión" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-700">
-                {!! $icono('salir') !!}<span :class="colapsado && 'lg:hidden'">Cerrar sesión</span>
-            </button>
-            <button type="button" @click="colapsado = !colapsado" class="hidden lg:flex w-full items-center gap-3 px-3 py-2 mt-1 rounded-lg text-xs text-gray-400 hover:bg-gray-100" :title="colapsado ? 'Expandir menú' : 'Contraer menú'">
-                <svg class="w-5 h-5 shrink-0 transition-transform" :class="colapsado && 'rotate-180'" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5"/></svg>
-                <span :class="colapsado && 'lg:hidden'">Contraer menú</span>
-            </button>
         </div>
     </aside>
 </div>

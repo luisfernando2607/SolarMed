@@ -1,545 +1,342 @@
-<div>
+<div class="dash">
 <style>
-/* ─── Grid & Cards ─────────────────────────────────────────── */
-.charts-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    padding: 8px 0;
-}
-.chart-card {
-    background: white;
-    border: 0.5px solid rgba(0,0,0,0.08);
-    border-radius: 12px;
-    padding: 1rem 1.25rem;
-    display: flex;
-    flex-direction: column;
-}
-.chart-label  { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; color: #888780; margin: 0; }
-.chart-title  { font-size: 13px; font-weight: 500; color: #2C2C2A; margin: 2px 0 12px; }
-.chart-wrap   { position: relative; width: 100%; }
-.chart-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; }
-.chart-legend span { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #888780; }
-.chart-legend i    { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
-
+    /* Paleta de datos (validada: separación para daltonismo y contraste sobre fondo claro) */
+    .dash {
+        --serie-1: #2a78d6;   /* azul: serie principal */
+        --serie-2: #eb6834;   /* naranja: segunda serie */
+        --serie-neutra: #c9c7c0;
+        --tinta-1: #1f1f1d;
+        --tinta-2: #5f5e5a;
+        --tinta-3: #8a8984;
+        --borde: #e9e7e2;
+    }
+    .dash .tarjeta { background: #fff; border: 1px solid var(--borde); border-radius: 16px; }
+    .dash .titulo-tarjeta { font-size: 14px; font-weight: 600; color: var(--tinta-1); }
+    .dash .subtitulo-tarjeta { font-size: 12px; color: var(--tinta-3); margin-top: 2px; }
+    .dash .lienzo { position: relative; width: 100%; }
+    .dash .punto { display: inline-block; width: 8px; height: 8px; border-radius: 9999px; }
 </style>
 
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
-<div class="mb-6 mt-2">
-    <livewire:panel-pendientes />
-</div>
-
-<div class="charts-grid mb-8">
-
-    {{-- ── Row 1: Turnos + Facturación (span2) ── --}}
-    <div class="chart-card">
-        <p class="chart-label">Operación</p>
-        <p class="chart-title">Turnos por mes</p>
-        <div class="chart-wrap" style="height:210px"><canvas id="chartTurnos"></canvas></div>
-        <div class="chart-legend">
-            <span><i style="background:#639922"></i>Completados</span>
-            <span><i style="background:#E24B4A"></i>Cancelados</span>
-            <span><i style="background:#BA7517;border-radius:50%"></i>% Cancelación</span>
+    {{-- ── Encabezado ── --}}
+    @php
+        $hora = (int) now()->format('H');
+        $saludo = $hora < 12 ? 'Buenos días' : ($hora < 19 ? 'Buenas tardes' : 'Buenas noches');
+    @endphp
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+            <p class="text-sm text-gray-500">{{ ucfirst(now()->translatedFormat('l, d \d\e F \d\e Y')) }}</p>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mt-1">{{ $saludo }}, {{ Str::before(auth()->user()->name, ' ') }}</h1>
+            <p class="text-sm text-gray-500 mt-1">Resumen de {{ $marca->nombre() }}</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('agenda') }}" wire:navigate class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75"/></svg>
+                Agenda
+            </a>
+            <a href="{{ route('turnos.crear') }}" wire:navigate class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                Registrar turno
+            </a>
+            <a href="{{ route('facturas.crear') }}" wire:navigate class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white shadow-sm hover:opacity-90 transition" style="background: {{ $marca->color() }}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                Nueva factura
+            </a>
         </div>
     </div>
 
-    <div class="chart-card" style="grid-column:span 2">
-        <p class="chart-label">Finanzas</p>
-        <p class="chart-title">Facturación mensual</p>
-        <div class="chart-wrap" style="height:210px"><canvas id="chartFacturacion"></canvas></div>
-        <div class="chart-legend">
-            <span><i style="background:#378ADD"></i>Facturado</span>
-        </div>
+    {{-- ── Indicadores del mes ── --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        @foreach ($kpis as $k)
+            <div class="tarjeta p-5">
+                <p class="text-sm font-medium text-gray-500">{{ $k['titulo'] }}</p>
+                <p class="mt-2 text-3xl font-semibold tracking-tight text-gray-900">{{ $k['valor'] }}</p>
+                <div class="mt-3 flex items-center gap-2 text-xs">
+                    @if ($k['delta'] === null)
+                        <span class="text-gray-400">Sin datos del mes anterior</span>
+                    @else
+                        @php $sube = $k['delta'] >= 0; @endphp
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-medium {{ $sube ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' }}">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="{{ $sube ? 'M4.5 15.75l7.5-7.5 7.5 7.5' : 'M19.5 8.25l-7.5 7.5-7.5-7.5' }}"/>
+                            </svg>
+                            {{ number_format(abs($k['delta']), 1) }} %
+                        </span>
+                        <span class="text-gray-400">vs. mes anterior</span>
+                    @endif
+                </div>
+                <p class="mt-1 text-xs text-gray-400">{{ $k['detalle'] }}</p>
+            </div>
+        @endforeach
     </div>
 
-    {{-- ── Row 2: Motivos (span2) + Diagnósticos ── --}}
-    <div class="chart-card" style="grid-column:span 2">
-        <p class="chart-label">Servicio</p>
-        <p class="chart-title">Motivos de consulta más frecuentes</p>
-        <div class="chart-wrap" style="height:400px"><canvas id="chartEspecialidad"></canvas></div>
-        <div class="chart-legend">
-            <span><i style="background:#1D9E75"></i>Med. General</span>
-            <span><i style="background:#7F77DD"></i>Ginecología</span>
-        </div>
-    </div>
+    {{-- ── Requiere atención ── --}}
+    <section>
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3">Requiere atención</h2>
+        <livewire:panel-pendientes />
+    </section>
 
-    <div class="chart-card">
-        <p class="chart-label">Clínica</p>
-        <p class="chart-title">Diagnósticos más frecuentes</p>
-        <div class="chart-wrap" style="height:400px"><canvas id="chartDiagnosticos"></canvas></div>
-        <p style="font-size:10px;color:#888780;margin-top:6px">* Escala logarítmica — hover para ver nombre completo del diagnóstico</p>
-    </div>
+    {{-- ── Tendencias ── --}}
+    <section>
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3">Últimos 6 meses</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+            <div class="tarjeta p-5 lg:col-span-3">
+                <p class="titulo-tarjeta">Facturación mensual</p>
+                <p class="subtitulo-tarjeta">Facturas pagadas · total del período ${{ number_format($totalFacturado6, 2) }}</p>
+                <div class="lienzo mt-4" style="height: 260px"><canvas id="chartFacturacion" aria-label="Facturación mensual de los últimos 6 meses" role="img"></canvas></div>
+            </div>
 
-        {{-- Ciudad: barras top 10 --}}
-    <div class="chart-card">
-        <p class="chart-label">Geografía</p>
-        <p class="chart-title">Top ciudades</p>
-        <div class="chart-wrap" style="height:160px"><canvas id="chartCiudad"></canvas></div>
-    </div>
-    
-    {{-- ── Row 3: Sexo + Edad + Ciudad ── --}}
-    <div class="chart-card">
-        <p class="chart-label">Distribución</p>
-        <p class="chart-title">Pacientes por sexo</p>
-        <div class="chart-wrap" style="height:160px;position:relative">
-            <canvas id="chartSexo"></canvas>
-            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);text-align:center;pointer-events:none">
-                <div style="font-size:20px;font-weight:500;color:#2C2C2A">{{ $porSexo->sum() }}</div>
-                <div style="font-size:10px;color:#888780">pacientes</div>
+            <div class="tarjeta p-5 lg:col-span-2">
+                <p class="titulo-tarjeta">Turnos por mes</p>
+                <p class="subtitulo-tarjeta">{{ number_format($totalTurnos6) }} turnos · cancelación {{ number_format($tasaCancelacion, 1) }} %</p>
+                <div class="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-gray-600">
+                    <span class="inline-flex items-center gap-1.5"><span class="punto" style="background: var(--serie-1)"></span>Completados ({{ array_sum($series['completados']) }})</span>
+                    <span class="inline-flex items-center gap-1.5"><span class="punto" style="background: var(--serie-2)"></span>Cancelados ({{ array_sum($series['cancelados']) }})</span>
+                    <span class="inline-flex items-center gap-1.5"><span class="punto" style="background: var(--serie-neutra)"></span>Otros ({{ array_sum($series['otros']) }})</span>
+                </div>
+                <div class="lienzo mt-3" style="height: 230px"><canvas id="chartTurnos" aria-label="Turnos completados, cancelados y otros por mes" role="img"></canvas></div>
             </div>
         </div>
-        <div class="chart-legend" style="justify-content:center">
-            <span><i style="background:#378ADD"></i>Masculino</span>
-            <span><i style="background:#D4537E"></i>Femenino</span>
-            <span><i style="background:#888780"></i>Otro</span>
-        </div>
-    </div>
+    </section>
 
-    <div class="chart-card">
-        <p class="chart-label">Demografía</p>
-        <p class="chart-title">Rangos de edad</p>
-        <div class="chart-wrap" style="height:160px"><canvas id="chartEdad"></canvas></div>
-        <div class="chart-legend">
-            <span><i style="background:#7F77DD"></i>Pacientes</span>
-            <span><i style="background:#BA7517;border-radius:50%"></i>Acumulado %</span>
+    {{-- ── Atención clínica ── --}}
+    <section>
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3">Atención clínica</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="tarjeta p-5">
+                <p class="titulo-tarjeta">Motivos de consulta más frecuentes</p>
+                <p class="subtitulo-tarjeta">Número de consultas</p>
+                @if ($motivos->isEmpty())
+                    <p class="text-sm text-gray-400 py-10 text-center">Aún no hay consultas registradas.</p>
+                @else
+                    <div class="lienzo mt-4" style="height: {{ 40 + $motivos->count() * 34 }}px"><canvas id="chartMotivos" role="img" aria-label="Motivos de consulta más frecuentes"></canvas></div>
+                @endif
+            </div>
+            <div class="tarjeta p-5">
+                <p class="titulo-tarjeta">Diagnósticos más frecuentes</p>
+                <p class="subtitulo-tarjeta">Por código CIE-10</p>
+                @if ($diagnosticos->isEmpty())
+                    <p class="text-sm text-gray-400 py-10 text-center">Aún no hay diagnósticos con código CIE-10.</p>
+                @else
+                    <div class="lienzo mt-4" style="height: {{ 40 + $diagnosticos->count() * 34 }}px"><canvas id="chartDiagnosticos" role="img" aria-label="Diagnósticos más frecuentes"></canvas></div>
+                @endif
+            </div>
         </div>
-    </div>
+    </section>
 
-    {{-- ── Row 5: Heatmap (span3) ── --}}
-    @php $maxH = $maxHeat ?: 1; @endphp
-    <div class="chart-card" style="grid-column:span 3">
-        <p class="chart-label">Optimización</p>
-        <p class="chart-title">Mapa de calor — Turnos por hora y día (últimos 3 meses)</p>
-        <div style="overflow-x:auto">
-            <table style="width:100%;border-collapse:separate;border-spacing:3px;font-size:11px">
-                <thead>
-                    <tr>
-                        <th style="padding:3px 8px;color:#888780;font-size:10px;font-weight:500;text-align:left;min-width:38px">Hora</th>
-                        @foreach ([2=>'Lun',3=>'Mar',4=>'Mié',5=>'Jue',6=>'Vie',7=>'Sáb',1=>'Dom'] as $l)
-                            <th style="padding:3px 8px;color:#5F5E5A;font-size:10px;font-weight:500;text-align:center;min-width:80px">{{ $l }}</th>
-                        @endforeach
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (range(8, 19) as $h)
+    {{-- ── Pacientes ── --}}
+    <section>
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3">Pacientes</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="tarjeta p-5">
+                <p class="titulo-tarjeta">Rangos de edad</p>
+                <p class="subtitulo-tarjeta">Pacientes con fecha de nacimiento</p>
+                <div class="lienzo mt-4" style="height: 220px"><canvas id="chartEdad" role="img" aria-label="Pacientes por rango de edad"></canvas></div>
+            </div>
+
+            <div class="tarjeta p-5">
+                <p class="titulo-tarjeta">Sexo</p>
+                @php
+                    $totalSexo = max(1, $porSexo->sum());
+                    $etiquetasSexo = ['femenino' => 'Femenino', 'masculino' => 'Masculino', 'otro' => 'Otro'];
+                    $coloresSexo = ['femenino' => 'var(--serie-1)', 'masculino' => 'var(--serie-2)', 'otro' => 'var(--serie-neutra)'];
+                @endphp
+                <p class="subtitulo-tarjeta">{{ number_format($porSexo->sum()) }} pacientes</p>
+                <div class="mt-6 flex h-3 rounded-full overflow-hidden gap-0.5 bg-gray-100">
+                    @foreach ($etiquetasSexo as $clave => $texto)
+                        @if (($porSexo[$clave] ?? 0) > 0)
+                            <div style="width: {{ $porSexo[$clave] / $totalSexo * 100 }}%; background: {{ $coloresSexo[$clave] }}" title="{{ $texto }}: {{ $porSexo[$clave] }}"></div>
+                        @endif
+                    @endforeach
+                </div>
+                <dl class="mt-5 space-y-3">
+                    @foreach ($etiquetasSexo as $clave => $texto)
+                        <div class="flex items-center justify-between text-sm">
+                            <dt class="inline-flex items-center gap-2 text-gray-600"><span class="punto" style="background: {{ $coloresSexo[$clave] }}"></span>{{ $texto }}</dt>
+                            <dd class="text-gray-900"><span class="font-semibold">{{ number_format(($porSexo[$clave] ?? 0) / $totalSexo * 100, 0) }} %</span> <span class="text-gray-400 text-xs">({{ $porSexo[$clave] ?? 0 }})</span></dd>
+                        </div>
+                    @endforeach
+                </dl>
+            </div>
+
+            <div class="tarjeta p-5">
+                <p class="titulo-tarjeta">Ciudades</p>
+                <p class="subtitulo-tarjeta">Donde viven los pacientes</p>
+                @php $maxCiudad = max(1, (int) $ciudades->max('total')); @endphp
+                <div class="mt-5 space-y-3">
+                    @forelse ($ciudades as $c)
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-700 truncate">{{ $c->ciudad }}</span>
+                                <span class="font-semibold text-gray-900">{{ $c->total }}</span>
+                            </div>
+                            <div class="h-2 rounded-full bg-gray-100"><div class="h-2 rounded-full" style="width: {{ $c->total / $maxCiudad * 100 }}%; background: var(--serie-1)"></div></div>
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-400 py-6 text-center">Sin ciudades registradas.</p>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- ── Mapa de calor ── --}}
+    <section>
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3">Demanda</h2>
+        <div class="tarjeta p-5">
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+                <div>
+                    <p class="titulo-tarjeta">Turnos por día y hora</p>
+                    <p class="subtitulo-tarjeta">Últimos 3 meses · útil para planificar el personal</p>
+                </div>
+                @php $rampa = ['#f3f2ee', '#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95']; @endphp
+                <div class="flex items-center gap-2 text-xs text-gray-500">
+                    Menos
+                    <div class="flex gap-0.5">@foreach ($rampa as $c)<span class="w-5 h-3 rounded-sm" style="background: {{ $c }}"></span>@endforeach</div>
+                    Más
+                </div>
+            </div>
+            <div class="mt-4 overflow-x-auto">
+                <table class="w-full text-xs border-separate" style="border-spacing: 3px">
+                    <thead>
                         <tr>
-                            <td style="padding:4px 8px;color:#888780;font-size:10px">{{ str_pad($h,2,'0',STR_PAD_LEFT) }}</td>
-                            @foreach ([2,3,4,5,6,7,1] as $d)
-                                @php
-                                    $v = $heatGrid[$h][$d] ?? 0;
-                                    $p = $v / $maxH;
-                                    if ($v === 0)       { $bg = '#f5f5f3'; $fg = 'transparent'; }
-                                    elseif ($p < 0.33)  { $bg = '#b0c8e4'; $fg = '#2C2C2A'; }
-                                    elseif ($p < 0.66)  { $bg = '#6496c8'; $fg = '#fff'; }
-                                    else                { $bg = '#1e488c'; $fg = '#fff'; }
-                                @endphp
-                                <td style="padding:5px 8px;text-align:center;background:{{ $bg }};color:{{ $fg }};border-radius:6px;font-size:11px;font-weight:500">
-                                    {{ $v ?: '' }}
-                                </td>
+                            <th class="w-12"></th>
+                            @foreach ($diasSemana as $dia)
+                                <th class="font-medium text-gray-500 pb-1">{{ $dia }}</th>
                             @endforeach
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($horas as $h)
+                            <tr>
+                                <td class="text-right pr-2 text-gray-400 whitespace-nowrap">{{ sprintf('%02d:00', $h) }}</td>
+                                @foreach ($diasSemana as $num => $dia)
+                                    @php
+                                        $v = $heatGrid[$h][$num] ?? 0;
+                                        $nivel = $maxHeat > 0 && $v > 0 ? (int) ceil($v / $maxHeat * (count($rampa) - 1)) : 0;
+                                    @endphp
+                                    <td class="h-7 rounded-md text-center align-middle {{ $nivel >= 4 ? 'text-white' : 'text-gray-600' }}"
+                                        style="background: {{ $rampa[$nivel] }}" title="{{ $dia }} {{ sprintf('%02d:00', $h) }}: {{ $v }} turno(s)">
+                                        {{ $v ?: '' }}
+                                    </td>
+                                @endforeach
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:10px;color:#888780">
-            <span>Menos</span>
-            <span style="width:16px;height:10px;border-radius:3px;display:inline-block;background:#f0f0f0"></span>
-            <span style="width:16px;height:10px;border-radius:3px;display:inline-block;background:#b0c8e4"></span>
-            <span style="width:16px;height:10px;border-radius:3px;display:inline-block;background:#6496c8"></span>
-            <span style="width:16px;height:10px;border-radius:3px;display:inline-block;background:#1e488c"></span>
-            <span>Más</span>
-            <span style="margin-left:12px">Máx: {{ $maxHeat }} turnos</span>
-        </div>
-    </div>
-
+    </section>
 </div>
 
-{{-- ═══════════════════════════════════════════════════════════
-     SCRIPTS
-     ═══════════════════════════════════════════════════════════ --}}
 <script>
 (function () {
-
-    /* ── Shared config ────────────────────────────────────────── */
-    let charts = [];
-    const tc  = 'rgba(0,0,0,0.42)';
-    const gc  = 'rgba(0,0,0,0.06)';
-
-    const TT = (sym = '') => ({
-        backgroundColor: '#fff',
-        borderColor: 'rgba(0,0,0,0.10)',
-        borderWidth: 1,
-        titleColor: '#2C2C2A',
-        bodyColor: '#5F5E5A',
-        padding: 10,
-        cornerRadius: 8,
-        boxPadding: 4,
-        callbacks: sym
-            ? { label: c => ` ${sym}${c.parsed.y.toLocaleString('es-EC', { minimumFractionDigits: 2 })}` }
-            : {}
-    });
-
-    const BASE = { responsive: true, maintainAspectRatio: false, animation: { duration: 500, easing: 'easeOutQuart' } };
-    const XS   = { grid: { display: false }, border: { display: false }, ticks: { color: tc, font: { size: 10 }, maxRotation: 30 } };
-    const YS   = { grid: { color: gc }, border: { display: false }, ticks: { color: tc, precision: 0, font: { size: 10 } } };
-
-    /* ── Delta-% plugin para Facturación ─────────────────────── */
-    const deltaPlugin = {
-        id: 'deltaLabels',
-        afterDatasetsDraw(chart) {
-            const { ctx, data } = chart;
-            const ds = data.datasets[0].data;
-            ctx.save();
-            ctx.font = '500 10px ui-sans-serif,system-ui,sans-serif';
-            ctx.textAlign = 'center';
-            ds.forEach((v, i) => {
-                if (i === 0) return;
-                const delta = Math.round((v - ds[i - 1]) / ds[i - 1] * 100);
-                const meta  = chart.getDatasetMeta(0);
-                const pt    = meta.data[i];
-                ctx.fillStyle = delta >= 0 ? '#639922' : '#E24B4A';
-                ctx.fillText((delta >= 0 ? '▲' : '▼') + Math.abs(delta) + '%', pt.x, pt.y - 12);
-            });
-            ctx.restore();
-        }
+    const datos = {
+        meses: {{ \Illuminate\Support\Js::from($series['meses']) }},
+        facturacion: {{ \Illuminate\Support\Js::from($series['facturacion']) }},
+        completados: {{ \Illuminate\Support\Js::from($series['completados']) }},
+        cancelados: {{ \Illuminate\Support\Js::from($series['cancelados']) }},
+        otros: {{ \Illuminate\Support\Js::from($series['otros']) }},
+        motivos: {{ \Illuminate\Support\Js::from($motivos) }},
+        diagnosticos: {{ \Illuminate\Support\Js::from($diagnosticos) }},
+        edad: {{ \Illuminate\Support\Js::from($rangosEdad) }},
     };
+    let charts = [];
 
-    /* ── Main init ────────────────────────────────────────────── */
     function initCharts() {
         charts.forEach(c => c.destroy());
         charts = [];
         // Solo en la página del dashboard (con navegación SPA el evento llega también a otras páginas)
-        if (!document.getElementById('chartFacturacion')) return;
-        /* 1 · Facturación — Line + Área + Δ% anotado */
-        charts.push(new Chart(document.getElementById('chartFacturacion'), {
+        if (!document.getElementById('chartFacturacion') || !window.Chart) return;
+
+        const css = getComputedStyle(document.querySelector('.dash'));
+        const v = n => css.getPropertyValue(n).trim();
+        const S1 = v('--serie-1'), S2 = v('--serie-2'), SN = v('--serie-neutra'), T2 = v('--tinta-2'), T3 = v('--tinta-3'), B = v('--borde');
+        const dinero = n => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+
+        Chart.defaults.font.family = 'Figtree, ui-sans-serif, system-ui, sans-serif';
+        Chart.defaults.font.size = 12;
+        Chart.defaults.color = T3;
+
+        const tooltip = {
+            backgroundColor: '#ffffff', titleColor: '#1f1f1d', bodyColor: T2, borderColor: B, borderWidth: 1,
+            padding: 10, cornerRadius: 10, boxPadding: 4, usePointStyle: true,
+        };
+        const ejeX = { grid: { display: false }, border: { display: false }, ticks: { color: T3 } };
+        const ejeY = { grid: { color: '#f0efea' }, border: { display: false }, ticks: { color: T3, maxTicksLimit: 5, precision: 0 }, beginAtZero: true };
+
+        // Facturación: una serie → área con línea de 2px
+        const ctxF = document.getElementById('chartFacturacion').getContext('2d');
+        const degradado = ctxF.createLinearGradient(0, 0, 0, 260);
+        degradado.addColorStop(0, 'rgba(42, 120, 214, 0.18)');
+        degradado.addColorStop(1, 'rgba(42, 120, 214, 0)');
+        charts.push(new Chart(ctxF, {
             type: 'line',
-            plugins: [deltaPlugin],
-            data: {
-                labels: {{ \Illuminate\Support\Js::from($facturacionMensual->pluck('mes')) }},
-                datasets: [{
-                    label: 'Facturado',
-                    data: {{ \Illuminate\Support\Js::from($facturacionMensual->pluck('monto')) }},
-                    borderColor: '#378ADD',
-                    borderWidth: 2,
-                    backgroundColor: 'rgba(55,138,221,0.12)',
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#378ADD',
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2
-                }]
-            },
+            data: { labels: datos.meses, datasets: [{ label: 'Facturado', data: datos.facturacion, borderColor: S1, backgroundColor: degradado, fill: true, borderWidth: 2, cubicInterpolationMode: 'monotone', pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: S1, pointHoverBorderColor: '#fff', pointHoverBorderWidth: 2 }] },
             options: {
-                ...BASE,
-                layout: { padding: { top: 22 } },
-                plugins: { legend: { display: false }, tooltip: TT('$') },
-                scales: { x: XS, y: YS }
-            }
+                responsive: true, maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { display: false }, tooltip: { ...tooltip, callbacks: { label: c => ' ' + dinero(c.parsed.y) } } },
+                scales: { x: ejeX, y: { ...ejeY, ticks: { ...ejeY.ticks, callback: dinero } } },
+            },
         }));
 
-        /* 2 · Turnos — Chart Mixto: Bar agrupado + Línea ratio cancelación */
-        @php
-            $completadosData = $turnosUltimosMeses->pluck('completados');
-            $canceladosData  = $turnosUltimosMeses->pluck('cancelados');
-            $ratioData = $turnosUltimosMeses->map(function ($row) {
-                $total = ($row->completados + $row->cancelados);
-                return $total > 0
-                    ? round($row->cancelados / $total * 100, 1)
-                    : 0;
-            });
-        @endphp
+        // Turnos: barras apiladas con un solo eje; 2px de separación del color de fondo entre segmentos
+        const segmento = { borderWidth: { top: 2 }, borderColor: '#ffffff', borderSkipped: 'bottom', borderRadius: 4, maxBarThickness: 32 };
         charts.push(new Chart(document.getElementById('chartTurnos'), {
             type: 'bar',
             data: {
-                labels: {{ \Illuminate\Support\Js::from($turnosUltimosMeses->pluck('mes')) }},
+                labels: datos.meses,
                 datasets: [
-                    {
-                        type: 'bar',
-                        label: 'Completados',
-                        data: {{ \Illuminate\Support\Js::from($completadosData) }},
-                        backgroundColor: '#639922',
-                        borderRadius: 5,
-                        borderSkipped: false,
-                        yAxisID: 'y'
-                    },
-                    {
-                        type: 'bar',
-                        label: 'Cancelados',
-                        data: {{ \Illuminate\Support\Js::from($canceladosData) }},
-                        backgroundColor: '#E24B4A',
-                        borderRadius: 5,
-                        borderSkipped: false,
-                        yAxisID: 'y'
-                    },
-                    {
-                        type: 'line',
-                        label: '% Cancelación',
-                        data: {{ \Illuminate\Support\Js::from($ratioData) }},
-                        borderColor: '#BA7517',
-                        borderWidth: 2,
-                        borderDash: [4, 3],
-                        pointBackgroundColor: '#BA7517',
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        fill: false,
-                        tension: 0.3,
-                        yAxisID: 'y2'
-                    }
-                ]
+                    { label: 'Completados', data: datos.completados, backgroundColor: S1, ...segmento },
+                    { label: 'Cancelados', data: datos.cancelados, backgroundColor: S2, ...segmento },
+                    { label: 'Otros', data: datos.otros, backgroundColor: SN, ...segmento },
+                ],
             },
             options: {
-                ...BASE,
-                plugins: { legend: { display: false }, tooltip: TT() },
-                scales: {
-                    x: XS,
-                    y: { ...YS },
-                    y2: {
-                        position: 'right',
-                        border: { display: false },
-                        grid: { display: false },
-                        ticks: { color: '#BA7517', font: { size: 10 }, callback: v => v + '%' },
-                        max: 100
-                    }
-                }
-            }
+                responsive: true, maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { display: false }, tooltip },
+                scales: { x: { ...ejeX, stacked: true }, y: { ...ejeY, stacked: true } },
+            },
         }));
 
-        /* 3 · Motivos — Radar */
-        @php
-        $radarColors = [
-            '#1D9E75' => ['border'=>'#1D9E75','bg'=>'rgba(29,158,117,0.15)','point'=>'#1D9E75'],
-            '#378ADD' => ['border'=>'#378ADD','bg'=>'rgba(55,138,221,0.15)','point'=>'#378ADD'],
-            '#D4537E' => ['border'=>'#D4537E','bg'=>'rgba(212,83,126,0.15)','point'=>'#D4537E'],
-            '#BA7517' => ['border'=>'#BA7517','bg'=>'rgba(186,117,23,0.15)','point'=>'#BA7517'],
-        ];
-        $radarDatasets = collect($motivosDatasets)->map(function ($ds) use ($radarColors) {
-            $dsArr = is_array($ds) ? $ds : (array) $ds;
-            $bgKey = $dsArr['backgroundColor'] ?? '#888780';
-            $c = $radarColors[$bgKey] ?? ['border'=>$bgKey,'bg'=>'rgba(136,135,128,0.15)','point'=>$bgKey];
-            return array_merge($dsArr, [
-                'borderColor'          => $c['border'],
-                'backgroundColor'      => $c['bg'],
-                'pointBackgroundColor' => $c['point'],
-                'borderWidth'          => 2,
-                'pointRadius'          => 4,
-            ]);
-        })->values()->toArray();
-        @endphp
-        charts.push(new Chart(document.getElementById('chartEspecialidad'), {
-            type: 'radar',
-            data: {
-                labels: {{ \Illuminate\Support\Js::from($motivosLabels) }},
-                datasets: {{ \Illuminate\Support\Js::from($radarDatasets) }}
-            },
-            options: {
-                ...BASE,
-                plugins: { legend: { display: false }, tooltip: TT() },
-                scales: {
-                    r: {
-                        grid:         { color: gc },
-                        angleLines:   { color: gc },
-                        pointLabels:  { color: tc, font: { size: 9 } },
-                        ticks:        { color: tc, font: { size: 9 }, stepSize: 1, backdropColor: 'transparent' },
-                        min: 0
-                    }
-                }
-            }
-        }));
-
-        /* 4 · Diagnósticos — Horizontal + escala logarítmica (original) */
-        @php
-            $diagLabels = $topDiagnosticos->pluck('codigo');
-            $diagData   = $topDiagnosticos->pluck('total');
-            $diagMap    = $topDiagnosticos->pluck('diagnostico', 'codigo');
-        @endphp
-        charts.push(new Chart(document.getElementById('chartDiagnosticos'), {
-            type: 'bar',
-            data: {
-                labels: {{ \Illuminate\Support\Js::from($diagLabels) }},
-                datasets: [{
-                    data: {{ \Illuminate\Support\Js::from($diagData) }},
-                    backgroundColor: '#D4537E',
-                    borderRadius: 5,
-                    borderSkipped: false
-                }]
-            },
-            options: {
-                ...BASE,
-                indexAxis: 'y',
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: '#fff', borderColor: 'rgba(0,0,0,0.1)', borderWidth: 1,
-                        titleColor: '#2C2C2A', bodyColor: '#5F5E5A', padding: 10, cornerRadius: 8,
-                        callbacks: {
-                            afterTitle: c => {
-                                const m = {{ \Illuminate\Support\Js::from($diagMap) }};
-                                return m[c[0].label] || '';
-                            }
-                        }
-                    }
+        // Rankings horizontales (una serie)
+        const ranking = (id, filas) => {
+            const el = document.getElementById(id);
+            if (!el || !filas.length) return;
+            charts.push(new Chart(el, {
+                type: 'bar',
+                data: { labels: filas.map(f => f.etiqueta), datasets: [{ label: 'Consultas', data: filas.map(f => f.total), backgroundColor: S1, borderRadius: 4, borderSkipped: 'start', maxBarThickness: 18 }] },
+                options: {
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip },
+                    scales: {
+                        x: { ...ejeY },
+                        y: { grid: { display: false }, border: { display: false }, ticks: { color: T2, autoSkip: false } },
+                    },
                 },
-                scales: {
-                    x: {
-                        type: 'logarithmic',
-                        grid: { color: gc },
-                        border: { display: false },
-                        ticks: { color: tc, font: { size: 10 }, callback: v => Number.isInteger(Math.log10(v)) ? v : '' }
-                    },
-                    y: { grid: { display: false }, border: { display: false }, ticks: { color: tc, font: { size: 10 } } }
-                }
-            }
-        }));
+            }));
+        };
+        ranking('chartMotivos', datos.motivos);
+        ranking('chartDiagnosticos', datos.diagnosticos);
 
-        /* 5 · Sexo — Doughnut 68% (original) */
-        charts.push(new Chart(document.getElementById('chartSexo'), {
-            type: 'doughnut',
-            data: {
-                labels: {{ \Illuminate\Support\Js::from($porSexo->keys()->map(fn($k) => match($k) { 'masculino' => 'Masculino', 'femenino' => 'Femenino', default => 'Otro' })) }},
-                datasets: [{
-                    data: {{ \Illuminate\Support\Js::from($porSexo->values()) }},
-                    backgroundColor: ['#378ADD', '#D4537E', '#888780'],
-                    borderColor: '#fff',
-                    borderWidth: 3,
-                    hoverOffset: 5
-                }]
-            },
-            options: {
-                ...BASE,
-                cutout: '68%',
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        ...TT(),
-                        callbacks: {
-                            label: c => {
-                                const t = {{ \Illuminate\Support\Js::from($porSexo->sum()) }};
-                                return ` ${c.label}: ${c.parsed} (${Math.round(c.parsed / t * 100)}%)`;
-                            }
-                        }
-                    }
-                }
-            }
-        }));
-
-        /* 6 · Edad — Bar + línea acumulada % (combo) */
-        @php
-            $edadValues = array_values($rangosEdad);
-            $edadTotal  = array_sum($edadValues);
-            $edadAcum   = [];
-            $acum       = 0;
-            foreach ($edadValues as $v) {
-                $acum += $v;
-                $edadAcum[] = $edadTotal > 0 ? round($acum / $edadTotal * 100, 1) : 0;
-            }
-        @endphp
+        // Edad
         charts.push(new Chart(document.getElementById('chartEdad'), {
             type: 'bar',
-            data: {
-                labels: {{ \Illuminate\Support\Js::from(array_keys($rangosEdad)) }},
-                datasets: [
-                    {
-                        type: 'bar',
-                        label: 'Pacientes',
-                        data: {{ \Illuminate\Support\Js::from($edadValues) }},
-                        backgroundColor: '#7F77DD',
-                        borderRadius: 5,
-                        borderSkipped: false,
-                        yAxisID: 'y'
-                    },
-                    {
-                        type: 'line',
-                        label: 'Acumulado %',
-                        data: {{ \Illuminate\Support\Js::from($edadAcum) }},
-                        borderColor: '#BA7517',
-                        borderWidth: 2,
-                        borderDash: [3, 3],
-                        pointBackgroundColor: '#BA7517',
-                        pointRadius: 3,
-                        pointHoverRadius: 5,
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        fill: false,
-                        tension: 0.3,
-                        yAxisID: 'y2'
-                    }
-                ]
-            },
-            options: {
-                ...BASE,
-                plugins: { legend: { display: false }, tooltip: TT() },
-                scales: {
-                    x: XS,
-                    y: { ...YS },
-                    y2: {
-                        position: 'right',
-                        border: { display: false },
-                        grid: { display: false },
-                        ticks: { color: '#BA7517', font: { size: 10 }, callback: v => v + '%' },
-                        max: 110
-                    }
-                }
-            }
+            data: { labels: Object.keys(datos.edad), datasets: [{ label: 'Pacientes', data: Object.values(datos.edad), backgroundColor: S1, borderRadius: 4, borderSkipped: 'bottom', maxBarThickness: 28 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip }, scales: { x: ejeX, y: ejeY } },
         }));
-
-        /* 7 · Ciudad — Horizontal Bar (escala de color proporcional) */
-        @php
-            $ciudadLabels = $porCiudad->pluck('ciudad')->toArray();
-            $ciudadValues = $porCiudad->pluck('total')->toArray();
-        @endphp
-        (function () {
-            const vals   = {{ \Illuminate\Support\Js::from($ciudadValues) }};
-            const maxVal = vals[0] || 1;
-            function lerpHex(a, b, t) {
-                const ah = parseInt(a, 16), bh = parseInt(b, 16);
-                const mix = c => Math.round(((ah >> c) & 0xff) * (1 - t) + ((bh >> c) & 0xff) * t);
-                return [16, 8, 0].map(mix).map(x => x.toString(16).padStart(2, '0')).join('');
-            }
-            const bgColors     = vals.map(v => '#' + lerpHex('e6f1fb', '185fa5', v / maxVal) + 'cc');
-            const borderColors = vals.map(v => '#' + lerpHex('b0c8e4', '0d3a6e', v / maxVal));
-
-            window.__chartCiudad = new Chart(document.getElementById('chartCiudad'), {
-                type: 'bar',
-                data: {
-                    labels: {{ \Illuminate\Support\Js::from($ciudadLabels) }},
-                    datasets: [{
-                        data: vals,
-                        backgroundColor: bgColors,
-                        borderColor: borderColors,
-                        borderWidth: 0.75,
-                        borderRadius: 5,
-                        borderSkipped: false
-                    }]
-                },
-                options: {
-                    ...BASE,
-                    indexAxis: 'y',
-                    plugins: { legend: { display: false }, tooltip: { ...TT(), callbacks: { label: c => ` ${c.parsed.x} pacientes` } } },
-                    scales: {
-                        x: { grid: { color: gc }, border: { display: false }, ticks: { color: tc, precision: 0, font: { size: 10 } } },
-                        y: { grid: { display: false }, border: { display: false }, ticks: { color: tc, font: { size: 10 } } }
-                    }
-                }
-            });
-            charts.push(window.__chartCiudad);
-        })();
-
     }
 
-    /* Boot: el script se vuelve a ejecutar en cada visita; se registra un único escuchador
-       que siempre llama a la versión más reciente de initCharts */
+    /* El script se vuelve a ejecutar en cada visita; un único escuchador llama a la versión más reciente */
     window.__dashboardInitCharts = initCharts;
     if (!window.__dashboardChartsRegistrado) {
         window.__dashboardChartsRegistrado = true;
         document.addEventListener('DOMContentLoaded', () => window.__dashboardInitCharts?.());
         document.addEventListener('livewire:navigated', () => window.__dashboardInitCharts?.());
     }
-
 })();
 </script>
 </div>
