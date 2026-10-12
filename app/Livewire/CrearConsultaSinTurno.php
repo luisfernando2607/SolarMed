@@ -37,6 +37,7 @@ class CrearConsultaSinTurno extends Component
     public function iniciarConsulta(): void
     {
         $this->showForm = true;
+        $this->sugerirTipoAtencion($this->selectedPaciente?->id, Medico::where('user_id', Auth::id())->value('especialidad_id'));
     }
 
     public function guardar(): void

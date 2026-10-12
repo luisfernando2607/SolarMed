@@ -11,6 +11,9 @@ use App\Models\ExpedienteConsulta;
 trait WithConsultaForm
 {
     public $tipo_consulta = 'general';
+    public $tipo_atencion = 'primera';
+    public $tipo_diagnostico = 'presuntivo';
+    public $revision_sistemas;
     public $motivo_consulta;
     public $anamnesis;
     public $diagnostico;
@@ -34,7 +37,10 @@ trait WithConsultaForm
         return [
             'tipo_consulta' => 'required|in:general,ginecologica,control_prenatal',
             'motivo_consulta' => 'required|string|max:2000',
+            'tipo_atencion' => 'required|in:primera,subsecuente',
             'anamnesis' => 'nullable|string|max:5000',
+            'revision_sistemas' => 'nullable|string|max:3000',
+            'tipo_diagnostico' => 'required|in:presuntivo,definitivo',
             'diagnostico' => 'required|string|max:2000',
             'codigo_cie10' => 'nullable|string|max:10',
             'tratamiento' => 'nullable|string|max:5000',
@@ -49,7 +55,24 @@ trait WithConsultaForm
         return [
             'motivo_consulta.required' => 'El motivo de consulta es obligatorio.',
             'diagnostico.required' => 'El diagnóstico es obligatorio.',
+            'tipo_atencion.required' => 'Indique si es primera consulta o subsecuente.',
+            'tipo_diagnostico.required' => 'Indique si el diagnóstico es presuntivo o definitivo.',
         ];
+    }
+
+    /**
+     * Formulario 002, bloque B: subsecuente si el paciente ya tiene consultas en la misma especialidad.
+     * Es una sugerencia; el médico puede cambiarla.
+     */
+    protected function sugerirTipoAtencion(?int $pacienteId, ?int $especialidadId): void
+    {
+        if (!$pacienteId) {
+            return;
+        }
+        $previas = ExpedienteConsulta::where('paciente_id', $pacienteId)
+            ->when($especialidadId, fn ($q) => $q->where('especialidad_id', $especialidadId))
+            ->exists();
+        $this->tipo_atencion = $previas ? 'subsecuente' : 'primera';
     }
 
     public function calcularImc(): void
@@ -62,7 +85,8 @@ trait WithConsultaForm
     public function resetForm(): void
     {
         $this->reset([
-            'tipo_consulta', 'motivo_consulta', 'anamnesis', 'diagnostico', 'codigo_cie10',
+            'tipo_consulta', 'tipo_atencion', 'tipo_diagnostico', 'revision_sistemas',
+            'motivo_consulta', 'anamnesis', 'diagnostico', 'codigo_cie10',
             'tratamiento', 'indicaciones', 'requiere_derivacion', 'derivacion_especialidad',
             'examen_fisico_pa', 'examen_fisico_fc', 'examen_fisico_fr', 'examen_fisico_temp',
             'examen_fisico_peso', 'examen_fisico_talla', 'examen_fisico_imc', 'examen_fisico_notas',
@@ -73,6 +97,9 @@ trait WithConsultaForm
     protected function llenarDesdeConsulta(ExpedienteConsulta $consulta): void
     {
         $this->tipo_consulta = $consulta->tipo_consulta;
+        $this->tipo_atencion = $consulta->tipo_atencion;
+        $this->tipo_diagnostico = $consulta->tipo_diagnostico;
+        $this->revision_sistemas = $consulta->revision_sistemas;
         $this->motivo_consulta = $consulta->motivo_consulta;
         $this->anamnesis = $consulta->anamnesis;
         $this->diagnostico = $consulta->diagnostico;
@@ -98,8 +125,10 @@ trait WithConsultaForm
     {
         return [
             'tipo_consulta' => $this->tipo_consulta,
+            'tipo_atencion' => $this->tipo_atencion,
             'motivo_consulta' => $this->motivo_consulta,
             'anamnesis' => $this->anamnesis,
+            'revision_sistemas' => $this->revision_sistemas,
             'examen_fisico' => [
                 'pa' => $this->examen_fisico_pa,
                 'fc' => $this->examen_fisico_fc,
@@ -112,6 +141,7 @@ trait WithConsultaForm
             ],
             'diagnostico' => $this->diagnostico,
             'codigo_cie10' => $this->codigo_cie10,
+            'tipo_diagnostico' => $this->tipo_diagnostico,
             'tratamiento' => $this->tratamiento,
             'indicaciones' => $this->indicaciones,
             'requiere_derivacion' => $this->requiere_derivacion,

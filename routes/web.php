@@ -299,6 +299,26 @@ Route::get('auditoria/incidentes', \App\Livewire\IncidentesSeguridad::class)
     ->middleware(['auth', 'can:auditoria.ver'])
     ->name('auditoria.incidentes');
 
+// Auditoría de la calidad de la historia clínica (formulario MSP 002) y planes de acción
+Route::get('auditoria/calidad-hc', \App\Livewire\CalidadHistorias::class)
+    ->middleware(['auth', 'can:auditoria.ver'])
+    ->name('auditoria.calidad');
+Route::get('auditoria/calidad-hc/{consulta}', \App\Livewire\EvaluarConsulta::class)
+    ->whereNumber('consulta')
+    ->middleware(['auth', 'can:auditoria.ver'])
+    ->name('auditoria.evaluar');
+Route::get('auditoria/calidad-hc/informe/{auditoria}', function (App\Models\AuditoriaHc $auditoria) {
+    abort_unless($auditoria->cerrada(), 404);
+    $auditoria->load('consulta.paciente', 'consulta.medico', 'consulta.especialidad', 'auditor', 'planes.responsable');
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'auditoria_hc', $auditoria->id, $auditoria->consulta->paciente_id, "Informe {$auditoria->numero()}");
+    return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.informe-auditoria-hc', ['a' => $auditoria, 'c' => $auditoria->consulta])
+        ->setPaper('a4', 'portrait')
+        ->stream("informe_auditoria_{$auditoria->numero()}.pdf");
+})->middleware(['auth', 'can:auditoria.ver'])->name('auditoria.informe');
+Route::get('auditoria/planes-accion', \App\Livewire\PlanesAccion::class)
+    ->middleware(['auth', 'can:auditoria.ver'])
+    ->name('auditoria.planes');
+
 // Tarifario (solo admin)
 Route::get('tarifario', GestionTarifario::class)
     ->middleware(['auth', 'can:configuracion.editar'])

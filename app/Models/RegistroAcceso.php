@@ -34,6 +34,7 @@ class RegistroAcceso extends Model
         'aceptar_confidencialidad' => 'Aceptó confidencialidad',
         'dar_permiso' => 'Dio permiso',
         'quitar_permiso' => 'Quitó permiso',
+        'auditar' => 'Auditó',
     ];
 
     /** Acciones de seguridad de la cuenta (no tocan datos clínicos) */

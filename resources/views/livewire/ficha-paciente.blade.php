@@ -207,6 +207,12 @@
                                     <p class="text-sm text-gray-600 mt-0.5">{{ $c->diagnostico }}</p>
                                 @endif
                                 <div class="flex flex-wrap items-center gap-2 mt-1.5 text-xs text-gray-400">
+                                    @if ($c->tipo_atencion)
+                                        <span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">{{ \App\Models\ExpedienteConsulta::TIPOS_ATENCION[$c->tipo_atencion] ?? $c->tipo_atencion }}</span>
+                                    @endif
+                                    @if ($c->tipo_diagnostico)
+                                        <span class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">Dx {{ mb_strtolower(\App\Models\ExpedienteConsulta::TIPOS_DIAGNOSTICO[$c->tipo_diagnostico] ?? $c->tipo_diagnostico) }}</span>
+                                    @endif
                                     @if ($c->codigo_cie10)
                                         <span class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-mono">{{ $c->codigo_cie10 }}</span>
                                     @endif
@@ -215,6 +221,9 @@
                                 @if ($c->tratamiento)
                                     <details class="mt-2 text-sm">
                                         <summary class="cursor-pointer text-xs font-medium text-blue-700">Ver tratamiento e indicaciones</summary>
+                                        @if ($c->revision_sistemas)
+                                            <p class="mt-2 text-gray-500"><span class="font-medium text-gray-600">Revisión de sistemas:</span> {{ $c->revision_sistemas }}</p>
+                                        @endif
                                         <p class="mt-2 text-gray-700 whitespace-pre-line">{{ $c->tratamiento }}</p>
                                         @if ($c->indicaciones)
                                             <p class="mt-2 text-gray-500 whitespace-pre-line">{{ $c->indicaciones }}</p>

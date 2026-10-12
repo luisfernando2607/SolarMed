@@ -1,5 +1,5 @@
 <div>
-    <div class="max-w-7xl mx-auto py-8 px-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         @php
             $tonosEstado = [
                 'pendiente' => 'bg-amber-50 text-amber-700',

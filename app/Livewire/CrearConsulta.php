@@ -23,6 +23,7 @@ class CrearConsulta extends Component
     {
         $this->turno = $turno->loadMissing('paciente');
         $this->paciente_id = $this->turno->paciente_id;
+        $this->sugerirTipoAtencion($this->paciente_id, $this->turno->especialidad_id);
     }
 
     public function guardar(): void

@@ -1,5 +1,5 @@
 <div>
-    <div class="max-w-7xl mx-auto py-8 px-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         @php
             $campo = 'w-full rounded-xl border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500';
             $tonosEstado = ['abierto' => 'bg-amber-50 text-amber-700', 'notificado' => 'bg-sky-50 text-sky-700', 'cerrado' => 'bg-gray-100 text-gray-600'];
