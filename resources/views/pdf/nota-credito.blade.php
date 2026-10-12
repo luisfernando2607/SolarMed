@@ -27,8 +27,8 @@
 <body>
     @php $factura = $nota->factura; @endphp
     <div class="encabezado center">
-        <img src="{{ public_path('images/SolarMed-bn.jpg') }}" alt="Solar Med" style="height: 50px; margin-bottom: 4px;">
-        <h1>{{ $emisor['nombre_comercial'] ?: config('app.name', 'CLÍNICA') }}</h1>
+        <img src="{{ $marca->logoBnRuta() }}" alt="{{ $marca->nombre() }}" style="height: 50px; margin-bottom: 4px;">
+        <h1>{{ $emisor['nombre_comercial'] ?: $marca->nombre() }}</h1>
         @if ($emisor['razon_social'])
             <p>{{ $emisor['razon_social'] }}</p>
         @endif

@@ -4,9 +4,64 @@
 })">
 <div class="max-w-5xl mx-auto py-8 px-4">
     <h1 class="text-2xl font-bold text-gray-900">Configuración</h1>
-    <p class="text-sm text-gray-500 mb-6">Agenda, alertas del control prenatal y horario de tareas automáticas. Los datos tributarios están en <a href="{{ route('sri.config') }}" wire:navigate class="text-blue-600 hover:underline">SRI</a> y en cada médico; las especialidades en <a href="{{ route('especialidades') }}" wire:navigate class="text-blue-600 hover:underline">Especialidades</a>.</p>
+    <p class="text-sm text-gray-500 mb-6">Datos de la clínica, agenda, alertas del control prenatal y horario de tareas automáticas. Los datos tributarios están en <a href="{{ route('sri.config') }}" wire:navigate class="text-blue-600 hover:underline">SRI</a> y en cada médico; las especialidades en <a href="{{ route('especialidades') }}" wire:navigate class="text-blue-600 hover:underline">Especialidades</a>.</p>
 
     <form wire:submit="guardar" class="space-y-6">
+        <section class="bg-white rounded-xl shadow-sm border p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-1">Clínica</h2>
+            <p class="text-xs text-gray-500 mb-4">Aparece en el inicio de sesión, el menú, el formulario de turnos para pacientes, los PDF y los correos.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="flex flex-col items-center gap-3">
+                    <div class="w-36 h-36 rounded-xl border bg-gray-50 flex items-center justify-center overflow-hidden">
+                        @if ($logo && !$errors->has('logo') && $logo->isPreviewable())
+                            <img src="{{ $logo->temporaryUrl() }}" alt="Vista previa" class="max-w-full max-h-full object-contain">
+                        @else
+                            <img src="{{ $marca->logoUrl() }}" alt="Logo" class="max-w-full max-h-full object-contain">
+                        @endif
+                    </div>
+                    <input wire:model="logo" type="file" accept="image/png,image/jpeg" class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-blue-50 file:text-blue-700">
+                    <p class="text-xs text-gray-400 text-center">PNG o JPG, máx. 1 MB. Se genera una versión en blanco y negro para los tickets.</p>
+                    @error('logo') <p class="text-red-500 text-xs">{{ $message }}</p> @enderror
+                    <button type="button" wire:click="quitarLogo" wire:confirm="¿Volver al logo original?" class="text-xs text-gray-500 hover:underline">Restaurar logo original</button>
+                </div>
+                <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 content-start">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Nombre de la clínica *</label>
+                    <input wire:model="marca_nombre" type="text"  class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    @error('marca_nombre') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Subtítulo</label>
+                    <input wire:model="marca_subtitulo" type="text" placeholder="Ej.: Ginecología y Medicina General" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    @error('marca_subtitulo') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Dirección</label>
+                    <input wire:model="marca_direccion" type="text"  class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    @error('marca_direccion') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Teléfono</label>
+                    <input wire:model="marca_telefono" type="text"  class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    @error('marca_telefono') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Correo</label>
+                    <input wire:model="marca_email" type="email"  class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    @error('marca_email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Color principal</label>
+                        <div class="flex gap-2 items-center">
+                            <input wire:model.live="marca_color" type="color" class="h-10 w-14 rounded-lg border-gray-300">
+                            <span class="text-sm font-mono text-gray-600">{{ $marca_color }}</span>
+                        </div>
+                        @error('marca_color') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="bg-white rounded-xl shadow-sm border p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Agenda</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

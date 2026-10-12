@@ -26,8 +26,8 @@
 </head>
 <body>
     <div class="encabezado center">
-        <img src="{{ public_path('images/SolarMed-bn.jpg') }}" alt="Solar Med" style="height: 50px; margin-bottom: 4px;">
-        <h1>{{ $emisor['nombre_comercial'] ?: config('app.name', 'CLÍNICA') }}</h1>
+        <img src="{{ $marca->logoBnRuta() }}" alt="{{ $marca->nombre() }}" style="height: 50px; margin-bottom: 4px;">
+        <h1>{{ $emisor['nombre_comercial'] ?: $marca->nombre() }}</h1>
         @if ($emisor['razon_social'])
             <p>{{ $emisor['razon_social'] }}</p>
         @endif
@@ -39,7 +39,7 @@
             <p>{{ $emisor['regimen_rimpe'] }}</p>
         @endif
         <p>Obligado a llevar contabilidad: {{ $emisor['obligado_contabilidad'] }}</p>
-        <p>Tel: {{ config('app.telefono', '044619253') }}</p>
+        @if ($marca->telefono())<p>Tel: {{ $marca->telefono() }}</p>@endif
         <p>Ecuador</p>
         <div class="double-line"></div>
         <h2 style="font-size:12px; margin:4px 0;">FACTURA</h2>

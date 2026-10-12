@@ -22,5 +22,5 @@ Puede verificar este comprobante en el portal del SRI (sri.gob.ec) con la clave 
 Se adjunta la representación impresa (PDF) y el archivo XML autorizado.
 
 Gracias por su confianza,<br>
-{{ config('app.name') }}
+{{ $marca->nombre() }}
 </x-mail::message>

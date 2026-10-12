@@ -29,8 +29,8 @@ class ComprobanteElectronicoMail extends Mailable
         $emisor = app(SriConfigService::class)->emisor($this->comprobante->medico);
 
         return new Envelope(
-            from: new Address(config('mail.from.address'), $emisor['nombre_comercial'] ?: ($emisor['razon_social'] ?: config('mail.from.name'))),
-            subject: "{$this->tipo()} electrónica {$this->numero()} — " . ($emisor['nombre_comercial'] ?: $emisor['razon_social'] ?: config('app.name')),
+            from: new Address(config('mail.from.address'), $emisor['nombre_comercial'] ?: ($emisor['razon_social'] ?: app(\App\Services\MarcaService::class)->nombre())),
+            subject: "{$this->tipo()} electrónica {$this->numero()} — " . ($emisor['nombre_comercial'] ?: $emisor['razon_social'] ?: app(\App\Services\MarcaService::class)->nombre()),
         );
     }
 

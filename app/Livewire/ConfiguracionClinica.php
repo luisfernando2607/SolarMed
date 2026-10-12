@@ -4,10 +4,18 @@ namespace App\Livewire;
 
 use App\Services\AjustesService;
 use App\Services\AuditoriaService;
+use Illuminate\Support\Facades\File;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class ConfiguracionClinica extends Component
 {
+    use WithFileUploads;
+
+    // Clínica (marca)
+    public $marca_nombre, $marca_subtitulo, $marca_direccion, $marca_telefono, $marca_email, $marca_color;
+    public $logo;
+
     // Agenda
     public string $tiposTexto = '';
     public string $duracionesTexto = '';
@@ -31,6 +39,9 @@ class ConfiguracionClinica extends Component
     public function mount(): void
     {
         $a = app(AjustesService::class);
+        foreach (['nombre', 'subtitulo', 'direccion', 'telefono', 'email', 'color'] as $campo) {
+            $this->{"marca_{$campo}"} = $a->get("marca.{$campo}");
+        }
         $this->tiposTexto = implode("\n", $a->get('agenda.tipos'));
         $this->duracionesTexto = implode(', ', $a->get('agenda.duraciones'));
         $this->duracion_defecto = $a->get('agenda.duracion_defecto');
@@ -77,6 +88,13 @@ class ConfiguracionClinica extends Component
             'movimientos_desde_semana' => 'required|integer|between:16,40',
             'dias_sin_control' => 'required|integer|between:7,90',
             'aviso_fpp_dias' => 'required|integer|between:1,60',
+            'marca_nombre' => 'required|string|max:80',
+            'marca_subtitulo' => 'nullable|string|max:120',
+            'marca_direccion' => 'nullable|string|max:200',
+            'marca_telefono' => 'nullable|string|max:40',
+            'marca_email' => 'nullable|email|max:120',
+            'marca_color' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'logo' => 'nullable|image|mimes:png,jpg,jpeg|max:1024|dimensions:min_width=64,min_height=64,max_width=3000,max_height=3000',
             'hora_recordatorios' => ['required', 'date_format:H:i'],
             'hora_respaldo' => ['required', 'date_format:H:i'],
         ], [
@@ -85,6 +103,9 @@ class ConfiguracionClinica extends Component
             'pa_severa_sistolica.gt' => 'Debe ser mayor que el umbral de hipertensión.',
             'pa_severa_diastolica.gt' => 'Debe ser mayor que el umbral de hipertensión.',
             'fcf_max.gt' => 'Debe ser mayor que el mínimo.',
+            'logo.image' => 'El logo debe ser una imagen PNG o JPG.',
+            'logo.max' => 'El logo no debe superar 1 MB.',
+            'logo.dimensions' => 'El logo debe medir entre 64 y 3000 píxeles por lado.',
         ]);
 
         if (!$tipos) {
@@ -101,6 +122,12 @@ class ConfiguracionClinica extends Component
         }
 
         $valores = [
+            'marca.nombre' => trim($this->marca_nombre),
+            'marca.subtitulo' => trim((string) $this->marca_subtitulo),
+            'marca.direccion' => trim((string) $this->marca_direccion),
+            'marca.telefono' => trim((string) $this->marca_telefono),
+            'marca.email' => trim((string) $this->marca_email),
+            'marca.color' => $this->marca_color,
             'agenda.tipos' => $tipos,
             'agenda.duraciones' => $duraciones,
             'agenda.duracion_defecto' => (int) $this->duracion_defecto,
@@ -114,12 +141,78 @@ class ConfiguracionClinica extends Component
             $valores["prenatal.{$campo}"] = $campo === 'au_tolerancia_cm' ? (float) $this->{$campo} : (int) $this->{$campo};
         }
 
+        if ($this->logo) {
+            $valores += $this->guardarLogo();
+            $this->reset('logo');
+        }
+
         app(AjustesService::class)->guardar($valores);
         app(AuditoriaService::class)->registrar('editar', 'configuracion', null, null, 'Configuración de agenda, alertas y tareas');
 
         $this->tiposTexto = implode("\n", $tipos);
         $this->duracionesTexto = implode(', ', $duraciones);
         $this->dispatch('notify', message: 'Configuración guardada.', type: 'success');
+    }
+
+    /** Valida el logo apenas se selecciona, para mostrar el error antes de guardar */
+    public function updatedLogo(): void
+    {
+        $this->validateOnly('logo', [
+            'logo' => 'nullable|image|mimes:png,jpg,jpeg|max:1024|dimensions:min_width=64,min_height=64,max_width=3000,max_height=3000',
+        ], [
+            'logo.image' => 'El logo debe ser una imagen PNG o JPG.',
+            'logo.mimes' => 'El logo debe ser una imagen PNG o JPG.',
+            'logo.max' => 'El logo no debe superar 1 MB.',
+            'logo.dimensions' => 'El logo debe medir entre 64 y 3000 píxeles por lado.',
+        ]);
+    }
+
+    public function quitarLogo(): void
+    {
+        $this->authorize('configuracion.editar');
+        $this->borrarLogosPropios();
+        app(AjustesService::class)->guardar(['marca.logo' => null, 'marca.logo_bn' => null]);
+        $this->dispatch('notify', message: 'Se restauró el logo original.', type: 'success');
+    }
+
+    /** Guarda el logo en public/marca y genera una versión en blanco y negro para los tickets térmicos */
+    private function guardarLogo(): array
+    {
+        $this->borrarLogosPropios();
+        $dir = public_path('marca');
+        File::ensureDirectoryExists($dir);
+
+        $ext = $this->logo->getMimeType() === 'image/png' ? 'png' : 'jpg';
+        $marca = now()->format('YmdHis');
+        $nombre = "logo-{$marca}.{$ext}";
+        File::copy($this->logo->getRealPath(), "{$dir}/{$nombre}");
+
+        $bn = "logo-bn-{$marca}.png";
+        $img = @imagecreatefromstring(File::get("{$dir}/{$nombre}"));
+        if ($img) {
+            // Fondo blanco para transparencias y escala de grises
+            $lienzo = imagecreatetruecolor(imagesx($img), imagesy($img));
+            imagefill($lienzo, 0, 0, imagecolorallocate($lienzo, 255, 255, 255));
+            imagecopy($lienzo, $img, 0, 0, 0, 0, imagesx($img), imagesy($img));
+            imagefilter($lienzo, IMG_FILTER_GRAYSCALE);
+            imagepng($lienzo, "{$dir}/{$bn}");
+            imagedestroy($img);
+            imagedestroy($lienzo);
+        } else {
+            File::copy("{$dir}/{$nombre}", "{$dir}/{$bn}");
+        }
+
+        return ['marca.logo' => "marca/{$nombre}", 'marca.logo_bn' => "marca/{$bn}"];
+    }
+
+    private function borrarLogosPropios(): void
+    {
+        foreach (['marca.logo', 'marca.logo_bn'] as $clave) {
+            $ruta = app(AjustesService::class)->get($clave);
+            if ($ruta && str_starts_with($ruta, 'marca/')) {
+                File::delete(public_path($ruta));
+            }
+        }
     }
 
     public function render()

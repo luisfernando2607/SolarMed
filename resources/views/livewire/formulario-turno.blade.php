@@ -1,27 +1,27 @@
-<div class="min-h-screen flex flex-col" style="background: #F1EFE8;">
+<div class="min-h-screen flex flex-col" style="--marca: {{ $marca->color() }}; --marca-medio: color-mix(in srgb, var(--marca) 75%, white); --marca-oscuro: color-mix(in srgb, var(--marca) 65%, black); --marca-claro: color-mix(in srgb, var(--marca) 40%, white); --marca-suave: color-mix(in srgb, var(--marca) 12%, white); background: #F1EFE8;">
 
     {{-- ===== PANTALLA DE ÉXITO ===== --}}
     @if ($turnoAsignado)
         <div class="flex-1 flex flex-col items-center justify-center px-6 text-center">
             <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5"
-                 style="background: #E1F5EE;">
-                <svg class="w-10 h-10" style="color: #1D9E75;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 style="background: var(--marca-suave);">
+                <svg class="w-10 h-10" style="color: var(--marca-medio);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                 </svg>
             </div>
 
-            <p class="text-xs font-semibold uppercase tracking-widest mb-1" style="color: #1D9E75;">
+            <p class="text-xs font-semibold uppercase tracking-widest mb-1" style="color: var(--marca-medio);">
                 ¡Turno asignado!
             </p>
-            <p class="font-extrabold leading-none my-3" style="font-size: 80px; color: #0F6E56;">
+            <p class="font-extrabold leading-none my-3" style="font-size: 80px; color: var(--marca);">
                 {{ $turnoAsignado }}
             </p>
             <p class="text-gray-600 text-sm">Preséntate en recepción y espera tu llamado.</p>
             <p class="text-xs text-gray-400 mt-1">Tiempo estimado de espera: ~10 min</p>
 
             <button wire:click="$set('turnoAsignado', null)"
-                class="mt-10 w-full max-w-xs py-4 rounded-2xl font-semibold text-white text-base shadow-lg shadow-green-700/20"
-                style="background: #1D9E75;">
+                class="mt-10 w-full max-w-xs py-4 rounded-2xl font-semibold text-white text-base shadow-lg shadow-black/10"
+                style="background: var(--marca-medio);">
                 Sacar otro turno
             </button>
         </div>
@@ -31,12 +31,14 @@
         <div class="max-w-lg mx-auto w-full flex flex-col flex-1" x-data="turnoWizard()" x-init="init()">
 
             {{-- Cabecera --}}
-            <div class="text-white text-center px-5 pt-8 pb-8 rounded-b-3xl shadow-lg shadow-green-800/10" style="background: linear-gradient(135deg, #0F6E56 0%, #1D9E75 100%);">
+            <div class="text-white text-center px-5 pt-8 pb-8 rounded-b-3xl shadow-lg shadow-black/10" style="background: linear-gradient(135deg, {{ $marca->color() }} 0%, color-mix(in srgb, {{ $marca->color() }} 70%, white) 100%);">
                 <div class="w-12 h-12 mx-auto mb-3 bg-white/15 rounded-2xl flex items-center justify-center backdrop-blur-sm">
                     <x-application-logo class="w-7 h-7 opacity-90" />
                 </div>
-                <h1 class="text-lg font-bold tracking-tight">SolarMed Software</h1>
-                <p class="text-xs mt-1 font-medium" style="opacity: 0.80;">Sistema Médico — Ginecología & Medicina General</p>
+                <h1 class="text-lg font-bold tracking-tight">{{ $marca->nombre() }}</h1>
+                @if ($marca->subtitulo())
+                    <p class="text-xs mt-1 font-medium" style="opacity: 0.80;">{{ $marca->subtitulo() }}</p>
+                @endif
             </div>
 
             {{-- Barra de progreso --}}
@@ -47,8 +49,8 @@
                             type="button"
                             class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-all duration-300"
                             :class="paso >= n ? 'shadow-sm' : ''"
-                            :style="paso > n  ? 'background:#9FE1CB; color:#085041;' :
-                                    paso == n ? 'background:#1D9E75; color:white;' :
+                            :style="paso > n  ? 'background:var(--marca-claro); color:var(--marca-oscuro);' :
+                                    paso == n ? 'background:var(--marca-medio); color:white;' :
                                     'background:#F1EFE8; color:#9CA3AF;'"
                             @click="if(n < paso) irA(n)"
                             :aria-current="paso == n ? 'step' : undefined"
@@ -64,7 +66,7 @@
                         </button>
                         <template x-if="n < 3">
                             <div class="h-0.5 flex-1 rounded-full transition-all duration-300"
-                                 :style="paso > n ? 'background:#9FE1CB' : 'background:#E5E3D9'">
+                                 :style="paso > n ? 'background:var(--marca-claro)' : 'background:#E5E3D9'">
                             </div>
                         </template>
                     </div>
@@ -79,7 +81,7 @@
                 <div x-show="paso == 1" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="flex-1 overflow-y-auto">
                     <div class="flex items-center gap-3 px-5 pt-5 pb-1">
                         <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                             style="background:#E1F5EE; color:#0F6E56;">
+                             style="background:var(--marca-suave); color:var(--marca);">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M5.121 17.804A8 8 0 1118.88 6.196M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -96,7 +98,7 @@
                         {{-- Datos personales --}}
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="form-label">Nombres <span class="text-green-600">*</span></label>
+                                <label class="form-label">Nombres <span style="color: var(--marca)">*</span></label>
                                 <div class="relative">
                                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A8 8 0 1118.88 6.196M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                     <input wire:model="nombres" type="text" required autocomplete="given-name"
@@ -106,7 +108,7 @@
                                 @error('nombres') <p class="form-error">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="form-label">Apellidos <span class="text-green-600">*</span></label>
+                                <label class="form-label">Apellidos <span style="color: var(--marca)">*</span></label>
                                 <div class="relative">
                                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A8 8 0 1118.88 6.196M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                     <input wire:model="apellidos" type="text" required autocomplete="family-name"
@@ -119,7 +121,7 @@
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label class="form-label">Cédula <span class="text-green-600">*</span></label>
+                                <label class="form-label">Cédula <span style="color: var(--marca)">*</span></label>
                                 <div class="relative">
                                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0"/></svg>
                                     <input wire:model="cedula" type="text" required
@@ -130,7 +132,7 @@
                                 @error('cedula') <p class="form-error">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="form-label">Celular <span class="text-green-600">*</span></label>
+                                <label class="form-label">Celular <span style="color: var(--marca)">*</span></label>
                                 <div class="relative">
                                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
                                     <input wire:model="telefono" type="tel" required
@@ -153,13 +155,13 @@
                                 @error('fecha_nacimiento') <p class="form-error">{{ $message }}</p> @enderror
                             </div>
                             <div>
-                                <label class="form-label">Sexo <span class="text-green-600">*</span></label>
+                                <label class="form-label">Sexo <span style="color: var(--marca)">*</span></label>
                                 <div class="grid grid-cols-3 gap-2 mt-1">
                                     @foreach(['masculino' => 'M', 'femenino' => 'F', 'otro' => 'O'] as $val => $label)
                                         <label
                                             class="flex flex-col items-center justify-center py-2.5 rounded-xl border-2 text-sm font-medium cursor-pointer transition-all duration-150"
                                             :style="$wire.sexo === '{{ $val }}'
-                                                ? 'border-color:#1D9E75; background:#E1F5EE; color:#085041;'
+                                                ? 'border-color:var(--marca-medio); background:var(--marca-suave); color:var(--marca-oscuro);'
                                                 : 'border-color:#E5E3D9; background:white; color:#6B7280;'">
                                             <input wire:model.live="sexo" type="radio" value="{{ $val }}" class="sr-only">
                                             {{ $label }}
@@ -235,7 +237,7 @@
                 <div x-show="paso == 2" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="flex-1 overflow-y-auto">
                     <div class="flex items-center gap-3 px-5 pt-5 pb-1">
                         <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                             style="background:#E1F5EE; color:#0F6E56;">
+                             style="background:var(--marca-suave); color:var(--marca);">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 016.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"/>
@@ -333,7 +335,7 @@
                 <div x-show="paso == 3" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="flex-1">
                     <div class="flex items-center gap-3 px-5 pt-5 pb-1">
                         <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                             style="background:#E1F5EE; color:#0F6E56;">
+                             style="background:var(--marca-suave); color:var(--marca);">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
@@ -348,7 +350,7 @@
                     <div class="px-5 pb-3 space-y-4">
 
                         <div>
-                            <label class="form-label">Especialidad <span class="text-green-600">*</span></label>
+                            <label class="form-label">Especialidad <span style="color: var(--marca)">*</span></label>
                             <div class="relative">
                                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                                 <select wire:model.live="especialidad_id" required class="form-input pl-10">
@@ -363,7 +365,7 @@
 
                         @if ($motivosDisponibles)
                             <div>
-                                <label class="form-label">Motivo de consulta <span class="text-green-600">*</span></label>
+                                <label class="form-label">Motivo de consulta <span style="color: var(--marca)">*</span></label>
                                 <div class="relative">
                                     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     <select wire:model="motivo" required class="form-input pl-10">
@@ -385,7 +387,7 @@
 
                         <div class="rounded-xl p-3.5 text-xs text-gray-500 flex gap-2.5 items-start"
                              style="background: #F1EFE8;">
-                            <svg class="w-4 h-4 flex-shrink-0 mt-0.5" style="color:#1D9E75;"
+                            <svg class="w-4 h-4 flex-shrink-0 mt-0.5" style="color:var(--marca-medio);"
                                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"/>
@@ -410,9 +412,9 @@
                         type="button"
                         x-show="paso < 3"
                         @click="$wire.validarPaso(paso).then(ok => { if(ok) paso++ })"
-                        class="py-4 rounded-2xl font-semibold text-white text-base shadow-lg shadow-green-700/20 active:scale-[0.98] transition-all"
+                        class="py-4 rounded-2xl font-semibold text-white text-base shadow-lg shadow-black/10 active:scale-[0.98] transition-all"
                         :class="paso > 1 ? 'flex-[2]' : 'w-full'"
-                        style="background: #1D9E75;">
+                        style="background: var(--marca-medio);">
                         Continuar →
                     </button>
 
@@ -420,8 +422,8 @@
                         type="submit"
                         x-show="paso == 3"
                         wire:loading.attr="disabled"
-                        class="flex-[2] py-4 rounded-2xl font-semibold text-white text-base flex items-center justify-center gap-2 shadow-lg shadow-green-700/20 active:scale-[0.98] transition-all"
-                        style="background: #1D9E75;">
+                        class="flex-[2] py-4 rounded-2xl font-semibold text-white text-base flex items-center justify-center gap-2 shadow-lg shadow-black/10 active:scale-[0.98] transition-all"
+                        style="background: var(--marca-medio);">
                         <span wire:loading.remove>
                             <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -442,7 +444,7 @@
         </div>
 
         <p class="text-center text-xs text-gray-400 pb-5">
-            SolarMed Software &mdash; Sistema Médico &mdash; Tel: 044619253
+            {{ $marca->nombre() }}@if ($marca->contacto()) &mdash; {{ $marca->contacto() }}@endif
         </p>
 
     @endif
