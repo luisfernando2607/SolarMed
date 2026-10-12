@@ -11,13 +11,13 @@ Sistema de gestión clínica integral para **SolarMed Software**, una consulta p
 - **Historia clínica (Expedientes)** — Consultas con anamnesis, examen físico, diagnóstico, tratamiento y referencias. Solo el autor corrige y cada corrección queda versionada con su motivo.
 - **Control prenatal** — Embarazos por paciente: edad gestacional y FPP desde la FUM, controles (peso, PA, altura uterina, FCF, presentación, movimientos fetales, edemas) con alertas clínicas, checklist de exámenes por trimestre (`config/clinica.php`) y cierre con desenlace.
 - **Recetas** — Receta en PDF (A5) con alergias resaltadas, vinculada a la consulta.
+- **Agenda de citas** — Calendario (FullCalendar) por médico con colores por especialidad, paciente nuevo o existente, control de choques, reprogramación arrastrando y "Registrar llegada" que crea el turno en sala de espera.
+- **Archivos del paciente** — Laboratorios, imágenes, referencias y fotos clínicas (PDF/JPG/PNG), con miniaturas y descarga auditada.
 - **Ecografías** — Informes con biometría fetal (DBP, CC, CA, LF), peso fetal estimado y PDF.
 - **Facturación electrónica SRI** — Factura y nota de crédito electrónicas con el RUC de cada médico, firma XAdES-BES, autorización automática en segundo plano y envío al paciente por correo (PDF + XML).
 - **Auditoría** — Registro de quién vio, descargó o modificó datos clínicos (LOPDP).
 - **Dashboard administrativo** — Estadísticas (pacientes por sexo/edad/ciudad, turnos, facturación mensual, diagnósticos frecuentes).
 - **Usuarios y permisos** — Roles (admin, médico, secretaria, enfermería) y permisos por ruta vía Spatie.
-
-**Pendiente:** agenda de citas (la tabla `citas` existe, falta la pantalla) y gestión de archivos del paciente (`ArchivoService` existe, falta la pantalla).
 
 ## Tecnologías
 

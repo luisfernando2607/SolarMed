@@ -541,6 +541,12 @@
 
                             {{-- Botones de acción --}}
                             <div class="mt-6 pt-4 border-t flex flex-wrap gap-3">
+                                @can('expediente.ver')
+                                    <a href="{{ route('pacientes.archivos', $selected->id) }}" wire:navigate
+                                       class="px-4 py-2 bg-slate-600 text-white text-sm font-medium rounded-lg hover:bg-slate-700 transition">
+                                        Archivos
+                                    </a>
+                                @endcan
                                 @if ($selected->sexo === 'femenino')
                                     @can('expediente.ver')
                                         <a href="{{ route('prenatal', $selected->id) }}" wire:navigate

@@ -40,6 +40,9 @@ new class extends Component
                             <x-nav-link :href="route('sala-espera')" :active="request()->routeIs('sala-espera*')" wire:navigate>
                                 {{ __('Sala de Espera') }}
                             </x-nav-link>
+                            <x-nav-link :href="route('agenda')" :active="request()->routeIs('agenda*')" wire:navigate>
+                                {{ __('Agenda') }}
+                            </x-nav-link>
                         @endcan
                         @can('turnos.ver')
                             @unlessrole('medico')
@@ -72,6 +75,9 @@ new class extends Component
                         </x-nav-link>
                     @endcan
                     @can('configuracion.editar')
+                        <x-nav-link :href="route('agenda')" :active="request()->routeIs('agenda*')" wire:navigate>
+                            {{ __('Agenda') }}
+                        </x-nav-link>
                         <x-nav-link :href="route('tarifario')" :active="request()->routeIs('tarifario*')" wire:navigate>
                             {{ __('Tarifario') }}
                         </x-nav-link>
@@ -137,6 +143,9 @@ new class extends Component
                     <x-responsive-nav-link :href="route('turnos.crear')" :active="request()->routeIs('turnos.crear*')" wire:navigate>
                         {{ __('Registrar turno') }}
                     </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('agenda')" :active="request()->routeIs('agenda*')" wire:navigate>
+                        {{ __('Agenda') }}
+                    </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('sala-espera')" :active="request()->routeIs('sala-espera*')" wire:navigate>
                         {{ __('Sala de Espera') }}
                     </x-responsive-nav-link>
@@ -172,6 +181,9 @@ new class extends Component
                 </x-responsive-nav-link>
             @endcan
             @can('configuracion.editar')
+                <x-responsive-nav-link :href="route('agenda')" wire:navigate>
+                    {{ __('Agenda') }}
+                </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('tarifario')" wire:navigate>
                     {{ __('Tarifario') }}
                 </x-responsive-nav-link>
