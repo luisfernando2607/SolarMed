@@ -541,6 +541,14 @@
 
                             {{-- Botones de acción --}}
                             <div class="mt-6 pt-4 border-t flex flex-wrap gap-3">
+                                @if ($selected->sexo === 'femenino')
+                                    @can('expediente.ver')
+                                        <a href="{{ route('prenatal', $selected->id) }}" wire:navigate
+                                           class="px-4 py-2 bg-pink-600 text-white text-sm font-medium rounded-lg hover:bg-pink-700 transition">
+                                            Control prenatal
+                                        </a>
+                                    @endcan
+                                @endif
                                 <a href="{{ route('pacientes.pdf', $selected->id) }}"
                                    class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

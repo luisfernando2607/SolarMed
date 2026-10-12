@@ -93,6 +93,14 @@
                 </div>
             </div>
 
+            @if ($turno->paciente->sexo === 'femenino')
+                <div class="md:col-span-2 flex justify-end">
+                    <a href="{{ route('prenatal', $turno->paciente->id) }}" wire:navigate
+                       class="px-4 py-2 bg-pink-600 text-white text-sm font-medium rounded-lg hover:bg-pink-700 transition">
+                        Control prenatal
+                    </a>
+                </div>
+            @endif
             @if ($turno->paciente->sexo === 'femenino' && ($turno->paciente->fum || $turno->paciente->gestas))
             <div class="md:col-span-2 bg-pink-50 rounded-xl shadow-sm border border-pink-200 p-6">
                 <h3 class="font-semibold text-pink-800 mb-3">Datos gineco-obstétricos</h3>

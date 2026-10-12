@@ -229,6 +229,7 @@ class ListaPacientes extends Component
             || $paciente->archivos()->exists()
             || \App\Models\ControlPrenatal::where('paciente_id', $paciente->id)->exists()
             || \App\Models\Receta::where('paciente_id', $paciente->id)->exists()
+            || \App\Models\Embarazo::where('paciente_id', $paciente->id)->exists()
             || \App\Models\Factura::where('paciente_id', $paciente->id)->exists();
 
         if ($tieneHistorial) {
