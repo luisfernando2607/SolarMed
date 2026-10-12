@@ -44,7 +44,8 @@ class CrearConsulta extends Component
         ]);
 
         app(\App\Services\AuditoriaService::class)->registrar('crear', 'consulta', $consulta->id, $consulta->paciente_id);
-        $this->dispatch('notify', message: 'Consulta registrada exitosamente.', type: 'success');
+        // Aviso que sobrevive a la redirección (lo muestra el layout)
+        session()->flash('notify', ['message' => 'Consulta registrada exitosamente.', 'type' => 'success']);
         $this->redirect(route('turno.atender', $this->turno->id), navigate: true);
     }
 

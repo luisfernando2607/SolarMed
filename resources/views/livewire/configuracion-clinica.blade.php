@@ -1,7 +1,4 @@
-<div x-data x-on:notify.window="Swal.fire({
-    icon: $event.detail.type, title: $event.detail.type === 'success' ? 'Listo' : 'Error',
-    text: $event.detail.message, timer: 3000, showConfirmButton: false, toast: true, position: 'top-end'
-})">
+<div>
 <div class="max-w-5xl mx-auto py-8 px-4">
     <h1 class="text-2xl font-bold text-gray-900">Configuración</h1>
     <p class="text-sm text-gray-500 mb-6">Datos de la clínica, agenda, alertas del control prenatal y horario de tareas automáticas. Los datos tributarios están en <a href="{{ route('sri.config') }}" wire:navigate class="text-blue-600 hover:underline">SRI</a> y en cada médico; las especialidades en <a href="{{ route('especialidades') }}" wire:navigate class="text-blue-600 hover:underline">Especialidades</a>.</p>

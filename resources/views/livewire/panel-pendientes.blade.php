@@ -1,6 +1,6 @@
 <div class="space-y-4" wire:poll.60s>
     @if ($hoy || $sri)
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 {{ $hoy && $sri ? 'lg:grid-cols-4' : 'lg:grid-cols-2' }} gap-4">
             @if ($hoy)
                 <a href="{{ route('agenda') }}" wire:navigate class="bg-white border rounded-xl p-4 hover:shadow-sm transition">
                     <p class="text-xs text-gray-500">Citas de hoy</p>

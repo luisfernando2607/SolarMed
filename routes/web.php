@@ -47,12 +47,10 @@ Route::get('verificar', function (Illuminate\Http\Request $request) {
 })->middleware('throttle:30,1')->name('certificados.buscar');
 
 // Dashboard protegido
-Route::get('dashboard', function () {
-    if (request()->user()->can('configuracion.editar')) {
-        return redirect()->route('admin.dashboard');
-    }
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Inicio del personal (el admin es redirigido a su dashboard)
+Route::get('dashboard', App\Livewire\InicioPersonal::class)
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::get('admin/dashboard', \App\Livewire\AdminDashboard::class)
     ->middleware(['auth', 'can:configuracion.editar'])
