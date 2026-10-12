@@ -133,6 +133,7 @@ class CrearConsultaSinTurno extends Component
         ExpedienteConsulta::create([
             'paciente_id' => $this->selectedPaciente->id,
             'medico_id' => $medico->id,
+            'especialidad_id' => $medico->especialidad_id,
             'tipo_consulta' => $this->tipo_consulta,
             'fecha' => now(),
             'motivo_consulta' => $this->motivo_consulta,

@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\Attributes\Locked;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use App\Models\User;
@@ -11,15 +12,22 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use App\Services\SriSignService;
 
 class GestionUsuarios extends Component
 {
     use WithPagination, WithFileUploads;
 
     public string $busqueda = '';
+    private const ORDENABLES = ['cedula', 'created_at', 'email', 'name'];
+
+    #[Locked]
     public string $sortBy = 'created_at';
+    #[Locked]
     public string $sortDirection = 'desc';
     public bool $editMode = false;
+    #[Locked]
     public ?int $editId = null;
 
     public $name;
@@ -29,6 +37,7 @@ class GestionUsuarios extends Component
     public $password_confirmation;
     public $rol;
     public $p12_file;
+    public $p12_password;
 
     protected function rules(): array
     {
@@ -42,6 +51,7 @@ class GestionUsuarios extends Component
         if ($this->editMode) {
             $rules['password'] = 'nullable|string|min:8|confirmed';
             $rules['p12_file'] = 'nullable|file|mimes:p12,pfx|max:2048';
+            $rules['p12_password'] = 'required_with:p12_file|nullable|string|max:255';
         } else {
             $rules['password'] = 'required|string|min:8|confirmed';
         }
@@ -59,11 +69,12 @@ class GestionUsuarios extends Component
         'rol.required' => 'Debe seleccionar un rol.',
         'p12_file.mimes' => 'El archivo debe ser .p12 o .pfx.',
         'p12_file.max' => 'El archivo no debe superar los 2MB.',
+        'p12_password.required_with' => 'Ingrese la contraseña del certificado.',
     ];
 
     public function resetForm(): void
     {
-        $this->reset(['name', 'email', 'cedula', 'password', 'password_confirmation', 'rol', 'p12_file', 'editMode', 'editId']);
+        $this->reset(['name', 'email', 'cedula', 'password', 'password_confirmation', 'rol', 'p12_file', 'p12_password', 'editMode', 'editId']);
     }
 
     public function crear(): void
@@ -84,6 +95,7 @@ class GestionUsuarios extends Component
         $this->password = null;
         $this->password_confirmation = null;
         $this->p12_file = null;
+        $this->p12_password = null;
         $this->rol = $user->roles->first()?->name;
     }
 
@@ -91,6 +103,10 @@ class GestionUsuarios extends Component
     {
         $this->authorize('usuarios.gestionar');
         $this->validate();
+
+        if ($this->p12_file && $this->rol === 'medico') {
+            $this->verificarP12();
+        }
 
         $data = [
             'name' => $this->name,
@@ -127,6 +143,16 @@ class GestionUsuarios extends Component
         $this->resetForm();
     }
 
+    private function verificarP12(): void
+    {
+        $contenido = file_get_contents($this->p12_file->getRealPath());
+        if (!openssl_pkcs12_read($contenido, $certs, (string) $this->p12_password)) {
+            throw ValidationException::withMessages([
+                'p12_password' => 'No se pudo abrir el certificado: la contraseña es incorrecta o el archivo no es válido.',
+            ]);
+        }
+    }
+
     private function guardarP12(User $user): void
     {
         $medico = Medico::firstOrCreate(
@@ -135,11 +161,18 @@ class GestionUsuarios extends Component
         );
 
         $path = $this->p12_file->store("certificados/{$user->id}", 'private');
-        $medico->update(['p12_path' => $path]);
+        $medico->update([
+            'p12_path' => $path,
+            'p12_password_encrypted' => SriSignService::encryptPassword((string) $this->p12_password),
+        ]);
     }
 
     public function ordenarPor($field): void
     {
+        if (!in_array($field, self::ORDENABLES, true)) {
+            return;
+        }
+
         if ($this->sortBy === $field) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
         } else {

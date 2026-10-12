@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\Attributes\Locked;
 use App\Models\Turno;
 use App\Models\Ecografia;
 use App\Models\Medico;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 class CrearEcografia extends Component
 {
     public Turno $turno;
+    #[Locked]
     public $paciente_id;
     public $fecha;
     public $indicacion;

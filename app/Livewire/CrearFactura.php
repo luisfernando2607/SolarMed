@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\Attributes\Locked;
 use Livewire\WithPagination;
 use App\Models\Factura;
 use App\Models\Paciente;
@@ -18,6 +19,7 @@ class CrearFactura extends Component
     public string $busqueda = '';
     public ?Paciente $selectedPaciente = null;
     public $serviciosDisponibles = [];
+    #[Locked]
     public $items = [];
     public $descuento = 0;
     public $forma_pago = 'efectivo';

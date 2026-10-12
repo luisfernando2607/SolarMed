@@ -228,6 +228,12 @@
                                     <p class="text-xs text-gray-400 mt-1">{{ $p12_file->getClientOriginalName() }}</p>
                                 @endif
                             </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Contraseña del certificado</label>
+                                <input wire:model="p12_password" type="password" autocomplete="new-password"
+                                    class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm py-2">
+                                @error('p12_password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                            </div>
                         @endif
 
                         <div class="flex justify-end gap-3 pt-4 border-t">

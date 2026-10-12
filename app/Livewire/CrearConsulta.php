@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\Attributes\Locked;
 use App\Models\Turno;
 use App\Models\Paciente;
 use App\Models\ExpedienteConsulta;
@@ -14,6 +15,7 @@ class CrearConsulta extends Component
 {
     use WithCie10Autocomplete;
     public Turno $turno;
+    #[Locked]
     public $paciente_id;
 
     public $tipo_consulta = 'general';
@@ -54,6 +56,12 @@ class CrearConsulta extends Component
         'motivo_consulta.required' => 'El motivo de consulta es obligatorio.',
         'diagnostico.required' => 'El diagnóstico es obligatorio.',
     ];
+
+    public function mount(Turno $turno): void
+    {
+        $this->turno = $turno->loadMissing('paciente');
+        $this->paciente_id = $this->turno->paciente_id;
+    }
 
     public function calcularImc(): void
     {

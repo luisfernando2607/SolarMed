@@ -36,9 +36,6 @@ class SriWebService {
 
         try {
             $client = new \SoapClient($urls['recepcion'], [
-                'stream_context' => stream_context_create([
-                    'ssl' => ['verify_peer' => false, 'verify_peer_name' => false],
-                ]),
                 'cache_wsdl' => WSDL_CACHE_NONE,
                 'trace' => true,
                 'exceptions' => true,
@@ -75,9 +72,6 @@ class SriWebService {
 
         try {
             $client = new \SoapClient($urls['autorizacion'], [
-                'stream_context' => stream_context_create([
-                    'ssl' => ['verify_peer' => false, 'verify_peer_name' => false],
-                ]),
                 'cache_wsdl' => WSDL_CACHE_NONE,
                 'trace' => true,
                 'exceptions' => true,
