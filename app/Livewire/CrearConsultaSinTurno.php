@@ -50,13 +50,14 @@ class CrearConsultaSinTurno extends Component
             return;
         }
 
-        ExpedienteConsulta::create($this->datosConsulta() + [
+        $consulta = ExpedienteConsulta::create($this->datosConsulta() + [
             'paciente_id' => $this->selectedPaciente->id,
             'medico_id' => $medico->id,
             'especialidad_id' => $medico->especialidad_id,
             'fecha' => now(),
         ]);
 
+        app(\App\Services\AuditoriaService::class)->registrar('crear', 'consulta', $consulta->id, $consulta->paciente_id);
         $this->dispatch('notify', message: 'Consulta registrada exitosamente.', type: 'success');
         $this->redirect(route('expedientes'), navigate: true);
     }

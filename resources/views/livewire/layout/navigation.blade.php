@@ -78,6 +78,9 @@ new class extends Component
                         <x-nav-link :href="route('sri.config')" :active="request()->routeIs('sri.config*')" wire:navigate>
                             {{ __('SRI') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('auditoria')" :active="request()->routeIs('auditoria*')" wire:navigate>
+                            {{ __('Auditoría') }}
+                        </x-nav-link>
                     @endcan
                 </div>
             </div>
@@ -174,6 +177,9 @@ new class extends Component
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('sri.config')" wire:navigate>
                     {{ __('SRI') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('auditoria')" wire:navigate>
+                    {{ __('Auditoría') }}
                 </x-responsive-nav-link>
             @endcan
         </div>

@@ -75,6 +75,7 @@ Route::get('ecografias/crear/{turno}', CrearEcografia::class)
 
 Route::get('ecografias/pdf/{ecografia}', function (Ecografia $ecografia) {
     $ecografia->load('paciente', 'medico.especialidad');
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'ecografia', $ecografia->id, $ecografia->paciente_id, 'PDF de ecografía');
     return Pdf::loadView('pdf.ecografia', ['eco' => $ecografia])
         ->setPaper('a4', 'portrait')
         ->stream("ecografia_{$ecografia->id}.pdf");
@@ -115,6 +116,7 @@ Route::get('facturas/{factura}', VerFactura::class)
 // Factura PDF
 Route::get('facturas/pdf/{factura}', function (App\Models\Factura $factura) {
     $factura->load('paciente', 'medico', 'items');
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'factura', $factura->id, $factura->paciente_id, "PDF factura {$factura->numero_factura}");
     $emisor = app(App\Services\SriConfigService::class)->emisor($factura->medico);
     return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.factura', ['factura' => $factura, 'emisor' => $emisor])
         ->setPaper([0, 0, 226, $factura->clave_acceso ? 500 : 430], 'portrait')
@@ -124,6 +126,7 @@ Route::get('facturas/pdf/{factura}', function (App\Models\Factura $factura) {
 // XML autorizado por el SRI (para entregar al cliente)
 Route::get('facturas/xml/{factura}', function (App\Models\Factura $factura) {
     abort_unless($factura->estado_sri === 'autorizado' && $factura->xml_autorizado_path, 404);
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'factura', $factura->id, $factura->paciente_id, "XML autorizado factura {$factura->numero_factura}");
     return Illuminate\Support\Facades\Storage::disk('private')
         ->download($factura->xml_autorizado_path, "factura_{$factura->numero_factura}.xml", ['Content-Type' => 'application/xml']);
 })->middleware(['auth', 'can:facturas.ver'])->name('facturas.xml');
@@ -131,6 +134,7 @@ Route::get('facturas/xml/{factura}', function (App\Models\Factura $factura) {
 // Nota de crédito: PDF y XML autorizado
 Route::get('notas-credito/pdf/{notaCredito}', function (App\Models\NotaCredito $notaCredito) {
     $notaCredito->load('factura.paciente', 'factura.items', 'medico');
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'nota_credito', $notaCredito->id, $notaCredito->factura->paciente_id, "PDF nota de crédito {$notaCredito->numero}");
     $emisor = app(App\Services\SriConfigService::class)->emisor($notaCredito->medico);
     return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.nota-credito', ['nota' => $notaCredito, 'emisor' => $emisor])
         ->setPaper([0, 0, 226, 500], 'portrait')
@@ -139,9 +143,15 @@ Route::get('notas-credito/pdf/{notaCredito}', function (App\Models\NotaCredito $
 
 Route::get('notas-credito/xml/{notaCredito}', function (App\Models\NotaCredito $notaCredito) {
     abort_unless($notaCredito->estado_sri === 'autorizado' && $notaCredito->xml_autorizado_path, 404);
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'nota_credito', $notaCredito->id, $notaCredito->factura?->paciente_id, "XML autorizado nota de crédito {$notaCredito->numero}");
     return Illuminate\Support\Facades\Storage::disk('private')
         ->download($notaCredito->xml_autorizado_path, "nota_credito_{$notaCredito->numero}.xml", ['Content-Type' => 'application/xml']);
 })->middleware(['auth', 'can:facturas.ver'])->name('notas-credito.xml');
+
+// Auditoría de accesos a datos clínicos (solo admin)
+Route::get('auditoria', \App\Livewire\Auditoria::class)
+    ->middleware(['auth', 'can:configuracion.editar'])
+    ->name('auditoria');
 
 // Tarifario (solo admin)
 Route::get('tarifario', GestionTarifario::class)
@@ -156,6 +166,7 @@ Route::get('sri/configuracion', \App\Livewire\SriConfigPage::class)
 // Historial paciente PDF
 Route::get('pacientes/pdf/{paciente}', function (App\Models\Paciente $paciente) {
     $paciente->load('consultas.medico', 'consultas.especialidad');
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'historia_clinica', $paciente->id, $paciente->id, 'PDF historia clínica completa');
     return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.historial-paciente', ['paciente' => $paciente])
         ->setPaper('a4', 'portrait')
         ->stream("historial_{$paciente->id}.pdf");

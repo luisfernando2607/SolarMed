@@ -98,6 +98,7 @@ class CrearEcografia extends Component
             report($e);
         }
 
+        app(\App\Services\AuditoriaService::class)->registrar('crear', 'ecografia', $eco->id, $eco->paciente_id);
         $this->ecografiaCreada = $eco;
         session()->flash('success', 'Ecografía registrada exitosamente.');
     }

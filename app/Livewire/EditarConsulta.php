@@ -24,6 +24,7 @@ class EditarConsulta extends Component
         $this->paciente = $this->consulta->paciente;
 
         $this->llenarDesdeConsulta($this->consulta);
+        app(\App\Services\AuditoriaService::class)->registrar('ver', 'consulta', $this->consulta->id, $this->consulta->paciente_id);
 
         if ($this->codigo_cie10) {
             $code = Cie10Code::where('codigo', $this->codigo_cie10)->first();
@@ -60,6 +61,7 @@ class EditarConsulta extends Component
             ]);
             $this->consulta->update($nuevos);
         });
+        app(\App\Services\AuditoriaService::class)->registrar('editar', 'consulta', $this->consulta->id, $this->consulta->paciente_id, $this->motivo_cambio);
 
         $this->dispatch('notify', message: 'Consulta actualizada exitosamente.', type: 'success');
 

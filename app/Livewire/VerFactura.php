@@ -21,6 +21,7 @@ class VerFactura extends Component
     public function mount(Factura $factura): void
     {
         $this->factura = $factura->loadMissing('paciente', 'medico.user', 'user', 'items.servicio', 'especialidad', 'notaCredito');
+        app(\App\Services\AuditoriaService::class)->registrar('ver', 'factura', $factura->id, $factura->paciente_id, $factura->numero_factura);
     }
 
     /** Estados en los que el comprobante todavía no fue recibido por el SRI */
