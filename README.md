@@ -1,50 +1,72 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
+
+<img src="docs/SolarMed1.jpg" alt="SolarMed" width="220"/>
 
 # SolarMed
 
-Sistema de gestión clínica integral para **SolarMed Software**, una consulta privada de Ginecología y Medicina General en Ecuador. Desarrollado con Laravel 12 y Livewire 3.
+**Sistema de gestión clínica integral para consultorios privados en Ecuador**
 
-## Funcionalidades
+Turnos · Agenda · Historia clínica · Control prenatal · Ecografías · Facturación electrónica SRI
 
-- **Módulo de turnos** — Colas en tiempo real con auto-registro del paciente (kiosco virtual), numeración secuencial por especialidad y seguimiento de estados (esperando, en atención, completado, cancelado).
-- **Atención médica** — Panel del médico para atender desde la sala de espera: consultas clínicas con diagnóstico CIE-10, ecografías y recetas.
-- **Historia clínica (Expedientes)** — Consultas con anamnesis, examen físico, diagnóstico, tratamiento y referencias. Solo el autor corrige y cada corrección queda versionada con su motivo.
-- **Control prenatal** — Embarazos por paciente: edad gestacional y FPP desde la FUM, controles (peso, PA, altura uterina, FCF, presentación, movimientos fetales, edemas) con alertas clínicas, checklist de exámenes por trimestre (`config/clinica.php`) y cierre con desenlace.
-- **Recetas** — Receta en PDF (A5) con alergias resaltadas, vinculada a la consulta.
-- **Agenda de citas** — Calendario (FullCalendar) por médico con colores por especialidad, paciente nuevo o existente, control de choques, reprogramación arrastrando y "Registrar llegada" que crea el turno en sala de espera.
-- **Archivos del paciente** — Laboratorios, imágenes, referencias y fotos clínicas (PDF/JPG/PNG), con miniaturas y descarga auditada.
-- **Ecografías** — Informes con biometría fetal (DBP, CC, CA, LF), peso fetal estimado y PDF.
-- **Facturación electrónica SRI** — Factura y nota de crédito electrónicas con el RUC de cada médico, firma XAdES-BES, autorización automática en segundo plano y envío al paciente por correo (PDF + XML).
-- **Recordatorios de citas** — Correo automático a las 17:00 a las pacientes con cita al día siguiente.
-- **Reporte de ventas** — Resumen mensual por RUC (facturas, notas de crédito, neto, forma de pago) exportable a Excel para el contador.
-- **Auditoría** — Registro de quién vio, descargó o modificó datos clínicos (LOPDP).
-- **Dashboard administrativo** — Estadísticas (pacientes por sexo/edad/ciudad, turnos, facturación mensual, diagnósticos frecuentes).
-- **Usuarios y permisos** — Roles (admin, médico, secretaria, enfermería) y permisos por ruta vía Spatie.
+![Laravel](https://img.shields.io/badge/Laravel_12-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![Livewire](https://img.shields.io/badge/Livewire_3-4E56A6?style=for-the-badge&logo=livewire&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP_8.2-777BB4?style=for-the-badge&logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL_8-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![License](https://img.shields.io/badge/licencia-MIT-2ea44f?style=for-the-badge)
+[![Pruebas](https://github.com/luisfernando2607/SolarMed/actions/workflows/tests.yml/badge.svg)](https://github.com/luisfernando2607/SolarMed/actions/workflows/tests.yml)
 
-## Tecnologías
+</div>
 
-| Componente | Tecnología |
+---
+
+## 🩺 El problema
+
+Muchos consultorios pequeños aún trabajan con **historias clínicas en papel, agendas manuales y facturación improvisada**: expedientes perdidos, salas de espera desordenadas, riesgo de multas del SRI y cero visibilidad del negocio.
+
+**SolarMed** reúne todo en un solo sistema que funciona **en red local**, sin mensualidades. Solo la facturación electrónica (SRI) y el envío de correos necesitan conexión a internet.
+
+---
+
+## ✨ Funcionalidades
+
+| Módulo | Qué hace |
 |---|---|
-| Backend | PHP ^8.2, Laravel ^12 |
-| Frontend | Livewire 3, Volt, Alpine.js, Tailwind CSS |
-| Base de datos | MySQL |
+| 🎫 **Turnos** | Cola en tiempo real con kiosco de auto-registro, numeración por especialidad y estados (esperando, en atención, completado, cancelado) |
+| 📅 **Agenda** | Calendario (FullCalendar) por médico con colores por especialidad, control de choques, reprogramación arrastrando, "Registrar llegada" que crea el turno y recordatorio por correo el día anterior |
+| 👩‍⚕️ **Atención médica** | Panel del doctor: consulta clínica, diagnósticos **CIE-10**, ecografías y recetas en PDF (con alergias resaltadas) |
+| 📂 **Historia clínica** | Anamnesis, examen físico, diagnóstico, tratamiento y referencias. Solo el autor corrige y cada corrección queda versionada con su motivo |
+| 🤰 **Control prenatal** | Embarazos por paciente: EG y FPP desde la FUM, controles con **alertas clínicas** (hipertensión, FCF, altura uterina, movimientos fetales), checklist de exámenes por trimestre y cierre con desenlace |
+| 🔬 **Ecografías** | Biometría estándar (DBP, CC, CA, LF), peso fetal estimado y reporte PDF |
+| 📎 **Archivos** | Laboratorios, imágenes, referencias y fotos clínicas (PDF/JPG/PNG) con miniaturas y descarga auditada |
+| 🧾 **Facturación SRI** | Factura y **nota de crédito** electrónicas con el RUC de cada médico, firma **XAdES-BES**, autorización automática en segundo plano y envío al paciente por correo (PDF + XML) |
+| 📊 **Dashboard** | Panel de pendientes (citas, SRI, embarazos con alertas), facturación por médico, pacientes por sexo/edad/ciudad, tendencia de turnos y top diagnósticos |
+| 📈 **Reportes** | Ventas mensuales por RUC para el contador, exportables a Excel |
+| 🔐 **Seguridad** | Roles y permisos por ruta (Spatie), verificación en dos pasos, **auditoría** de accesos a datos clínicos (LOPDP) y respaldos diarios cifrados |
+
+---
+
+## 🛠️ Stack
+
+| Capa | Tecnología |
+|---|---|
+| Backend | PHP 8.2 · Laravel 12 |
+| Frontend | Livewire 3 · Volt · Alpine.js · Tailwind CSS · FullCalendar · Chart.js |
+| Base de datos | MySQL 8 |
 | Build | Vite 7 |
-| PDF | barryvdh/laravel-dompdf |
-| QR | simplesoftwareio/simple-qrcode |
-| Facturación SRI | XML + SOAP + Firma digital PKCS#12 |
-| Roles/Permisos | spatie/laravel-permission |
+| PDF / QR | barryvdh/laravel-dompdf · simple-qrcode |
+| Facturación | XML + web services SRI + firma XAdES-BES (PKCS#12) |
+| Seguridad | spatie/laravel-permission · pragmarx/google2fa |
+| CI | GitHub Actions |
 
-## Requisitos
+---
 
-- PHP ^8.2
-- Composer
-- Node.js ^18
-- MySQL 8.x
+## 🚀 Instalación
 
-## Instalación
+**Requisitos:** PHP 8.2+, Composer, Node.js 18+, MySQL 8
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/luisfernando2607/SolarMed.git
 cd SolarMed
 composer install
 npm install
@@ -68,33 +90,30 @@ php artisan migrate --seed
 npm run build
 ```
 
-## Desarrollo
+**Modo desarrollo** (servidor, colas, logs, Vite HMR y tareas programadas en paralelo):
 
 ```bash
 composer dev
 ```
 
-Ejecuta simultáneamente: servidor Laravel, listener de colas, logs, Vite HMR y el programador de tareas.
+📄 Documentación técnica: [`docs/doc-tecnico.md`](docs/doc-tecnico.md)
 
-### Pruebas
+---
+
+## 🧪 Pruebas
 
 ```bash
 php artisan test
 ```
 
-Cubren permisos por rol, turnos, facturación, formulario de consulta y facturación electrónica SRI
-(XML, firma XAdES-BES y web services simulados). Usan SQLite en memoria; no tocan la base `solarmed`.
+Más de 100 pruebas: permisos por rol, turnos, consultas e historial de correcciones, control prenatal,
+agenda, archivos, facturación y nota de crédito SRI (XML, firma XAdES-BES verificada criptográficamente y
+web services simulados), correo, auditoría, 2FA, respaldos y reportes. Usan SQLite en memoria (no tocan la
+base `solarmed`) y se ejecutan automáticamente en GitHub Actions en cada PR.
 
-## Historia clínica y auditoría
+---
 
-Una consulta solo la puede corregir el médico que la registró. Cada corrección exige un motivo y guarda la
-versión anterior, visible en el *Historial de correcciones* de la consulta.
-
-Cada vez que alguien ve la ficha de un paciente, abre una consulta, descarga un PDF o XML, o crea,
-corrige o elimina información clínica, queda registrado (usuario, IP y fecha). El administrador lo
-consulta en **Auditoría**.
-
-## Usuarios y permisos
+## 🔐 Usuarios y permisos
 
 No hay registro público: los usuarios los crea un administrador en **Usuarios**. Cada ruta exige un
 permiso (`routes/web.php`) y los roles se definen en `database/seeders/RolesSeeder.php`:
@@ -106,7 +125,9 @@ permiso (`routes/web.php`) y los roles se definen en `database/seeders/RolesSeed
 | secretaria | Turnos, sala de espera, facturación |
 | enfermeria | Ver turnos y pacientes |
 
-## Verificación en dos pasos (2FA)
+---
+
+## 📱 Verificación en dos pasos (2FA)
 
 Cada usuario la activa en **Perfil** con una app autenticadora (Google Authenticator, Microsoft
 Authenticator o Authy) y recibe 8 códigos de recuperación de un solo uso. Para exigirla a ciertos roles:
@@ -119,7 +140,20 @@ Los usuarios de esos roles que aún no la tengan solo podrán entrar a su perfil
 Si alguien pierde el teléfono y sus códigos, un admin puede desactivarla desde la base de datos
 (`two_factor_secret`, `two_factor_recovery_codes` y `two_factor_confirmed_at` en `NULL`).
 
-## Facturación electrónica SRI
+---
+
+## 🗂️ Historia clínica y auditoría
+
+Una consulta solo la puede corregir el médico que la registró. Cada corrección exige un motivo y guarda la
+versión anterior, visible en el *Historial de correcciones* de la consulta.
+
+Cada vez que alguien ve la ficha de un paciente, abre una consulta, descarga un PDF o XML, o crea,
+corrige o elimina información clínica, queda registrado (usuario, IP y fecha). El administrador lo
+consulta en **Auditoría**.
+
+---
+
+## 🧾 Facturación electrónica SRI
 
 Cada médico factura con **su propio RUC** y su propia numeración (`001-001-000000001` por RUC).
 
@@ -147,7 +181,9 @@ Cada médico factura con **su propio RUC** y su propia numeración (`001-001-000
 > El certificado `.p12` de cada médico debe corresponder a su RUC; de lo contrario el SRI rechaza el
 > comprobante. Probar siempre primero en ambiente de pruebas.
 
-## Producción
+---
+
+## 🏥 Producción
 
 - `.env`: `APP_ENV=production`, `APP_DEBUG=false`, `LOG_LEVEL=warning`, `SESSION_ENCRYPT=true`,
   `APP_URL` con `https://`.
@@ -170,6 +206,12 @@ Cada médico factura con **su propio RUC** y su propia numeración (`001-001-000
   ```
 - No versionar `.env` ni volcados de base de datos con datos reales.
 
-## Licencia
+---
 
-MIT
+<div align="center">
+
+Desarrollado por **[Luis Fernando Flores](https://github.com/luisfernando2607)** · DevStar · Guayaquil, Ecuador 🇪🇨
+
+<sub>Licencia MIT</sub>
+
+</div>
