@@ -14,7 +14,7 @@
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Subir archivo</h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                 <div class="md:col-span-2">
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Archivo (PDF, JPG o PNG, máx. 5 MB) *</label>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Archivo (PDF, JPG o PNG, máx. {{ round(\App\Services\ArchivoService::maxKb() / 1024, 1) }} MB) *</label>
                     <input wire:model="archivo" type="file" accept=".pdf,.jpg,.jpeg,.png"
                         class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                     <div wire:loading wire:target="archivo" class="text-xs text-gray-500 mt-1">Cargando...</div>

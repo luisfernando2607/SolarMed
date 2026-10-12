@@ -113,6 +113,23 @@ base `solarmed`) y se ejecutan automáticamente en GitHub Actions en cada PR.
 
 ---
 
+## ⚙️ Configuración
+
+Casi todo se ajusta sin tocar código:
+
+| Dónde | Qué |
+|---|---|
+| **Configuración** (admin) | Tipos de cita, duraciones, horario y días de atención de la agenda; umbrales de las alertas prenatales; hora de los recordatorios y del respaldo |
+| **Especialidades** (admin) | Nombre, prefijo del número de turno, color en la agenda, motivos de consulta del registro de turnos, activar/desactivar |
+| **SRI** y **Usuarios** (admin) | Datos tributarios de la clínica y de cada médico, certificados `.p12`, ambiente de pruebas/producción |
+| **Tarifario** (admin) | Servicios y precios |
+| `.env` | Base de datos, correo, respaldos (`BACKUP_*`), roles con 2FA obligatoria (`TWO_FACTOR_ROLES`), tamaño máximo de archivos (`ARCHIVO_MAX_KB`), turnos por cédula al día (`TURNO_RATE_LIMIT`) |
+| `config/clinica.php` | Checklist de exámenes prenatales por trimestre |
+
+Aún requieren cambio de código: los permisos de cada rol (`RolesSeeder`) y la tarifa de IVA (todo se factura con IVA 0 %, propio de servicios de salud).
+
+---
+
 ## 🔐 Usuarios y permisos
 
 No hay registro público: los usuarios los crea un administrador en **Usuarios**. Cada ruta exige un

@@ -81,8 +81,14 @@ new class extends Component
                         <x-nav-link :href="route('tarifario')" :active="request()->routeIs('tarifario*')" wire:navigate>
                             {{ __('Tarifario') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('especialidades')" :active="request()->routeIs('especialidades*')" wire:navigate>
+                            {{ __('Especialidades') }}
+                        </x-nav-link>
                         <x-nav-link :href="route('sri.config')" :active="request()->routeIs('sri.config*')" wire:navigate>
                             {{ __('SRI') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('configuracion')" :active="request()->routeIs('configuracion*')" wire:navigate>
+                            {{ __('Configuración') }}
                         </x-nav-link>
                         <x-nav-link :href="route('reportes.ventas')" :active="request()->routeIs('reportes*')" wire:navigate>
                             {{ __('Reportes') }}
@@ -190,8 +196,14 @@ new class extends Component
                 <x-responsive-nav-link :href="route('tarifario')" wire:navigate>
                     {{ __('Tarifario') }}
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('especialidades')" wire:navigate>
+                    {{ __('Especialidades') }}
+                </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('sri.config')" wire:navigate>
                     {{ __('SRI') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('configuracion')" wire:navigate>
+                    {{ __('Configuración') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('reportes.ventas')" wire:navigate>
                     {{ __('Reportes') }}

@@ -24,7 +24,11 @@ class ArchivoService {
         'image/png' => 'png',
     ];
 
-    const MAX_KB = 5120; // 5 MB
+    /** Tamaño máximo en KB (ARCHIVO_MAX_KB en .env) */
+    public static function maxKb(): int
+    {
+        return (int) config('clinica.max_archivo_kb', 5120);
+    }
 
     public function subir(
         UploadedFile $archivo,
@@ -40,8 +44,8 @@ class ArchivoService {
         if (!isset(self::MIME_PERMITIDOS[$mime])) {
             throw ValidationException::withMessages(['archivo' => 'Formato no permitido. Solo PDF, JPG y PNG.']);
         }
-        if (ceil($archivo->getSize() / 1024) > self::MAX_KB) {
-            throw ValidationException::withMessages(['archivo' => 'El archivo supera el límite de 5 MB.']);
+        if (ceil($archivo->getSize() / 1024) > self::maxKb()) {
+            throw ValidationException::withMessages(['archivo' => 'El archivo supera el límite de ' . round(self::maxKb() / 1024, 1) . ' MB.']);
         }
         if (!array_key_exists($categoria, self::CATEGORIAS)) {
             throw ValidationException::withMessages(['categoria' => 'Categoría no válida.']);

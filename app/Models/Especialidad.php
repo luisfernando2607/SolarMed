@@ -5,8 +5,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Especialidad extends Model {
     protected $table = 'especialidades';
-    protected $fillable = ['nombre', 'codigo', 'color_agenda', 'activo'];
-    protected $casts    = ['activo' => 'boolean'];
+    protected $fillable = ['nombre', 'codigo', 'prefijo_turno', 'color_agenda', 'motivos', 'activo'];
+    protected $casts    = ['activo' => 'boolean', 'motivos' => 'array'];
 
     public function medicos(): HasMany  { return $this->hasMany(Medico::class); }
     public function turnos(): HasMany   { return $this->hasMany(Turno::class); }

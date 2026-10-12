@@ -63,8 +63,7 @@ class TurnoService
         return DB::transaction(function () use ($datos, $datosPaciente, $sobrescribirPaciente, $cedula, $espId, $hoy) {
             // Bloquea la especialidad para que dos registros simultáneos no tomen el mismo número
             $especialidad = Especialidad::lockForUpdate()->findOrFail($espId);
-            $prefijos = config('clinica.especialidades_prefijos', []);
-            $prefijo = strtoupper($prefijos[$especialidad->codigo] ?? $especialidad->codigo[0]);
+            $prefijo = mb_strtoupper($especialidad->prefijo_turno ?: mb_substr($especialidad->codigo, 0, 1));
             $numero = $this->siguienteNumero($espId, $hoy);
 
             $paciente = Paciente::where('cedula', $cedula)->first();
