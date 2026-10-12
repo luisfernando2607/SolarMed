@@ -15,6 +15,8 @@ Sistema de gestión clínica integral para **SolarMed Software**, una consulta p
 - **Archivos del paciente** — Laboratorios, imágenes, referencias y fotos clínicas (PDF/JPG/PNG), con miniaturas y descarga auditada.
 - **Ecografías** — Informes con biometría fetal (DBP, CC, CA, LF), peso fetal estimado y PDF.
 - **Facturación electrónica SRI** — Factura y nota de crédito electrónicas con el RUC de cada médico, firma XAdES-BES, autorización automática en segundo plano y envío al paciente por correo (PDF + XML).
+- **Recordatorios de citas** — Correo automático a las 17:00 a las pacientes con cita al día siguiente.
+- **Reporte de ventas** — Resumen mensual por RUC (facturas, notas de crédito, neto, forma de pago) exportable a Excel para el contador.
 - **Auditoría** — Registro de quién vio, descargó o modificó datos clínicos (LOPDP).
 - **Dashboard administrativo** — Estadísticas (pacientes por sexo/edad/ciudad, turnos, facturación mensual, diagnósticos frecuentes).
 - **Usuarios y permisos** — Roles (admin, médico, secretaria, enfermería) y permisos por ruta vía Spatie.
@@ -140,7 +142,7 @@ Cada médico factura con **su propio RUC** y su propia numeración (`001-001-000
 - `php artisan config:cache && php artisan route:cache && php artisan view:cache`
 - **Cola** (autorización automática del SRI) siempre activa, por ejemplo con Supervisor:
   `php artisan queue:work --tries=1 --max-time=3600`
-- **Programador de tareas** (`sri:reintentar` cada 15 min) en el cron del servidor:
+- **Programador de tareas** (`sri:reintentar` cada 15 min, `citas:recordatorios` 17:00, `respaldo:crear` 02:30) en el cron del servidor:
   `* * * * * cd /ruta/SolarMed && php artisan schedule:run >> /dev/null 2>&1`
 - **Respaldos**: `php artisan respaldo:crear` corre cada día a las 02:30 (requiere el cron). Incluye la base
   `solarmed` y `storage/app/private` (certificados, XML del SRI, archivos de pacientes). Configurar en `.env`:
