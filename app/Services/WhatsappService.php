@@ -34,9 +34,12 @@ class WhatsappService
     public function mensaje(Cita $cita): string
     {
         $fecha = $cita->fecha_hora->copy()->locale('es');
+        $paciente = $cita->paciente;
+        // Identidad reservada (AM 5216-A Art. 13): el mensaje sale de la clínica, no lleva el nombre
+        $nombre = $paciente?->identidad_reservada ? "paciente con cédula {$paciente->cedula_enmascarada}" : $paciente?->nombre_completo;
 
         return strtr((string) $this->ajustes->get('recordatorios.whatsapp_plantilla'), [
-            '{paciente}' => (string) $cita->paciente?->nombre_completo,
+            '{paciente}' => (string) $nombre,
             '{fecha}' => $fecha->translatedFormat('l j \d\e F'),
             '{hora}' => $fecha->format('H:i'),
             '{medico}' => (string) $cita->medico?->nombre_completo,

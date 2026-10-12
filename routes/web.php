@@ -184,7 +184,7 @@ Route::get('verificar/{codigo}', function (string $codigo) {
         ->map(fn ($w) => mb_substr($w, 0, 1) . str_repeat('*', max(2, mb_strlen($w) - 1)))->implode(' ');
     return view('certificados.verificar', [
         'c' => $c,
-        'pacienteOculto' => $c ? $ocultar($c->paciente?->nombre_completo) : null,
+        'pacienteOculto' => $c ? ($c->paciente?->identidad_reservada ? 'Identidad reservada' : $ocultar($c->paciente?->nombre_completo)) : null,
         'cedulaOculta' => $c ? str_repeat('*', max(0, strlen((string) $c->paciente?->cedula) - 3)) . substr((string) $c->paciente?->cedula, -3) : null,
     ]);
 })->middleware('throttle:30,1')->name('certificados.verificar');
@@ -279,6 +279,25 @@ Route::get('auditoria/exportar', function (Illuminate\Http\Request $request) {
         fclose($salida);
     }, 'auditoria_' . now()->format('Ymd_His') . '.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
 })->middleware(['auth', 'can:auditoria.ver'])->name('auditoria.exportar');
+
+// Solicitudes sobre la HC (AM 5216-A Arts. 12, 28-30; LOPDP). Ven auditoría y quienes editan pacientes.
+Route::get('auditoria/solicitudes', \App\Livewire\SolicitudesInformacion::class)
+    ->middleware(['auth'])
+    ->name('auditoria.solicitudes');
+Route::get('auditoria/solicitudes/{solicitud}/documento', function (App\Models\SolicitudInformacion $solicitud) {
+    abort_unless(auth()->user()->canAny(['auditoria.ver', 'pacientes.editar']) && $solicitud->documento_ruta, 404);
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'solicitud', $solicitud->id, $solicitud->paciente_id, 'Respaldo de la solicitud');
+    return Illuminate\Support\Facades\Storage::disk('private')->response($solicitud->documento_ruta, $solicitud->documento_nombre, [
+        'Content-Type' => $solicitud->documento_mime,
+        'X-Content-Type-Options' => 'nosniff',
+        'Cache-Control' => 'private, no-store',
+    ], 'inline');
+})->middleware(['auth'])->name('auditoria.solicitudes.documento');
+
+// Incidentes de seguridad de datos (LOPDP)
+Route::get('auditoria/incidentes', \App\Livewire\IncidentesSeguridad::class)
+    ->middleware(['auth', 'can:auditoria.ver'])
+    ->name('auditoria.incidentes');
 
 // Tarifario (solo admin)
 Route::get('tarifario', GestionTarifario::class)

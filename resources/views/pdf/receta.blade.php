@@ -23,6 +23,7 @@
     </style>
 </head>
 <body>
+    @include('pdf.partials.confidencial')
     <div class="header">
         <table>
             <tr>
@@ -49,7 +50,7 @@
 
     <table class="paciente">
         <tr>
-            <td class="label">Paciente:</td><td>{{ $receta->paciente->nombre_completo }}</td>
+            <td class="label">Paciente:</td><td>{{ $receta->paciente->nombre_visible }}</td>
             <td class="label">Cédula:</td><td>{{ $receta->paciente->cedula }}</td>
         </tr>
         <tr>

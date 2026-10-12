@@ -44,6 +44,17 @@
                         @if ($p->telefono)
                             <a href="tel:{{ preg_replace('/[^0-9+]/', '', $p->telefono) }}" class="hover:text-blue-700">{{ $p->telefono }}</a>
                         @endif
+                        @if ($p->identidad_reservada)
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700" title="AM 5216-A Art. 13: en documentos y pantallas compartidas se muestra la cédula en lugar del nombre">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                                Identidad reservada
+                            </span>
+                        @endif
+                        @php $pasiva = $p->archivoPasivo($ultimaAtencion); @endphp
+                        <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $pasiva ? 'bg-gray-100 text-gray-600' : 'bg-emerald-50 text-emerald-700' }}"
+                              title="Última atención: {{ $ultimaAtencion?->format('d/m/Y') ?? '—' }}. Pasa al archivo pasivo tras {{ \App\Models\Paciente::ANIOS_ARCHIVO_ACTIVO }} años sin atención (AM 5216-A Art. 17)">
+                            HC {{ $pasiva ? 'pasiva' : 'activa' }}
+                        </span>
                     </div>
                 </div>
             </div>

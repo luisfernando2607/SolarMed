@@ -30,6 +30,25 @@
         </div>
     @endif
 
+    @if ($cumplimiento)
+        <div class="bg-white border rounded-xl p-4 flex flex-wrap items-center gap-x-6 gap-y-2 {{ $cumplimiento['vencidas'] ? 'border-red-300' : '' }}">
+            <h3 class="font-semibold text-gray-800 text-sm">Plazos legales</h3>
+            @if ($cumplimiento['solicitudes'])
+                <a href="{{ route('auditoria.solicitudes') }}" wire:navigate class="text-sm text-gray-700 hover:underline">
+                    {{ $cumplimiento['solicitudes'] }} {{ $cumplimiento['solicitudes'] === 1 ? 'solicitud pendiente' : 'solicitudes pendientes' }}
+                    @if ($cumplimiento['vencidas'])
+                        <span class="ml-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">{{ $cumplimiento['vencidas'] }} fuera de plazo</span>
+                    @endif
+                </a>
+            @endif
+            @if ($cumplimiento['incidentes'])
+                <a href="{{ route('auditoria.incidentes') }}" wire:navigate class="text-sm text-amber-800 hover:underline">
+                    {{ $cumplimiento['incidentes'] }} {{ $cumplimiento['incidentes'] === 1 ? 'incidente por notificar' : 'incidentes por notificar' }} a la autoridad
+                </a>
+            @endif
+        </div>
+    @endif
+
     @if ($embarazos && ($embarazos['activos'] || $embarazos['atencion']->isNotEmpty()))
         <div class="bg-white border rounded-xl p-5">
             <div class="flex items-center justify-between mb-3">

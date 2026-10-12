@@ -17,6 +17,7 @@
     </style>
 </head>
 <body>
+    @include('pdf.partials.confidencial')
     @php $p = $c->paciente; @endphp
     <table class="header" width="100%">
         <tr>
@@ -33,7 +34,8 @@
     <div class="numero">N.º {{ $c->numero() }} · {{ $c->tipo === 'reposo' ? 'Reposo' : 'Atención médica' }}</div>
 
     <p>
-        Certifico que <strong>{{ $p->nombre_completo }}</strong>, con cédula de identidad N.º <strong>{{ $p->cedula }}</strong>{{ $p->edad !== null ? ', de ' . $p->edad . ' años de edad' : '' }},
+        {{-- Identidad reservada (AM 5216-A Art. 13): solo la cédula --}}
+        Certifico que {{ $p->identidad_reservada ? 'el/la paciente' : '' }}<strong>{{ $p->identidad_reservada ? '' : $p->nombre_completo }}</strong>{{ $p->identidad_reservada ? '' : ',' }} con cédula de identidad N.º <strong>{{ $p->cedula }}</strong>{{ $p->edad !== null ? ', de ' . $p->edad . ' años de edad' : '' }},
         fue atendido(a) en consulta médica el día <strong>{{ $c->fecha_atencion->translatedFormat('d \d\e F \d\e Y') }}</strong>@if ($c->hora_atencion) a las {{ $c->hora_atencion }}@endif.
     </p>
 

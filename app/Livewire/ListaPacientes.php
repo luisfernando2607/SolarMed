@@ -51,6 +51,7 @@ class ListaPacientes extends Component
     public $cesareas;
     public $abortos;
     public $metodo_anticonceptivo;
+    public bool $identidad_reservada = false;
 
     protected function rules(): array
     {
@@ -81,6 +82,7 @@ class ListaPacientes extends Component
             'cesareas' => 'nullable|integer|min:0|max:50',
             'abortos' => 'nullable|integer|min:0|max:50',
             'metodo_anticonceptivo' => 'nullable|string|max:255',
+            'identidad_reservada' => 'boolean',
         ];
     }
 
@@ -155,6 +157,7 @@ class ListaPacientes extends Component
         $this->cesareas = $paciente->cesareas;
         $this->abortos = $paciente->abortos;
         $this->metodo_anticonceptivo = $paciente->metodo_anticonceptivo;
+        $this->identidad_reservada = (bool) $paciente->identidad_reservada;
     }
 
     public function cancelarEdicion(): void
@@ -197,6 +200,7 @@ class ListaPacientes extends Component
             'cesareas' => $this->cesareas !== null ? (int) $this->cesareas : null,
             'abortos' => $this->abortos !== null ? (int) $this->abortos : null,
             'metodo_anticonceptivo' => $this->metodo_anticonceptivo,
+            'identidad_reservada' => $this->identidad_reservada,
         ]);
 
         app(\App\Services\AuditoriaService::class)->registrar('editar', 'paciente', $paciente->id, $paciente->id, 'Datos del paciente');

@@ -20,6 +20,7 @@
     </style>
 </head>
 <body>
+    @include('pdf.partials.confidencial')
     <table class="header" width="100%">
         <tr>
             <td style="width: 65px;"><img src="{{ $marca->logoRuta() }}" alt="" style="max-height: 45px; max-width: 60px;"></td>
@@ -34,7 +35,7 @@
     <h1>PEDIDO DE EXÁMENES</h1>
 
     <table class="datos" width="100%">
-        <tr><td class="label">Paciente:</td><td>{{ $p->paciente->nombre_completo }}</td><td class="label">Cédula:</td><td>{{ $p->paciente->cedula }}</td></tr>
+        <tr><td class="label">Paciente:</td><td>{{ $p->paciente->nombre_visible }}</td><td class="label">Cédula:</td><td>{{ $p->paciente->cedula }}</td></tr>
         <tr><td class="label">Edad:</td><td>{{ $p->paciente->edad !== null ? $p->paciente->edad . ' años' : '--' }}</td><td class="label">Sexo:</td><td>{{ ucfirst((string) $p->paciente->sexo) }}</td></tr>
         @if ($p->diagnostico)
             <tr><td class="label">Diagnóstico presuntivo:</td><td colspan="3">{{ $p->diagnostico }}@if ($p->codigo_cie10) (CIE-10 {{ $p->codigo_cie10 }})@endif</td></tr>

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Historial Clínico - {{ $paciente->nombre_completo }}</title>
+    <title>Historia clínica</title>
     <style>
         body { font-family: 'Helvetica', sans-serif; font-size: 11px; color: #333; line-height: 1.5; }
         .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #2563eb; padding-bottom: 12px; }
@@ -27,6 +27,7 @@
     </style>
 </head>
 <body>
+    @include('pdf.partials.confidencial')
     <div class="header">
         <img src="{{ $marca->logoRuta() }}" alt="{{ $marca->nombre() }}" style="height: 50px; margin-bottom: 6px;">
         <h1>HISTORIAL CLÍNICO</h1>
@@ -37,7 +38,7 @@
     <div class="section">
         <h2>Datos del paciente</h2>
         <table>
-            <tr><td class="label">Nombre:</td><td class="value">{{ $paciente->nombre_completo }}</td></tr>
+            <tr><td class="label">Nombre:</td><td class="value">{{ $paciente->nombre_visible }}</td></tr>
             <tr><td class="label">Cédula:</td><td class="value">{{ $paciente->cedula }}</td></tr>
             <tr><td class="label">Edad:</td><td class="value">{{ $paciente->edad ?? '--' }} años</td></tr>
             <tr><td class="label">Sexo:</td><td class="value">{{ ucfirst($paciente->sexo) }}</td></tr>
