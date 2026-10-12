@@ -102,11 +102,69 @@ class ConsultaTest extends TestCase
             ->assertSet('motivo_consulta', 'Control anual')
             ->assertSet('examen_fisico_talla', 1.6)
             ->set('diagnostico', 'Quiste ovárico simple')
+            ->set('motivo_cambio', 'Resultado de ecografía')
             ->call('guardar')
             ->assertHasNoErrors();
 
         $this->assertSame('Quiste ovárico simple', $consulta->fresh()->diagnostico);
         $this->assertEquals(25.0, $consulta->fresh()->examen_fisico['imc']);
+    }
+
+    public function test_correccion_guarda_version_anterior_y_motivo(): void
+    {
+        $this->llenar(Livewire::test(AtenderTurno::class, ['turno' => $this->turno]))->call('guardarConsulta');
+        $consulta = ExpedienteConsulta::sole();
+
+        Livewire::test(EditarConsulta::class, ['consulta' => $consulta])
+            ->set('diagnostico', 'Quiste ovárico simple')
+            ->call('guardar')
+            ->assertHasErrors(['motivo_cambio' => 'required'])
+            ->set('motivo_cambio', 'Resultado de ecografía')
+            ->call('guardar')
+            ->assertHasNoErrors();
+
+        $version = $consulta->versiones()->sole();
+        $this->assertSame('Paciente sana', $version->datos_anteriores['diagnostico']);
+        $this->assertSame('Resultado de ecografía', $version->motivo);
+        $this->assertSame($this->user->id, $version->user_id);
+    }
+
+    public function test_guardar_sin_cambios_no_crea_version(): void
+    {
+        $this->llenar(Livewire::test(AtenderTurno::class, ['turno' => $this->turno]))->call('guardarConsulta');
+        $consulta = ExpedienteConsulta::sole();
+
+        Livewire::test(EditarConsulta::class, ['consulta' => $consulta])
+            ->set('motivo_cambio', 'Revisión')
+            ->call('guardar');
+
+        $this->assertSame(0, $consulta->versiones()->count());
+    }
+
+    public function test_otro_medico_no_puede_editar_la_consulta(): void
+    {
+        $this->llenar(Livewire::test(AtenderTurno::class, ['turno' => $this->turno]))->call('guardarConsulta');
+        $consulta = ExpedienteConsulta::sole();
+
+        $otro = User::factory()->create();
+        $otro->assignRole('medico');
+        Medico::create(['user_id' => $otro->id, 'nombres' => 'Jorge', 'apellidos' => 'Bury', 'especialidad_id' => $this->medico->especialidad_id]);
+
+        $admin = User::factory()->create();
+        $admin->assignRole('admin');
+
+        $this->actingAs($otro)->get(route('consultas.editar', $consulta))->assertForbidden();
+        $this->actingAs($admin)->get(route('consultas.editar', $consulta))->assertForbidden();
+        $this->actingAs($this->user)->get(route('consultas.editar', $consulta))->assertOk();
+    }
+
+    public function test_editar_consulta_sin_turno_muestra_la_pagina(): void
+    {
+        $this->llenar(Livewire::test(CrearConsultaSinTurno::class))
+            ->call('seleccionarPaciente', $this->paciente->id)
+            ->call('guardar');
+
+        $this->get(route('consultas.editar', ExpedienteConsulta::sole()))->assertOk()->assertSee('Volver a Expedientes');
     }
 
     public function test_validacion_obligatoria(): void

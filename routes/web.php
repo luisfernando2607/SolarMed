@@ -65,7 +65,7 @@ Route::get('consultas/crear/{turno}', CrearConsulta::class)
     ->name('consultas.crear');
 
 Route::get('consultas/editar/{consulta}', EditarConsulta::class)
-    ->middleware(['auth', 'can:expediente.crear'])
+    ->middleware(['auth', 'can:update,consulta'])
     ->name('consultas.editar');
 
 // Ecografías

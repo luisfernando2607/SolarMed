@@ -2,6 +2,7 @@
 namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ExpedienteConsulta extends Model {
@@ -24,4 +25,5 @@ class ExpedienteConsulta extends Model {
     public function especialidad(): BelongsTo{ return $this->belongsTo(Especialidad::class); }
     public function controlPrenatal(): HasOne { return $this->hasOne(ControlPrenatal::class, 'consulta_id'); }
     public function ecografia(): HasOne      { return $this->hasOne(Ecografia::class, 'consulta_id'); }
+    public function versiones(): HasMany     { return $this->hasMany(ExpedienteConsultaVersion::class, 'consulta_id')->latest('created_at')->latest('id'); }
 }

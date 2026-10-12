@@ -127,10 +127,12 @@
                                     @endif
                                 </div>
                                 <div class="flex items-center gap-1 ml-3 shrink-0">
+                                    @can('update', $consulta)
                                     <a href="{{ route('consultas.editar', $consulta->id) }}" wire:navigate
                                        class="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
                                         Editar
                                     </a>
+                                    @endcan
                                 </div>
                             </div>
                             <div class="flex flex-wrap gap-2 mt-2 pt-2 border-t border-gray-100">
