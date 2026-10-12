@@ -226,6 +226,17 @@ class ConfiguracionClinica extends Component
         }
     }
 
+    /** Contraste del texto blanco sobre el color elegido (botones), para avisar si es muy claro */
+    public function getContrasteColorProperty(): ?float
+    {
+        if (!preg_match('/^#[0-9A-Fa-f]{6}$/', (string) $this->marca_color)) {
+            return null;
+        }
+        $lin = function (int $c) { $c /= 255; return $c <= 0.03928 ? $c / 12.92 : (($c + 0.055) / 1.055) ** 2.4; };
+        [$r, $g, $b] = sscanf($this->marca_color, '#%02x%02x%02x');
+        return round(1.05 / (0.2126 * $lin($r) + 0.7152 * $lin($g) + 0.0722 * $lin($b) + 0.05), 1);
+    }
+
     public function render()
     {
         return view('livewire.configuracion-clinica')->layout('layouts.app');

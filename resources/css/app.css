@@ -4,12 +4,19 @@
 
 [x-cloak] { display: none !important; }
 
+/* Respaldo: tonos de azul de Tailwind. Los layouts los reemplazan por el color de la clínica (MarcaService::paletaCss). */
+:where(:root) {
+    --marca-50: 239 246 255; --marca-100: 219 234 254; --marca-200: 191 219 254; --marca-300: 147 197 253;
+    --marca-400: 96 165 250; --marca-500: 59 130 246; --marca-600: 37 99 235; --marca-700: 29 78 216;
+    --marca-800: 30 64 175; --marca-900: 30 58 138; --marca-950: 23 37 84;
+}
+
 @layer components {
     .form-input {
         @apply w-full rounded-xl border-2 border-gray-200 bg-white px-4 py-3.5 text-sm text-gray-700 placeholder-gray-400 transition-all duration-200;
     }
     .form-input:focus {
-        @apply border-green-500 outline-none ring-2 ring-green-500/20;
+        @apply border-blue-500 outline-none ring-2 ring-blue-500/20;
     }
     .form-input[readonly] {
         @apply bg-gray-50 cursor-not-allowed;
