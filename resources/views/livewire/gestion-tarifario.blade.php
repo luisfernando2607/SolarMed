@@ -80,7 +80,7 @@
                                                 x-on:click="Swal.fire({
                                                     icon: 'warning',
                                                     title: '¿Eliminar servicio?',
-                                                    text: '{{ $s->nombre }}',
+                                                    text: {{ \Illuminate\Support\Js::from($s->nombre) }},
                                                     showCancelButton: true,
                                                     confirmButtonColor: '#dc2626',
                                                     cancelButtonColor: '#6b7280',

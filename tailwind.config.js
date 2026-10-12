@@ -11,6 +11,11 @@ export default {
 
     theme: {
         extend: {
+            // "blue" es el color de la clínica (Configuración > Clínica): los tonos llegan como variables CSS
+            colors: {
+                blue: Object.fromEntries([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]
+                    .map((t) => [t, `rgb(var(--marca-${t}) / <alpha-value>)`])),
+            },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },

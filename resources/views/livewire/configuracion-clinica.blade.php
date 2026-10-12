@@ -53,6 +53,13 @@
                             <input wire:model.live="marca_color" type="color" class="h-10 w-14 rounded-lg border-gray-300">
                             <span class="text-sm font-mono text-gray-600">{{ $marca_color }}</span>
                         </div>
+                        @if ($this->contrasteColor !== null)
+                            @if ($this->contrasteColor >= 4.5)
+                                <p class="text-xs text-emerald-700 mt-1">✓ Buen contraste con texto blanco ({{ $this->contrasteColor }}:1)</p>
+                            @else
+                                <p class="text-xs text-amber-700 mt-1">⚠ Color claro: el texto blanco de los botones se leerá mal ({{ $this->contrasteColor }}:1, se recomienda 4.5:1). Elija un tono más oscuro.</p>
+                            @endif
+                        @endif
                         @error('marca_color') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>

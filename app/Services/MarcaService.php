@@ -70,6 +70,31 @@ class MarcaService
         ])->filter()->implode(' · ');
     }
 
+    /**
+     * Escala de tonos (50–950) del color principal como variables CSS "R G B", para Tailwind.
+     * El color elegido es el tono 600; los claros se mezclan con blanco y los oscuros con negro.
+     */
+    public function paletaCss(): string
+    {
+        [$r, $g, $b] = sscanf($this->color(), '#%02x%02x%02x');
+        $mezclas = [50 => 0.95, 100 => 0.88, 200 => 0.75, 300 => 0.58, 400 => 0.36, 500 => 0.16, 600 => 0.0,
+                    700 => -0.15, 800 => -0.30, 900 => -0.45, 950 => -0.62];
+
+        return collect($mezclas)->map(function ($f, $tono) use ($r, $g, $b) {
+            $canal = fn ($c) => (int) round($f >= 0 ? $c + (255 - $c) * $f : $c * (1 + $f));
+            return "--marca-{$tono}: {$canal($r)} {$canal($g)} {$canal($b)};";
+        })->implode(' ');
+    }
+
+    /** Contraste del texto blanco sobre el color principal (WCAG) */
+    public function contrasteConBlanco(): float
+    {
+        $lin = function (int $c) { $c /= 255; return $c <= 0.03928 ? $c / 12.92 : (($c + 0.055) / 1.055) ** 2.4; };
+        [$r, $g, $b] = sscanf($this->color(), '#%02x%02x%02x');
+        $l = 0.2126 * $lin($r) + 0.7152 * $lin($g) + 0.0722 * $lin($b);
+        return round(1.05 / ($l + 0.05), 2);
+    }
+
     private function logoRelativo(string $clave, string $defecto): string
     {
         $ruta = $this->ajuste($clave);

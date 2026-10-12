@@ -1,111 +1,62 @@
 <div>
     <div class="max-w-7xl mx-auto py-8 px-4">
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold text-gray-900">Pacientes</h1>
-            <span class="text-sm text-gray-500">{{ $pacientes->total() }} registros</span>
-        </div>
-
-        {{-- Búsqueda --}}
-        <div class="mb-6">
-            <input wire:model.live.debounce.300ms="busqueda" type="text"
-                class="w-full max-w-md rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                placeholder="Buscar por nombre, cédula o teléfono...">
+        {{-- Encabezado --}}
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Pacientes</h1>
+                <p class="text-sm text-gray-500 mt-1">{{ number_format($pacientes->total()) }} {{ $pacientes->total() === 1 ? 'paciente registrado' : 'pacientes registrados' }}</p>
+            </div>
+            <div class="relative w-full sm:w-96">
+                <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                <input wire:model.live.debounce.300ms="busqueda" type="search"
+                    class="w-full pl-10 rounded-xl border-gray-200 bg-white shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Buscar por nombre, cédula o teléfono…">
+            </div>
         </div>
 
         {{-- Tabla --}}
-        <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div class="bg-white rounded-2xl border border-gray-200/80 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
-                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                    <thead class="text-xs text-gray-500 border-b border-gray-100">
                         <tr>
-                            <th class="text-left px-4 py-3">#</th>
-                            <th class="text-left px-4 py-3">
-                                <button wire:click="ordenarPor('nombres')" class="flex items-center gap-1 hover:text-gray-700">
-                                    Nombres
-                                    @if ($sortBy === 'nombres')
-                                        <svg class="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"/></svg>
-                                    @else
-                                        <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
-                                    @endif
-                                </button>
-                            </th>
-                            <th class="text-left px-4 py-3">
-                                <button wire:click="ordenarPor('apellidos')" class="flex items-center gap-1 hover:text-gray-700">
-                                    Apellidos
-                                    @if ($sortBy === 'apellidos')
-                                        <svg class="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"/></svg>
-                                    @else
-                                        <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
-                                    @endif
-                                </button>
-                            </th>
-                            <th class="text-left px-4 py-3">
-                                <button wire:click="ordenarPor('cedula')" class="flex items-center gap-1 hover:text-gray-700">
-                                    Cédula
-                                    @if ($sortBy === 'cedula')
-                                        <svg class="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"/></svg>
-                                    @else
-                                        <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
-                                    @endif
-                                </button>
-                            </th>
-                            <th class="text-left px-4 py-3">Teléfono</th>
-                            <th class="text-left px-4 py-3">Edad</th>
-                            <th class="text-left px-4 py-3">
-                                <button wire:click="ordenarPor('sexo')" class="flex items-center gap-1 hover:text-gray-700">
-                                    Sexo
-                                    @if ($sortBy === 'sexo')
-                                        <svg class="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"/></svg>
-                                    @else
-                                        <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
-                                    @endif
-                                </button>
-                            </th>
-                            <th class="text-left px-4 py-3">
-                                <button wire:click="ordenarPor('created_at')" class="flex items-center gap-1 hover:text-gray-700">
-                                    Registro
-                                    @if ($sortBy === 'created_at')
-                                        <svg class="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"/></svg>
-                                    @else
-                                        <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
-                                    @endif
-                                </button>
-                            </th>
-                            <th class="text-center px-4 py-3">
-                                <svg class="w-4 h-4 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" title="Acciones">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
-                                </svg>
-                            </th>
+                            <th class="text-left font-medium px-5 py-3"><button wire:click="ordenarPor('apellidos')" class="inline-flex items-center gap-1 hover:text-gray-800">Paciente @if ($sortBy === 'apellidos')<svg class="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"/></svg>@else<svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>@endif</button></th>
+                            <th class="text-left font-medium px-5 py-3 hidden md:table-cell">Teléfono</th>
+                            <th class="text-left font-medium px-5 py-3"><button wire:click="ordenarPor('sexo')" class="inline-flex items-center gap-1 hover:text-gray-800">Edad y sexo @if ($sortBy === 'sexo')<svg class="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"/></svg>@else<svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>@endif</button></th>
+                            <th class="text-left font-medium px-5 py-3 hidden lg:table-cell"><button wire:click="ordenarPor('created_at')" class="inline-flex items-center gap-1 hover:text-gray-800">Registro @if ($sortBy === 'created_at')<svg class="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"/></svg>@else<svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>@endif</button></th>
+                            <th class="px-5 py-3"><span class="sr-only">Acciones</span></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse ($pacientes as $p)
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="px-4 py-3 text-gray-400">{{ $p->id }}</td>
-                                <td class="px-4 py-3 font-medium">{{ $p->nombres }}</td>
-                                <td class="px-4 py-3">{{ $p->apellidos }}</td>
-                                <td class="px-4 py-3 text-gray-500">{{ $p->cedula }}</td>
-                                <td class="px-4 py-3">{{ $p->telefono ?? '--' }}</td>
-                                <td class="px-4 py-3">{{ $p->edad ?? '--' }}</td>
-                                <td class="px-4 py-3 capitalize">{{ $p->sexo }}</td>
-                                <td class="px-4 py-3 text-gray-500">{{ $p->created_at->format('d/m/Y') }}</td>
-                                <td class="px-4 py-3 text-center">
-                                    <div class="flex items-center justify-center gap-1.5">
-                                        <button wire:click="seleccionar({{ $p->id }})"
-                                            class="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition"
-                                            title="Ver ficha">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                            </svg>
+                            @php
+                                $ini = mb_strtoupper(mb_substr((string) $p->nombres, 0, 1) . mb_substr((string) $p->apellidos, 0, 1));
+                                $tonoSexo = ['femenino' => 'bg-pink-50 text-pink-700', 'masculino' => 'bg-sky-50 text-sky-700'][$p->sexo] ?? 'bg-gray-100 text-gray-600';
+                            @endphp
+                            <tr class="hover:bg-gray-50/70 transition">
+                                <td class="px-5 py-3">
+                                    <button wire:click="seleccionar({{ $p->id }})" class="flex items-center gap-3 text-left group">
+                                        <span class="flex items-center justify-center w-9 h-9 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold shrink-0">{{ $ini }}</span>
+                                        <span class="min-w-0">
+                                            <span class="block font-medium text-gray-900 group-hover:text-blue-700 truncate">{{ $p->nombre_completo }}</span>
+                                            <span class="block text-xs text-gray-500 font-mono">{{ $p->cedula }}</span>
+                                        </span>
+                                    </button>
+                                </td>
+                                <td class="px-5 py-3 text-gray-600 hidden md:table-cell">{{ $p->telefono ?: '—' }}</td>
+                                <td class="px-5 py-3">
+                                    <span class="text-gray-700">{{ $p->edad !== null ? $p->edad . ' años' : '—' }}</span>
+                                    <span class="ml-1.5 px-2 py-0.5 rounded-full text-xs font-medium capitalize {{ $tonoSexo }}">{{ $p->sexo }}</span>
+                                </td>
+                                <td class="px-5 py-3 text-gray-500 hidden lg:table-cell">{{ $p->created_at->format('d/m/Y') }}</td>
+                                <td class="px-5 py-3">
+                                    <div class="flex items-center justify-end gap-1">
+                                        <button wire:click="seleccionar({{ $p->id }})" class="p-2 rounded-lg text-gray-400 hover:text-blue-700 hover:bg-blue-50 transition" title="Ver ficha" aria-label="Ver ficha">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                         </button>
                                         @can('pacientes.editar')
-                                            <button wire:click="editar({{ $p->id }})"
-                                                class="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition"
-                                                title="Editar">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                                </svg>
+                                            <button wire:click="editar({{ $p->id }})" class="p-2 rounded-lg text-gray-400 hover:text-gray-800 hover:bg-gray-100 transition" title="Editar" aria-label="Editar">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
                                             </button>
                                         @endcan
                                         @can('pacientes.eliminar')
@@ -113,25 +64,27 @@
                                                 x-on:click="Swal.fire({
                                                     icon: 'warning',
                                                     title: '¿Eliminar paciente?',
-                                                    text: '{{ $p->nombre_completo }}. Esta acción no se puede deshacer.',
+                                                    text: {{ \Illuminate\Support\Js::from($p->nombre_completo . '. Esta acción no se puede deshacer.') }},
                                                     showCancelButton: true,
                                                     confirmButtonColor: '#dc2626',
                                                     cancelButtonColor: '#6b7280',
                                                     confirmButtonText: 'Sí, eliminar',
                                                     cancelButtonText: 'Cancelar'
                                                 }).then((result) => { if (result.isConfirmed) $wire.eliminarPaciente({{ $p->id }}) })"
-                                                class="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition"
-                                                title="Eliminar">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                                </svg>
+                                                class="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition" title="Eliminar" aria-label="Eliminar">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
                                             </button>
                                         @endcan
                                     </div>
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="9" class="px-4 py-8 text-center text-gray-400">No se encontraron pacientes</td></tr>
+                            <tr>
+                                <td colspan="5" class="px-5 py-14 text-center">
+                                    <p class="text-sm font-medium text-gray-700">{{ $busqueda ? 'Ningún paciente coincide con la búsqueda' : 'Aún no hay pacientes' }}</p>
+                                    <p class="text-xs text-gray-400 mt-1">{{ $busqueda ? 'Pruebe con otro nombre, cédula o teléfono.' : 'Se registran al tomar un turno o al agendar una cita.' }}</p>
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>

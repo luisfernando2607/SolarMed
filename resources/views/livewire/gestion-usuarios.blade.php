@@ -117,7 +117,7 @@
                                                     x-on:click="Swal.fire({
                                                         icon: 'warning',
                                                         title: '¿Eliminar usuario?',
-                                                        text: '{{ $u->name }}. Esta acción no se puede deshacer.',
+                                                        text: {{ \Illuminate\Support\Js::from($u->name . '. Esta acción no se puede deshacer.') }},
                                                         showCancelButton: true,
                                                         confirmButtonColor: '#dc2626',
                                                         cancelButtonColor: '#6b7280',
