@@ -15,9 +15,12 @@ use Livewire\Component;
 /** Panel de pendientes del día según los permisos del usuario. */
 class PanelPendientes extends Component
 {
+    /** El dashboard personal ya muestra sus propios indicadores del día */
+    public bool $mostrarHoy = true;
+
     private function hoy(): ?array
     {
-        if (!Auth::user()->can('turnos.ver')) {
+        if (!$this->mostrarHoy || !Auth::user()->can('turnos.ver')) {
             return null;
         }
 

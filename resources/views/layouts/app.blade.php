@@ -17,6 +17,10 @@
              x-on:livewire:navigated.window="menuAbierto = false">
             <livewire:layout.navigation />
 
+            {{-- Avisos de toda la app: $this->dispatch('notify', message: …, type: success|error|warning|info)
+                 o session()->flash('notify', [...]) antes de redirigir --}}
+            <div x-data x-on:notify.window="window.notificar($event.detail)"></div>
+
             <div class="transition-all duration-200 lg:pl-64" :class="colapsado ? 'lg:!pl-[72px]' : 'lg:pl-64'">
                 @if (isset($header))
                     <header class="bg-white shadow">
@@ -30,5 +34,29 @@
                 </main>
             </div>
         </div>
+        <script>
+            window.notificar = function ({ message = '', type = 'success' } = {}) {
+                if (!window.Swal) return;
+                const titulos = { success: 'Listo', error: 'No se pudo completar', warning: 'Atención', info: 'Información' };
+                if (type === 'warning') {
+                    // Avisos que requieren lectura (p. ej. alertas clínicas): cuadro central con confirmación
+                    Swal.fire({ icon: 'warning', title: titulos.warning, text: message, confirmButtonText: 'Entendido', confirmButtonColor: @js($marca->color()) });
+                    return;
+                }
+                Swal.fire({
+                    toast: true, position: 'top-end', icon: type, title: titulos[type] ?? '', text: message,
+                    timer: type === 'error' ? 6000 : 3500, timerProgressBar: true, showConfirmButton: false,
+                    didOpen: t => { t.addEventListener('mouseenter', Swal.stopTimer); t.addEventListener('mouseleave', Swal.resumeTimer); },
+                });
+            };
+        </script>
+        @if (session('notify'))
+            <script>
+                (function () {
+                    const aviso = @js(session('notify'));
+                    window.Swal ? window.notificar(aviso) : document.addEventListener('DOMContentLoaded', () => window.notificar(aviso), { once: true });
+                })();
+            </script>
+        @endif
     </body>
 </html>

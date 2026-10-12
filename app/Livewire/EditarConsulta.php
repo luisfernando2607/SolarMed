@@ -63,7 +63,8 @@ class EditarConsulta extends Component
         });
         app(\App\Services\AuditoriaService::class)->registrar('editar', 'consulta', $this->consulta->id, $this->consulta->paciente_id, $this->motivo_cambio);
 
-        $this->dispatch('notify', message: 'Consulta actualizada exitosamente.', type: 'success');
+        // Aviso que sobrevive a la redirección (lo muestra el layout)
+        session()->flash('notify', ['message' => 'Consulta actualizada exitosamente.', 'type' => 'success']);
 
         $referer = request()->header('referer');
         if ($referer && str_contains($referer, route('pacientes'))) {

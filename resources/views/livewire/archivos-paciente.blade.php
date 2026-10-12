@@ -1,7 +1,4 @@
-<div x-data x-on:notify.window="Swal.fire({
-    icon: $event.detail.type, title: $event.detail.type === 'success' ? 'Listo' : 'Error',
-    text: $event.detail.message, timer: 3000, showConfirmButton: false, toast: true, position: 'top-end'
-})">
+<div>
 <div class="max-w-6xl mx-auto py-8 px-4">
     <div class="mb-6">
         <a href="{{ url()->previous() }}" class="text-sm text-blue-600 hover:text-blue-800">&larr; Volver</a>

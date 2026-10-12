@@ -1,12 +1,4 @@
-<div x-data x-on:notify.window="Swal.fire({
-    icon: $event.detail.type,
-    title: $event.detail.type === 'success' ? 'Guardado' : 'Error',
-    text: $event.detail.message,
-    timer: 3000,
-    showConfirmButton: false,
-    toast: true,
-    position: 'top-end'
-})">
+<div>
     <div class="max-w-4xl mx-auto py-8 px-4">
         <div class="mb-6">
             <a href="{{ route('expedientes') }}" wire:navigate class="text-sm text-blue-600 hover:text-blue-800">&larr; Volver a Expedientes</a>

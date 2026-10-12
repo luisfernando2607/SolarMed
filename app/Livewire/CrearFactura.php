@@ -202,7 +202,8 @@ class CrearFactura extends Component
             'observaciones' => $this->observaciones,
         ], $this->items);
 
-        $this->dispatch('notify', message: "Factura {$factura->numero_factura} creada exitosamente.", type: 'success');
+        // Aviso que sobrevive a la redirección (lo muestra el layout)
+        session()->flash('notify', ['message' => "Factura {$factura->numero_factura} creada exitosamente.", 'type' => 'success']);
         $this->redirect(route('facturas.ver', $factura->id), navigate: true);
     }
 

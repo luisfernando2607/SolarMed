@@ -1,12 +1,4 @@
-<div x-data x-on:notify.window="Swal.fire({
-    icon: $event.detail.type,
-    title: $event.detail.type === 'success' ? 'Guardado' : 'Error',
-    text: $event.detail.message,
-    timer: 3000,
-    showConfirmButton: false,
-    toast: true,
-    position: 'top-end'
-})">
+<div>
     <div class="max-w-4xl mx-auto py-8 px-4">
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-gray-900">Configuración SRI</h1>

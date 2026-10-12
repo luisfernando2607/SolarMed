@@ -1,7 +1,4 @@
-<div x-data x-on:notify.window="Swal.fire({
-    icon: $event.detail.type, title: $event.detail.type === 'success' ? 'Listo' : 'Atención',
-    text: $event.detail.message, timer: 3500, showConfirmButton: false, toast: true, position: 'top-end'
-})">
+<div>
 <div class="max-w-7xl mx-auto py-8 px-4">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <h1 class="text-2xl font-bold text-gray-900">Agenda de citas</h1>
