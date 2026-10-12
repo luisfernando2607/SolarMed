@@ -69,6 +69,9 @@
                         <p class="text-sm font-medium text-gray-900 truncate">{{ $c->paciente?->nombre_completo }}</p>
                         <p class="text-xs text-gray-500 truncate">{{ $c->tipo }}@unless ($medico) · {{ $c->medico?->nombre_completo }}@endunless</p>
                     </div>
+                    @if (in_array($c->estado, ['pendiente', 'confirmada'], true) && $c->fecha_hora->isFuture() && ($wa = app(\App\Services\WhatsappService::class)->enlaceRecordatorio($c)))
+                        <x-boton-whatsapp :href="$wa" compacto class="shrink-0" />
+                    @endif
                     <span class="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium {{ $estadosCita[$c->estado][1] ?? 'bg-gray-100 text-gray-600' }}">{{ $estadosCita[$c->estado][0] ?? $c->estado }}</span>
                 </div>
             @empty

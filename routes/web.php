@@ -267,6 +267,11 @@ Route::get('configuracion', \App\Livewire\ConfiguracionClinica::class)
     ->middleware(['auth', 'can:configuracion.editar'])
     ->name('configuracion');
 
+// Roles y permisos (solo admin)
+Route::get('roles', \App\Livewire\RolesPermisos::class)
+    ->middleware(['auth', 'can:configuracion.editar'])
+    ->name('roles');
+
 // SRI (solo admin)
 Route::get('sri/configuracion', \App\Livewire\SriConfigPage::class)
     ->middleware(['auth', 'can:configuracion.editar'])

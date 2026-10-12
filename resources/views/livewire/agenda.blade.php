@@ -139,6 +139,9 @@
 
                 <div class="flex flex-wrap justify-end gap-2 mt-6">
                     <button wire:click="cerrarModal" class="px-4 py-2 border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50">Cerrar</button>
+                    @if ($enlaceWhatsapp)
+                        <x-boton-whatsapp :href="$enlaceWhatsapp" />
+                    @endif
                     @can('turnos.gestionar')
                         @if (in_array($cita->estado, ['pendiente', 'confirmada'], true))
                             <button wire:click="cambiarEstado('cancelada')" wire:confirm="¿Cancelar esta cita?"
