@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use App\Models\Paciente;
 use App\Models\Turno;
 use App\Models\ExpedienteConsulta;
@@ -17,13 +18,19 @@ class DatosDemoSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        // Este seeder BORRA pacientes, turnos, consultas y facturas: nunca sobre datos reales
+        if (app()->isProduction() || \App\Models\Paciente::exists()) {
+            $this->command?->warn('DatosDemoSeeder omitido: ya existen pacientes o el entorno es producción.');
+            return;
+        }
+
+        Schema::disableForeignKeyConstraints();
         FacturaItem::truncate();
         Factura::truncate();
         ExpedienteConsulta::truncate();
         Turno::truncate();
         Paciente::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        Schema::enableForeignKeyConstraints();
 
         $generalId = DB::table('especialidades')->where('codigo', 'general')->value('id');
         $ginecoId = DB::table('especialidades')->where('codigo', 'ginecologia')->value('id');

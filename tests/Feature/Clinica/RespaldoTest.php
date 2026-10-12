@@ -22,6 +22,8 @@ class RespaldoTest extends TestCase
             'respaldo.password' => 'clave-respaldo',
             'respaldo.dias_retencion' => 30,
         ]);
+        // Ninguna prueba de respaldos debe ejecutar procesos reales (mysqldump, tar, openssl)
+        Process::preventStrayProcesses();
     }
 
     protected function tearDown(): void
@@ -64,7 +66,7 @@ class RespaldoTest extends TestCase
 
     public function test_si_falla_el_volcado_reporta_error(): void
     {
-        Process::fake(['mysqldump*' => Process::result(errorOutput: 'Access denied', exitCode: 2)]);
+        Process::fake(["'mysqldump'*" => Process::result(errorOutput: 'Access denied', exitCode: 2)]);
 
         $this->artisan('respaldo:crear')->assertFailed();
         Process::assertDidntRun(fn (PendingProcess $p) => $p->command[0] === 'tar');
