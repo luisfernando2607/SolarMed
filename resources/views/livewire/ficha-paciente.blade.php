@@ -188,7 +188,7 @@
                     @forelse ($consultas as $c)
                         <div class="flex gap-4 px-5 py-4">
                             <div class="w-16 shrink-0 text-xs text-gray-400 leading-relaxed pt-0.5">
-                                <span class="block font-medium text-gray-700">{{ $c->fecha->format('d/m/Y') }}</span>{{ $c->fecha->format('H:i') }}
+                                <span class="block font-medium text-gray-700">{{ $c->fecha->format('d/m/Y') }}</span>{{ $c->fecha->format('H:i') !== '00:00' ? $c->fecha->format('H:i') : '' }}
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm font-medium text-gray-900">{{ $c->motivo_consulta }}</p>
