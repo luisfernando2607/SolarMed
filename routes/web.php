@@ -256,6 +256,29 @@ Route::get('reportes/ventas', \App\Livewire\ReporteVentas::class)
 Route::get('auditoria', \App\Livewire\Auditoria::class)
     ->middleware(['auth', 'can:auditoria.ver'])
     ->name('auditoria');
+Route::get('auditoria/exportar', function (Illuminate\Http\Request $request) {
+    $filtros = $request->only(['paciente', 'usuario', 'accion', 'desde', 'hasta']);
+    app(\App\Services\AuditoriaService::class)->registrar('exportar', 'auditoria', null, null,
+        'CSV del registro de accesos' . ($filtros ? ' · ' . http_build_query($filtros) : ''));
+
+    return response()->streamDownload(function () use ($filtros) {
+        $salida = fopen('php://output', 'w');
+        fwrite($salida, "\xEF\xBB\xBF"); // BOM: Excel abre bien las tildes
+        fputcsv($salida, ['ID', 'Fecha', 'Usuario', 'Acción', 'Recurso', 'ID recurso', 'Paciente', 'Cédula', 'Detalle', 'IP', 'Navegador', 'Sello SHA-256'], ';');
+        App\Models\RegistroAcceso::with('user', 'paciente')->filtrar($filtros)->orderBy('id')
+            ->chunk(1000, function ($registros) use ($salida) {
+                // Evita que Excel interprete como fórmula un texto escrito por un usuario (p. ej. el correo de un intento fallido)
+                $seguro = fn ($v) => is_string($v) && preg_match('/^[=+\-@\t\r]/', $v) ? "'" . $v : $v;
+                foreach ($registros as $r) {
+                    fputcsv($salida, array_map($seguro, [
+                        $r->id, $r->created_at->format('Y-m-d H:i:s'), $r->user?->name, App\Models\RegistroAcceso::ACCIONES[$r->accion] ?? $r->accion,
+                        $r->recurso, $r->recurso_id, $r->paciente?->nombre_completo, $r->paciente?->cedula, $r->detalle, $r->ip, $r->user_agent, $r->hash,
+                    ]), ';');
+                }
+            });
+        fclose($salida);
+    }, 'auditoria_' . now()->format('Ymd_His') . '.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+})->middleware(['auth', 'can:auditoria.ver'])->name('auditoria.exportar');
 
 // Tarifario (solo admin)
 Route::get('tarifario', GestionTarifario::class)
@@ -289,5 +312,11 @@ Route::get('pacientes/pdf/{paciente}', function (App\Models\Paciente $paciente) 
         ->setPaper('a4', 'portrait')
         ->stream("historial_{$paciente->id}.pdf");
 })->middleware(['auth', 'can:expediente.ver'])->name('pacientes.pdf');
+
+// Requisitos de la cuenta: clave personal y acuerdo de confidencialidad (AM 5216-A)
+Route::get('cuenta/password', \App\Livewire\Cuenta\CambiarPassword::class)
+    ->middleware('auth')->name('cuenta.password');
+Route::get('cuenta/confidencialidad', \App\Livewire\Cuenta\AcuerdoConfidencialidad::class)
+    ->middleware('auth')->name('cuenta.confidencialidad');
 
 require __DIR__.'/auth.php';

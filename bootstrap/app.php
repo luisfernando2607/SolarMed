@@ -11,6 +11,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Orden: primero clave propia y acuerdo de confidencialidad, luego verificación en dos pasos
+        $middleware->appendToGroup('web', \App\Http\Middleware\ExigirRequisitosCuenta::class);
         $middleware->appendToGroup('web', \App\Http\Middleware\ExigirDosFactores::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

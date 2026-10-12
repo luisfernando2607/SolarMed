@@ -25,6 +25,10 @@ class User extends Authenticatable
         'email',
         'cedula',
         'password',
+        'debe_cambiar_password',
+        'password_cambiado_at',
+        'confidencialidad_aceptada_at',
+        'confidencialidad_ip',
     ];
 
     /**
@@ -66,6 +70,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'debe_cambiar_password' => 'boolean',
+            'password_cambiado_at' => 'datetime',
+            'confidencialidad_aceptada_at' => 'datetime',
             'two_factor_secret' => 'encrypted',
             'two_factor_recovery_codes' => 'encrypted:array',
             'two_factor_confirmed_at' => 'datetime',

@@ -48,7 +48,10 @@ new #[Layout('layouts.guest')] class extends Component
                 $user->forceFill([
                     'password' => Hash::make($this->password),
                     'remember_token' => Str::random(60),
+                    'debe_cambiar_password' => false,
+                    'password_cambiado_at' => now(),
                 ])->save();
+                app(\App\Services\AuditoriaService::class)->registrar('cambiar_password', 'cuenta', $user->id, null, 'Recuperación por correo', $user->id);
 
                 event(new PasswordReset($user));
             }

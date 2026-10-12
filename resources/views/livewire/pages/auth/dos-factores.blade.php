@@ -55,6 +55,8 @@ new #[Layout('layouts.guest')] class extends Component
 
         if (!$valido) {
             RateLimiter::hit($clave, 300);
+            app(\App\Services\AuditoriaService::class)->registrar('login_fallido', 'sesion', null, null,
+                $this->usarRecuperacion ? 'Código de recuperación incorrecto' : 'Código de verificación incorrecto', $user?->id);
             $this->addError('codigo', 'Código incorrecto.');
             return;
         }
