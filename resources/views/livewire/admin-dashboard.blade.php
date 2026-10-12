@@ -210,10 +210,10 @@
             type: 'line',
             plugins: [deltaPlugin],
             data: {
-                labels: {!! json_encode($facturacionMensual->pluck('mes')) !!},
+                labels: {{ \Illuminate\Support\Js::from($facturacionMensual->pluck('mes')) }},
                 datasets: [{
                     label: 'Facturado',
-                    data: {!! json_encode($facturacionMensual->pluck('monto')) !!},
+                    data: {{ \Illuminate\Support\Js::from($facturacionMensual->pluck('monto')) }},
                     borderColor: '#378ADD',
                     borderWidth: 2,
                     backgroundColor: 'rgba(55,138,221,0.12)',
@@ -248,12 +248,12 @@
         charts.push(new Chart(document.getElementById('chartTurnos'), {
             type: 'bar',
             data: {
-                labels: {!! json_encode($turnosUltimosMeses->pluck('mes')) !!},
+                labels: {{ \Illuminate\Support\Js::from($turnosUltimosMeses->pluck('mes')) }},
                 datasets: [
                     {
                         type: 'bar',
                         label: 'Completados',
-                        data: {!! json_encode($completadosData) !!},
+                        data: {{ \Illuminate\Support\Js::from($completadosData) }},
                         backgroundColor: '#639922',
                         borderRadius: 5,
                         borderSkipped: false,
@@ -262,7 +262,7 @@
                     {
                         type: 'bar',
                         label: 'Cancelados',
-                        data: {!! json_encode($canceladosData) !!},
+                        data: {{ \Illuminate\Support\Js::from($canceladosData) }},
                         backgroundColor: '#E24B4A',
                         borderRadius: 5,
                         borderSkipped: false,
@@ -271,7 +271,7 @@
                     {
                         type: 'line',
                         label: '% Cancelación',
-                        data: {!! json_encode($ratioData) !!},
+                        data: {{ \Illuminate\Support\Js::from($ratioData) }},
                         borderColor: '#BA7517',
                         borderWidth: 2,
                         borderDash: [4, 3],
@@ -327,8 +327,8 @@
         charts.push(new Chart(document.getElementById('chartEspecialidad'), {
             type: 'radar',
             data: {
-                labels: {!! json_encode($motivosLabels) !!},
-                datasets: {!! json_encode($radarDatasets) !!}
+                labels: {{ \Illuminate\Support\Js::from($motivosLabels) }},
+                datasets: {{ \Illuminate\Support\Js::from($radarDatasets) }}
             },
             options: {
                 ...BASE,
@@ -354,9 +354,9 @@
         charts.push(new Chart(document.getElementById('chartDiagnosticos'), {
             type: 'bar',
             data: {
-                labels: {!! json_encode($diagLabels) !!},
+                labels: {{ \Illuminate\Support\Js::from($diagLabels) }},
                 datasets: [{
-                    data: {!! json_encode($diagData) !!},
+                    data: {{ \Illuminate\Support\Js::from($diagData) }},
                     backgroundColor: '#D4537E',
                     borderRadius: 5,
                     borderSkipped: false
@@ -372,7 +372,7 @@
                         titleColor: '#2C2C2A', bodyColor: '#5F5E5A', padding: 10, cornerRadius: 8,
                         callbacks: {
                             afterTitle: c => {
-                                const m = {!! json_encode($diagMap) !!};
+                                const m = {{ \Illuminate\Support\Js::from($diagMap) }};
                                 return m[c[0].label] || '';
                             }
                         }
@@ -394,9 +394,9 @@
         charts.push(new Chart(document.getElementById('chartSexo'), {
             type: 'doughnut',
             data: {
-                labels: {!! json_encode($porSexo->keys()->map(fn($k) => match($k) { 'masculino' => 'Masculino', 'femenino' => 'Femenino', default => 'Otro' })) !!},
+                labels: {{ \Illuminate\Support\Js::from($porSexo->keys()->map(fn($k) => match($k) { 'masculino' => 'Masculino', 'femenino' => 'Femenino', default => 'Otro' })) }},
                 datasets: [{
-                    data: {!! json_encode($porSexo->values()) !!},
+                    data: {{ \Illuminate\Support\Js::from($porSexo->values()) }},
                     backgroundColor: ['#378ADD', '#D4537E', '#888780'],
                     borderColor: '#fff',
                     borderWidth: 3,
@@ -412,7 +412,7 @@
                         ...TT(),
                         callbacks: {
                             label: c => {
-                                const t = {!! json_encode($porSexo->sum()) !!};
+                                const t = {{ \Illuminate\Support\Js::from($porSexo->sum()) }};
                                 return ` ${c.label}: ${c.parsed} (${Math.round(c.parsed / t * 100)}%)`;
                             }
                         }
@@ -435,12 +435,12 @@
         charts.push(new Chart(document.getElementById('chartEdad'), {
             type: 'bar',
             data: {
-                labels: {!! json_encode(array_keys($rangosEdad)) !!},
+                labels: {{ \Illuminate\Support\Js::from(array_keys($rangosEdad)) }},
                 datasets: [
                     {
                         type: 'bar',
                         label: 'Pacientes',
-                        data: {!! json_encode($edadValues) !!},
+                        data: {{ \Illuminate\Support\Js::from($edadValues) }},
                         backgroundColor: '#7F77DD',
                         borderRadius: 5,
                         borderSkipped: false,
@@ -449,7 +449,7 @@
                     {
                         type: 'line',
                         label: 'Acumulado %',
-                        data: {!! json_encode($edadAcum) !!},
+                        data: {{ \Illuminate\Support\Js::from($edadAcum) }},
                         borderColor: '#BA7517',
                         borderWidth: 2,
                         borderDash: [3, 3],
@@ -487,7 +487,7 @@
             $ciudadValues = $porCiudad->pluck('total')->toArray();
         @endphp
         (function () {
-            const vals   = {!! json_encode($ciudadValues) !!};
+            const vals   = {{ \Illuminate\Support\Js::from($ciudadValues) }};
             const maxVal = vals[0] || 1;
             function lerpHex(a, b, t) {
                 const ah = parseInt(a, 16), bh = parseInt(b, 16);
@@ -500,7 +500,7 @@
             window.__chartCiudad = new Chart(document.getElementById('chartCiudad'), {
                 type: 'bar',
                 data: {
-                    labels: {!! json_encode($ciudadLabels) !!},
+                    labels: {{ \Illuminate\Support\Js::from($ciudadLabels) }},
                     datasets: [{
                         data: vals,
                         backgroundColor: bgColors,

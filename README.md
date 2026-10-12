@@ -41,11 +41,25 @@ Sistema de gestión clínica integral para **SolarMed Software**, una consulta p
 
 ```bash
 git clone <repo-url>
-cd solarmed
+cd SolarMed
 composer install
 npm install
 cp .env.example .env
 php artisan key:generate
+```
+
+Crear la base de datos `solarmed` y un usuario propio (no usar `root`):
+
+```sql
+CREATE DATABASE solarmed CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'solarmed'@'localhost' IDENTIFIED BY '<contraseña segura>';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, INDEX, REFERENCES,
+      LOCK TABLES, CREATE TEMPORARY TABLES ON solarmed.* TO 'solarmed'@'localhost';
+```
+
+Completar `DB_USERNAME` y `DB_PASSWORD` en `.env` y luego:
+
+```bash
 php artisan migrate --seed
 npm run build
 ```
@@ -57,6 +71,48 @@ composer dev
 ```
 
 Ejecuta simultáneamente: servidor Laravel, listener de colas, logs y Vite HMR.
+
+### Pruebas
+
+```bash
+php artisan test
+```
+
+Cubren permisos por rol, turnos, facturación, formulario de consulta y facturación electrónica SRI
+(XML, firma XAdES-BES y web services simulados). Usan SQLite en memoria; no tocan la base `solarmed`.
+
+## Usuarios y permisos
+
+No hay registro público: los usuarios los crea un administrador en **Usuarios**. Cada ruta exige un
+permiso (`routes/web.php`) y los roles se definen en `database/seeders/RolesSeeder.php`:
+
+| Rol | Acceso |
+|---|---|
+| admin | Todo |
+| medico | Pacientes, expedientes, ecografías, facturación |
+| secretaria | Turnos, sala de espera, facturación |
+| enfermeria | Ver turnos y pacientes |
+
+## Facturación electrónica SRI
+
+1. **SRI > Configuración**: RUC, razón social, dirección, establecimiento, punto de emisión y ambiente
+   (`1` = pruebas, `2` = producción).
+2. **Usuarios > editar médico**: subir el certificado `.p12` y su contraseña. Se aceptan certificados
+   *legacy* (Security Data, BCE) que OpenSSL 3 no abre por defecto.
+3. En la factura: **Generar XML → Firmar → Enviar al SRI → Consultar autorización**.
+   Si el SRI devuelve el comprobante, sus mensajes se muestran en la factura y se puede regenerar.
+
+> El RUC configurado debe pertenecer al titular del certificado con el que se firma; de lo contrario
+> el SRI rechaza el comprobante. Probar siempre primero en ambiente de pruebas.
+
+## Producción
+
+- `.env`: `APP_ENV=production`, `APP_DEBUG=false`, `LOG_LEVEL=warning`, `SESSION_ENCRYPT=true`,
+  `APP_URL` con `https://`.
+- Servir solo por HTTPS (la app maneja historias clínicas y certificados digitales).
+- `php artisan config:cache && php artisan route:cache && php artisan view:cache`
+- Respaldar la base `solarmed` **y** `storage/app/private` (certificados, XML del SRI, archivos de pacientes).
+- No versionar `.env` ni volcados de base de datos con datos reales.
 
 ## Licencia
 
