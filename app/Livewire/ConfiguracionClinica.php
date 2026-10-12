@@ -27,6 +27,7 @@ class ConfiguracionClinica extends Component
     public $hora_inicio;
     public $hora_fin;
     public array $dias = [];
+    public string $plantillaWhatsapp = '';
 
     // Alertas prenatales
     public $pa_sistolica, $pa_diastolica, $pa_severa_sistolica, $pa_severa_diastolica;
@@ -54,6 +55,7 @@ class ConfiguracionClinica extends Component
         $this->hora_inicio = $a->get('agenda.hora_inicio');
         $this->hora_fin = $a->get('agenda.hora_fin');
         $this->dias = array_map('strval', $a->get('agenda.dias_laborables'));
+        $this->plantillaWhatsapp = (string) $a->get('recordatorios.whatsapp_plantilla');
         foreach (self::PRENATAL as $campo) {
             $this->{$campo} = $a->get("prenatal.{$campo}");
         }
@@ -86,6 +88,7 @@ class ConfiguracionClinica extends Component
             'hora_fin' => ['required', 'date_format:H:i', 'after:hora_inicio'],
             'dias' => 'required|array|min:1',
             'dias.*' => 'in:0,1,2,3,4,5,6',
+            'plantillaWhatsapp' => 'required|string|max:700',
             'pa_sistolica' => 'required|integer|between:100,200',
             'pa_diastolica' => 'required|integer|between:60,130',
             'pa_severa_sistolica' => 'required|integer|between:120,250|gt:pa_sistolica',
@@ -108,6 +111,7 @@ class ConfiguracionClinica extends Component
         ], [
             'hora_fin.after' => 'La hora de cierre debe ser posterior a la de inicio.',
             'dias.required' => 'Seleccione al menos un día de atención.',
+            'plantillaWhatsapp.required' => 'Escriba el mensaje del recordatorio.',
             'pa_severa_sistolica.gt' => 'Debe ser mayor que el umbral de hipertensión.',
             'pa_severa_diastolica.gt' => 'Debe ser mayor que el umbral de hipertensión.',
             'fcf_max.gt' => 'Debe ser mayor que el mínimo.',
@@ -145,6 +149,7 @@ class ConfiguracionClinica extends Component
             'agenda.hora_inicio' => $this->hora_inicio,
             'agenda.hora_fin' => $this->hora_fin,
             'agenda.dias_laborables' => array_values(array_map('intval', $this->dias)),
+            'recordatorios.whatsapp_plantilla' => trim($this->plantillaWhatsapp),
             'tareas.hora_recordatorios' => $this->hora_recordatorios,
             'tareas.hora_respaldo' => $this->hora_respaldo,
         ];

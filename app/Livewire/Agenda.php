@@ -8,6 +8,7 @@ use App\Models\Medico;
 use App\Models\Paciente;
 use App\Services\AjustesService;
 use App\Services\TurnoService;
+use App\Services\WhatsappService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -298,7 +299,10 @@ class Agenda extends Component
             'medicos' => Medico::where('activo', true)->with('especialidad')->orderBy('apellidos')->get(),
             'pacientes' => $pacientes,
             'pacienteSeleccionado' => $this->paciente_id ? Paciente::find($this->paciente_id) : null,
-            'cita' => $this->citaId ? Cita::with('paciente', 'medico.especialidad')->find($this->citaId) : null,
+            'cita' => $cita = $this->citaId ? Cita::with('paciente', 'medico.especialidad')->find($this->citaId) : null,
+            // Recordatorio solo para citas por venir
+            'enlaceWhatsapp' => $cita && in_array($cita->estado, ['pendiente', 'confirmada'], true) && $cita->fecha_hora->isFuture()
+                ? app(WhatsappService::class)->enlaceRecordatorio($cita) : null,
         ])->layout('layouts.app');
     }
 }

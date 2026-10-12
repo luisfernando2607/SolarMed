@@ -108,6 +108,12 @@
                     </div>
                     @error('dias') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Mensaje del recordatorio por WhatsApp</label>
+                    <textarea wire:model="plantillaWhatsapp" rows="3" maxlength="700" class="w-full rounded-lg border-gray-300 shadow-sm text-sm"></textarea>
+                    <p class="text-xs text-gray-400 mt-1">Se reemplazan: {{ implode(' ', \App\Services\WhatsappService::PLACEHOLDERS) }}. El botón WhatsApp aparece en la cita de la agenda y en la agenda de hoy.</p>
+                    @error('plantillaWhatsapp') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
             </div>
         </section>
 
