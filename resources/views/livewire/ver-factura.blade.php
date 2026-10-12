@@ -164,6 +164,50 @@
                 </div>
             @endif
 
+            {{-- Envío por correo al paciente --}}
+            @php $ncAutorizada = $factura->notaCredito?->estado_sri === 'autorizado'; @endphp
+            @if ($factura->estado_sri === 'autorizado')
+                <div class="p-6 border-b">
+                    <h3 class="font-semibold text-gray-700 mb-2">Envío por correo</h3>
+                    <div class="text-xs text-gray-500 space-y-0.5 mb-3">
+                        <p>Factura:
+                            @if ($factura->email_enviado_at)
+                                enviada a <strong>{{ $factura->email_enviado_a }}</strong> el {{ $factura->email_enviado_at->format('d/m/Y H:i') }}
+                            @else
+                                aún no enviada
+                            @endif
+                        </p>
+                        @if ($ncAutorizada)
+                            <p>Nota de crédito:
+                                @if ($factura->notaCredito->email_enviado_at)
+                                    enviada a <strong>{{ $factura->notaCredito->email_enviado_a }}</strong> el {{ $factura->notaCredito->email_enviado_at->format('d/m/Y H:i') }}
+                                @else
+                                    aún no enviada
+                                @endif
+                            </p>
+                        @endif
+                    </div>
+                    @can('facturas.crear')
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input wire:model="correo_envio" type="email" maxlength="150"
+                                class="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                placeholder="correo@paciente.com">
+                            <button wire:click="enviarCorreo('factura')"
+                                class="px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 transition">
+                                {{ $factura->email_enviado_at ? 'Reenviar factura' : 'Enviar factura' }}
+                            </button>
+                            @if ($ncAutorizada)
+                                <button wire:click="enviarCorreo('nota_credito')"
+                                    class="px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 transition">
+                                    {{ $factura->notaCredito->email_enviado_at ? 'Reenviar nota de crédito' : 'Enviar nota de crédito' }}
+                                </button>
+                            @endif
+                        </div>
+                        @error('correo_envio') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    @endcan
+                </div>
+            @endif
+
             {{-- Nota de crédito (anulación de factura autorizada) --}}
             @if ($factura->estado_sri === 'autorizado')
                 @php $nc = $factura->notaCredito; @endphp

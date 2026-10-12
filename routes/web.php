@@ -86,6 +86,14 @@ Route::get('recetas/crear/{turno}', CrearReceta::class)
     ->middleware(['auth', 'can:expediente.crear'])
     ->name('recetas.crear');
 
+Route::get('recetas/pdf/{receta}', function (App\Models\Receta $receta) {
+    $receta->load('paciente', 'medico.especialidad', 'consulta');
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'receta', $receta->id, $receta->paciente_id, 'PDF de receta');
+    return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.receta', ['receta' => $receta])
+        ->setPaper('a5', 'portrait')
+        ->stream("receta_{$receta->id}.pdf");
+})->middleware(['auth', 'can:expediente.ver'])->name('recetas.pdf');
+
 // Expedientes clínicos
 Route::get('expedientes', ListaExpedientes::class)
     ->middleware(['auth', 'can:expediente.ver'])
@@ -117,9 +125,7 @@ Route::get('facturas/{factura}', VerFactura::class)
 Route::get('facturas/pdf/{factura}', function (App\Models\Factura $factura) {
     $factura->load('paciente', 'medico', 'items');
     app(\App\Services\AuditoriaService::class)->registrar('descargar', 'factura', $factura->id, $factura->paciente_id, "PDF factura {$factura->numero_factura}");
-    $emisor = app(App\Services\SriConfigService::class)->emisor($factura->medico);
-    return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.factura', ['factura' => $factura, 'emisor' => $emisor])
-        ->setPaper([0, 0, 226, $factura->clave_acceso ? 500 : 430], 'portrait')
+    return app(App\Services\RidePdfService::class)->factura($factura)
         ->stream("factura_{$factura->numero_factura}.pdf");
 })->middleware(['auth', 'can:facturas.ver'])->name('facturas.pdf');
 
@@ -135,9 +141,7 @@ Route::get('facturas/xml/{factura}', function (App\Models\Factura $factura) {
 Route::get('notas-credito/pdf/{notaCredito}', function (App\Models\NotaCredito $notaCredito) {
     $notaCredito->load('factura.paciente', 'factura.items', 'medico');
     app(\App\Services\AuditoriaService::class)->registrar('descargar', 'nota_credito', $notaCredito->id, $notaCredito->factura->paciente_id, "PDF nota de crédito {$notaCredito->numero}");
-    $emisor = app(App\Services\SriConfigService::class)->emisor($notaCredito->medico);
-    return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.nota-credito', ['nota' => $notaCredito, 'emisor' => $emisor])
-        ->setPaper([0, 0, 226, 500], 'portrait')
+    return app(App\Services\RidePdfService::class)->notaCredito($notaCredito)
         ->stream("nota_credito_{$notaCredito->numero}.pdf");
 })->middleware(['auth', 'can:facturas.ver'])->name('notas-credito.pdf');
 

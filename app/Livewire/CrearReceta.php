@@ -72,6 +72,7 @@ class CrearReceta extends Component
         }
 
         $receta = Receta::create([
+            'consulta_id' => \App\Models\ExpedienteConsulta::where('turno_id', $this->turno->id)->latest('fecha')->value('id'),
             'paciente_id' => $this->paciente_id,
             'medico_id' => $medico->id,
             'fecha' => now(),
@@ -81,6 +82,7 @@ class CrearReceta extends Component
 
         app(\App\Services\AuditoriaService::class)->registrar('crear', 'receta', $receta->id, $receta->paciente_id);
         session()->flash('success', 'Receta creada exitosamente.');
+        session()->flash('receta_creada', $receta->id);
         $this->redirect(route('turno.atender', $this->turno->id), navigate: true);
     }
 

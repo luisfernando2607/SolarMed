@@ -13,7 +13,7 @@ class Factura extends Model {
         'subtotal', 'descuento', 'total', 'forma_pago',
         'referencia_pago', 'estado', 'estado_sri',
         'xml_enviado_path', 'xml_firmado_path', 'xml_autorizado_path', 'observaciones',
-        'fecha_autorizacion', 'mensajes_sri',
+        'fecha_autorizacion', 'mensajes_sri', 'email_enviado_at', 'email_enviado_a',
     ];
     protected $casts = [
         'fecha' => 'date',
@@ -22,6 +22,7 @@ class Factura extends Model {
         'total' => 'decimal:2',
         'fecha_autorizacion' => 'datetime',
         'mensajes_sri' => 'array',
+        'email_enviado_at' => 'datetime',
     ];
 
     public function paciente(): BelongsTo     { return $this->belongsTo(Paciente::class); }

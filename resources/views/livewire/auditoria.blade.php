@@ -56,6 +56,7 @@
                                         @case('editar') bg-amber-100 text-amber-700 @break
                                         @case('crear') bg-green-100 text-green-700 @break
                                         @case('descargar') bg-purple-100 text-purple-700 @break
+                                        @case('enviar') bg-teal-100 text-teal-700 @break
                                         @default bg-blue-100 text-blue-700
                                     @endswitch">{{ \App\Models\RegistroAcceso::ACCIONES[$r->accion] ?? $r->accion }}</span>
                             </td>

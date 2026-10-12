@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\Jobs\AutorizarComprobanteSri;
+use App\Jobs\EnviarComprobantePorCorreo;
 use App\Models\Factura;
 use App\Models\NotaCredito;
 use Illuminate\Support\Facades\Storage;
@@ -65,6 +66,11 @@ class ComprobanteSriService {
 
         if ($resultado['estado'] === 'AUTORIZADO' && $comprobante instanceof NotaCredito) {
             $comprobante->factura->update(['estado' => 'anulada']);
+        }
+
+        // Entrega automática al paciente si tiene correo registrado
+        if ($resultado['estado'] === 'AUTORIZADO' && !$comprobante->email_enviado_at) {
+            EnviarComprobantePorCorreo::dispatch($comprobante);
         }
 
         return $resultado;
