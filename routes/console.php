@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Retoma comprobantes que quedaron pendientes con el SRI (requiere el cron de schedule:run)
 Schedule::command('sri:reintentar')->everyFifteenMinutes()->withoutOverlapping();
+
+// Respaldo diario de la base de datos y los archivos privados
+Schedule::command('respaldo:crear')->dailyAt('02:30')->withoutOverlapping();

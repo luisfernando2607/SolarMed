@@ -142,7 +142,17 @@ Cada médico factura con **su propio RUC** y su propia numeración (`001-001-000
   `php artisan queue:work --tries=1 --max-time=3600`
 - **Programador de tareas** (`sri:reintentar` cada 15 min) en el cron del servidor:
   `* * * * * cd /ruta/SolarMed && php artisan schedule:run >> /dev/null 2>&1`
-- Respaldar la base `solarmed` **y** `storage/app/private` (certificados, XML del SRI, archivos de pacientes).
+- **Respaldos**: `php artisan respaldo:crear` corre cada día a las 02:30 (requiere el cron). Incluye la base
+  `solarmed` y `storage/app/private` (certificados, XML del SRI, archivos de pacientes). Configurar en `.env`:
+  `BACKUP_PATH` (idealmente un disco externo o carpeta sincronizada fuera del servidor), `BACKUP_DIAS` y
+  `BACKUP_PASSWORD` (cifra con AES-256; guardarla en lugar seguro: sin ella no se puede restaurar).
+  Restaurar:
+  ```bash
+  openssl enc -d -aes-256-cbc -pbkdf2 -in solarmed_FECHA.tar.gz.enc -out respaldo.tar.gz   # pide la contraseña
+  tar -xzf respaldo.tar.gz            # base.sql y private/
+  mysql -u solarmed -p solarmed < base.sql
+  cp -r private/* storage/app/private/
+  ```
 - No versionar `.env` ni volcados de base de datos con datos reales.
 
 ## Licencia
