@@ -18,6 +18,7 @@ class FacturaServiceTest extends TestCase
 
     private array $cabecera;
     private ServicioTarifario $servicio;
+    private Medico $medico;
 
     protected function setUp(): void
     {
@@ -25,7 +26,7 @@ class FacturaServiceTest extends TestCase
 
         $especialidad = Especialidad::create(['nombre' => 'Medicina General', 'codigo' => 'general']);
         $user = User::factory()->create();
-        $medico = Medico::create([
+        $medico = $this->medico = Medico::create([
             'user_id' => $user->id, 'nombres' => 'Carlos', 'apellidos' => 'García', 'especialidad_id' => $especialidad->id,
         ]);
         $paciente = Paciente::create([
@@ -69,6 +70,26 @@ class FacturaServiceTest extends TestCase
             $this->cabecera + ['descuento' => 100],
             [['servicio_id' => $this->servicio->id, 'cantidad' => 1]]
         );
+    }
+
+    public function test_numeracion_independiente_por_ruc_del_medico(): void
+    {
+        $items = [['servicio_id' => $this->servicio->id, 'cantidad' => 1]];
+
+        $this->medico->update(['ruc' => '0912345678001', 'razon_social' => 'García Carlos', 'direccion_matriz' => 'Guayaquil']);
+        $otroUser = User::factory()->create();
+        $otro = Medico::create([
+            'user_id' => $otroUser->id, 'nombres' => 'Jorge', 'apellidos' => 'Bury', 'especialidad_id' => $this->medico->especialidad_id,
+            'ruc' => '0998765432001', 'razon_social' => 'Bury Jorge', 'direccion_matriz' => 'Guayaquil', 'sri_pto_emi' => '002',
+        ]);
+
+        $a1 = app(FacturaService::class)->crear($this->cabecera, $items);
+        $b1 = app(FacturaService::class)->crear(['medico_id' => $otro->id] + $this->cabecera, $items);
+        $a2 = app(FacturaService::class)->crear($this->cabecera, $items);
+
+        $this->assertSame(['0912345678001', '001-001-000000001'], [$a1->ruc_emisor, $a1->numero_factura]);
+        $this->assertSame(['0998765432001', '001-002-000000001'], [$b1->ruc_emisor, $b1->numero_factura]);
+        $this->assertSame('001-001-000000002', $a2->numero_factura);
     }
 
     public function test_numeracion_secuencial(): void

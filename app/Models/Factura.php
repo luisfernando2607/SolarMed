@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Factura extends Model {
     protected $fillable = [
-        'numero_factura', 'clave_acceso', 'numero_autorizacion', 'ambiente_sri',
+        'numero_factura', 'ruc_emisor', 'clave_acceso', 'numero_autorizacion', 'ambiente_sri',
         'paciente_id', 'medico_id', 'especialidad_id',
         'turno_id', 'cita_id', 'user_id', 'fecha',
         'subtotal', 'descuento', 'total', 'forma_pago',

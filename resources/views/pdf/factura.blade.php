@@ -27,8 +27,18 @@
 <body>
     <div class="encabezado center">
         <img src="{{ public_path('images/SolarMed-bn.jpg') }}" alt="Solar Med" style="height: 50px; margin-bottom: 4px;">
-        <h1>{{ config('app.name', 'CLÍNICA') }}</h1>
-        <p>RUC: {{ $factura->medico?->user?->cedula ?? config('app.ruc', '1234567890001') }}</p>
+        <h1>{{ $emisor['nombre_comercial'] ?: config('app.name', 'CLÍNICA') }}</h1>
+        @if ($emisor['razon_social'])
+            <p>{{ $emisor['razon_social'] }}</p>
+        @endif
+        <p>RUC: {{ $factura->ruc_emisor ?: ($emisor['ruc'] ?: '--') }}</p>
+        @if ($emisor['direccion'])
+            <p>{{ $emisor['direccion'] }}</p>
+        @endif
+        @if ($emisor['regimen_rimpe'])
+            <p>{{ $emisor['regimen_rimpe'] }}</p>
+        @endif
+        <p>Obligado a llevar contabilidad: {{ $emisor['obligado_contabilidad'] }}</p>
         <p>Tel: {{ config('app.telefono', '044619253') }}</p>
         <p>Ecuador</p>
         <div class="double-line"></div>

@@ -95,15 +95,21 @@ permiso (`routes/web.php`) y los roles se definen en `database/seeders/RolesSeed
 
 ## Facturación electrónica SRI
 
-1. **SRI > Configuración**: RUC, razón social, dirección, establecimiento, punto de emisión y ambiente
-   (`1` = pruebas, `2` = producción).
-2. **Usuarios > editar médico**: subir el certificado `.p12` y su contraseña. Se aceptan certificados
-   *legacy* (Security Data, BCE) que OpenSSL 3 no abre por defecto.
-3. En la factura: **Generar XML → Firmar → Enviar al SRI → Consultar autorización**.
+Cada médico factura con **su propio RUC** y su propia numeración (`001-001-000000001` por RUC).
+
+1. **SRI > Configuración**: ambiente (`1` = pruebas, `2` = producción) y datos de la clínica, que se usan
+   como respaldo para médicos que aún no tienen RUC configurado.
+2. **Usuarios > editar médico**:
+   - Datos tributarios: RUC, razón social, dirección matriz, obligado a llevar contabilidad,
+     régimen RIMPE, establecimiento y punto de emisión.
+   - Certificado `.p12` del médico y su contraseña. Se aceptan certificados *legacy*
+     (Security Data, BCE) que OpenSSL 3 no abre por defecto.
+3. **Facturación > Nueva factura**: elegir el médico emisor (se sugiere el que atendió al paciente).
+4. En la factura: **Generar XML → Firmar → Enviar al SRI → Consultar autorización**.
    Si el SRI devuelve el comprobante, sus mensajes se muestran en la factura y se puede regenerar.
 
-> El RUC configurado debe pertenecer al titular del certificado con el que se firma; de lo contrario
-> el SRI rechaza el comprobante. Probar siempre primero en ambiente de pruebas.
+> El certificado `.p12` de cada médico debe corresponder a su RUC; de lo contrario el SRI rechaza el
+> comprobante. Probar siempre primero en ambiente de pruebas.
 
 ## Producción
 

@@ -115,8 +115,9 @@ Route::get('facturas/{factura}', VerFactura::class)
 // Factura PDF
 Route::get('facturas/pdf/{factura}', function (App\Models\Factura $factura) {
     $factura->load('paciente', 'medico', 'items');
-    return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.factura', ['factura' => $factura])
-        ->setPaper([0, 0, 226, $factura->clave_acceso ? 470 : 400], 'portrait')
+    $emisor = app(App\Services\SriConfigService::class)->emisor($factura->medico);
+    return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.factura', ['factura' => $factura, 'emisor' => $emisor])
+        ->setPaper([0, 0, 226, $factura->clave_acceso ? 500 : 430], 'portrait')
         ->stream("factura_{$factura->numero_factura}.pdf");
 })->middleware(['auth', 'can:facturas.ver'])->name('facturas.pdf');
 

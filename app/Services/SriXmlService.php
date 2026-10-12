@@ -19,14 +19,27 @@ class SriXmlService {
         $paciente = $factura->paciente;
         $config = app(SriConfigService::class);
 
-        $ruc = $config->get('sri_ruc');
+        $emisor = $config->emisor($medico);
+        $dondeConfigurar = $emisor['origen'] === 'medico' ? 'Usuarios > datos tributarios del médico' : 'SRI > Configuración';
+
+        $ruc = $emisor['ruc'];
         if (!$ruc || !preg_match('/^\d{13}$/', $ruc)) {
-            throw new \RuntimeException('Configure un RUC válido (13 dígitos) en SRI > Configuración antes de generar el XML.');
+            throw new \RuntimeException("Configure un RUC válido (13 dígitos) en {$dondeConfigurar} antes de generar el XML.");
         }
 
-        $razonSocial = $config->get('sri_razon_social');
+        // La numeración de la factura pertenece al RUC con el que se emitió
+        if ($factura->ruc_emisor && $factura->ruc_emisor !== $ruc) {
+            throw new \RuntimeException("La factura se numeró con el RUC {$factura->ruc_emisor}, pero el emisor actual tiene RUC {$ruc}. Corrija el RUC del médico o emita una nueva factura.");
+        }
+
+        $razonSocial = $emisor['razon_social'];
         if (!$razonSocial) {
-            throw new \RuntimeException('Configure la razón social en SRI > Configuración antes de generar el XML.');
+            throw new \RuntimeException("Configure la razón social en {$dondeConfigurar} antes de generar el XML.");
+        }
+
+        $direccion = $emisor['direccion'];
+        if (!$direccion) {
+            throw new \RuntimeException("Configure la dirección matriz en {$dondeConfigurar} antes de generar el XML.");
         }
 
         // Ambiente, establecimiento, punto de emisión y secuencial salen de la propia factura,
@@ -59,7 +72,7 @@ class SriXmlService {
         $this->addChild($doc, $infoTributaria, 'ambiente', $ambiente);
         $this->addChild($doc, $infoTributaria, 'tipoEmision', '1');
         $this->addChild($doc, $infoTributaria, 'razonSocial', mb_substr($razonSocial, 0, 300));
-        if ($nombreComercial = $config->get('sri_nombre_comercial')) {
+        if ($nombreComercial = $emisor['nombre_comercial']) {
             $this->addChild($doc, $infoTributaria, 'nombreComercial', mb_substr($nombreComercial, 0, 300));
         }
         $this->addChild($doc, $infoTributaria, 'ruc', $ruc);
@@ -68,17 +81,20 @@ class SriXmlService {
         $this->addChild($doc, $infoTributaria, 'estab', $estab);
         $this->addChild($doc, $infoTributaria, 'ptoEmi', $ptoEmi);
         $this->addChild($doc, $infoTributaria, 'secuencial', $secuencial);
-        $this->addChild($doc, $infoTributaria, 'dirMatriz', mb_substr($config->get('sri_direccion', ''), 0, 300));
+        $this->addChild($doc, $infoTributaria, 'dirMatriz', mb_substr($direccion, 0, 300));
+        if ($emisor['regimen_rimpe']) {
+            $this->addChild($doc, $infoTributaria, 'contribuyenteRimpe', $emisor['regimen_rimpe']);
+        }
 
         // infoFactura
         $infoFactura = $doc->createElement('infoFactura');
         $facturaEl->appendChild($infoFactura);
         $this->addChild($doc, $infoFactura, 'fechaEmision', $fechaEmision->format('d/m/Y'));
-        $this->addChild($doc, $infoFactura, 'dirEstablecimiento', mb_substr($config->get('sri_direccion', ''), 0, 300));
-        if ($contribuyenteEspecial = $config->get('sri_contribuyente_especial')) {
+        $this->addChild($doc, $infoFactura, 'dirEstablecimiento', mb_substr($direccion, 0, 300));
+        if ($contribuyenteEspecial = $emisor['contribuyente_especial']) {
             $this->addChild($doc, $infoFactura, 'contribuyenteEspecial', $contribuyenteEspecial);
         }
-        $this->addChild($doc, $infoFactura, 'obligadoContabilidad', $config->get('sri_obligado_contabilidad', 'NO'));
+        $this->addChild($doc, $infoFactura, 'obligadoContabilidad', $emisor['obligado_contabilidad']);
         $this->addChild($doc, $infoFactura, 'tipoIdentificacionComprador', $comprador['tipo']);
         $this->addChild($doc, $infoFactura, 'razonSocialComprador', $comprador['nombre']);
         $this->addChild($doc, $infoFactura, 'identificacionComprador', $comprador['identificacion']);

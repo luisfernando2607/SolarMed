@@ -39,6 +39,16 @@ class GestionUsuarios extends Component
     public $p12_file;
     public $p12_password;
 
+    // Datos tributarios del médico (emisor de sus facturas electrónicas)
+    public $ruc;
+    public $razon_social;
+    public $nombre_comercial;
+    public $direccion_matriz;
+    public $obligado_contabilidad = 'NO';
+    public $regimen_rimpe;
+    public $sri_establecimiento = '001';
+    public $sri_pto_emi = '001';
+
     protected function rules(): array
     {
         $rules = [
@@ -47,6 +57,19 @@ class GestionUsuarios extends Component
             'cedula' => 'nullable|string|max:13',
             'rol' => 'required|exists:roles,name',
         ];
+
+        if ($this->rol === 'medico') {
+            $rules += [
+                'ruc' => ['nullable', 'regex:/^\d{13}$/'],
+                'razon_social' => 'required_with:ruc|nullable|string|max:300',
+                'nombre_comercial' => 'nullable|string|max:300',
+                'direccion_matriz' => 'required_with:ruc|nullable|string|max:300',
+                'obligado_contabilidad' => 'required|in:SI,NO',
+                'regimen_rimpe' => ['nullable', Rule::in(Medico::REGIMENES_RIMPE)],
+                'sri_establecimiento' => ['required', 'regex:/^\d{3}$/'],
+                'sri_pto_emi' => ['required', 'regex:/^\d{3}$/'],
+            ];
+        }
 
         if ($this->editMode) {
             $rules['password'] = 'nullable|string|min:8|confirmed';
@@ -70,11 +93,18 @@ class GestionUsuarios extends Component
         'p12_file.mimes' => 'El archivo debe ser .p12 o .pfx.',
         'p12_file.max' => 'El archivo no debe superar los 2MB.',
         'p12_password.required_with' => 'Ingrese la contraseña del certificado.',
+        'ruc.regex' => 'El RUC debe tener 13 dígitos.',
+        'razon_social.required_with' => 'La razón social es obligatoria si se ingresa el RUC.',
+        'direccion_matriz.required_with' => 'La dirección matriz es obligatoria si se ingresa el RUC.',
+        'sri_establecimiento.regex' => 'Use 3 dígitos, por ejemplo 001.',
+        'sri_pto_emi.regex' => 'Use 3 dígitos, por ejemplo 001.',
     ];
 
     public function resetForm(): void
     {
-        $this->reset(['name', 'email', 'cedula', 'password', 'password_confirmation', 'rol', 'p12_file', 'p12_password', 'editMode', 'editId']);
+        $this->reset(['name', 'email', 'cedula', 'password', 'password_confirmation', 'rol', 'p12_file', 'p12_password', 'editMode', 'editId',
+            'ruc', 'razon_social', 'nombre_comercial', 'direccion_matriz', 'obligado_contabilidad',
+            'regimen_rimpe', 'sri_establecimiento', 'sri_pto_emi']);
     }
 
     public function crear(): void
@@ -97,6 +127,16 @@ class GestionUsuarios extends Component
         $this->p12_file = null;
         $this->p12_password = null;
         $this->rol = $user->roles->first()?->name;
+
+        $medico = $user->medico;
+        $this->ruc = $medico?->ruc;
+        $this->razon_social = $medico?->razon_social;
+        $this->nombre_comercial = $medico?->nombre_comercial;
+        $this->direccion_matriz = $medico?->direccion_matriz;
+        $this->obligado_contabilidad = $medico?->obligado_contabilidad ?? 'NO';
+        $this->regimen_rimpe = $medico?->regimen_rimpe;
+        $this->sri_establecimiento = $medico?->sri_establecimiento ?? '001';
+        $this->sri_pto_emi = $medico?->sri_pto_emi ?? '001';
     }
 
     public function guardar(): void
@@ -123,8 +163,11 @@ class GestionUsuarios extends Component
             $user->update($data);
             $user->syncRoles([$this->rol]);
 
-            if ($this->p12_file && $this->rol === 'medico') {
-                $this->guardarP12($user);
+            if ($this->rol === 'medico') {
+                $medico = $this->guardarDatosMedico($user);
+                if ($this->p12_file) {
+                    $this->guardarP12($user, $medico);
+                }
             }
 
             $this->dispatch('notify', message: 'Usuario actualizado exitosamente.', type: 'success');
@@ -133,8 +176,11 @@ class GestionUsuarios extends Component
             $user = User::create($data);
             $user->assignRole($this->rol);
 
-            if ($this->p12_file && $this->rol === 'medico') {
-                $this->guardarP12($user);
+            if ($this->rol === 'medico') {
+                $medico = $this->guardarDatosMedico($user);
+                if ($this->p12_file) {
+                    $this->guardarP12($user, $medico);
+                }
             }
 
             $this->dispatch('notify', message: 'Usuario creado exitosamente.', type: 'success');
@@ -153,13 +199,29 @@ class GestionUsuarios extends Component
         }
     }
 
-    private function guardarP12(User $user): void
+    private function guardarDatosMedico(User $user): Medico
     {
         $medico = Medico::firstOrCreate(
             ['user_id' => $user->id],
-            ['nombres' => $user->name, 'apellidos' => '', 'especialidad_id' => 1]
+            ['nombres' => $user->name, 'apellidos' => '', 'especialidad_id' => \App\Models\Especialidad::value('id')]
         );
 
+        $medico->update([
+            'ruc' => $this->ruc ?: null,
+            'razon_social' => $this->razon_social ?: null,
+            'nombre_comercial' => $this->nombre_comercial ?: null,
+            'direccion_matriz' => $this->direccion_matriz ?: null,
+            'obligado_contabilidad' => $this->obligado_contabilidad,
+            'regimen_rimpe' => $this->regimen_rimpe ?: null,
+            'sri_establecimiento' => $this->sri_establecimiento,
+            'sri_pto_emi' => $this->sri_pto_emi,
+        ]);
+
+        return $medico;
+    }
+
+    private function guardarP12(User $user, Medico $medico): void
+    {
         $path = $this->p12_file->store("certificados/{$user->id}", 'private');
         $medico->update([
             'p12_path' => $path,

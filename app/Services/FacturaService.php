@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\Models\Factura;
+use App\Models\Medico;
 use App\Models\ServicioTarifario;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -9,13 +10,16 @@ use Illuminate\Validation\ValidationException;
 
 class FacturaService {
 
-    /** Genera número de factura formato SRI: 001-001-000000001 */
-    public function siguienteNumero(): string {
-        $config = app(SriConfigService::class);
-        $estab = $config->get('sri_establecimiento', '001');
-        $ptoEmi = $config->get('sri_pto_emi', '001');
+    /**
+     * Genera número de factura formato SRI (001-001-000000001).
+     * La secuencia es independiente para cada RUC emisor y punto de emisión.
+     */
+    public function siguienteNumero(array $emisor): string {
+        $estab = $emisor['establecimiento'];
+        $ptoEmi = $emisor['pto_emi'];
 
-        $ultimo = Factura::where('numero_factura', 'like', "{$estab}-{$ptoEmi}-%")
+        $ultimo = Factura::where('ruc_emisor', $emisor['ruc'])
+            ->where('numero_factura', 'like', "{$estab}-{$ptoEmi}-%")
             ->orderBy('id', 'desc')
             ->value('numero_factura');
 
@@ -45,11 +49,15 @@ class FacturaService {
             ]);
         }
 
-        // Evita que dos facturas simultáneas obtengan el mismo número secuencial
-        return Cache::lock('factura-numero', 10)->block(5, function () use ($cabecera, $lineas, $subtotal, $descuento) {
-            return DB::transaction(function () use ($cabecera, $lineas, $subtotal, $descuento) {
+        $config = app(SriConfigService::class);
+        $emisor = $config->emisor(Medico::find($cabecera['medico_id'] ?? null));
+
+        // Evita que dos facturas simultáneas del mismo emisor obtengan el mismo número secuencial
+        return Cache::lock('factura-numero-' . ($emisor['ruc'] ?: 'sin-ruc'), 10)->block(5, function () use ($cabecera, $lineas, $subtotal, $descuento, $emisor) {
+            return DB::transaction(function () use ($cabecera, $lineas, $subtotal, $descuento, $emisor) {
                 $factura = Factura::create(array_merge($cabecera, [
-                    'numero_factura' => $this->siguienteNumero(),
+                    'numero_factura' => $this->siguienteNumero($emisor),
+                    'ruc_emisor'     => $emisor['ruc'],
                     'ambiente_sri'   => app(SriConfigService::class)->get('sri_ambiente', '1'),
                     'descuento'      => $descuento,
                     'subtotal'       => $subtotal,

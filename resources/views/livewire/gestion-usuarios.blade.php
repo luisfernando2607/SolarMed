@@ -236,6 +236,72 @@
                             </div>
                         @endif
 
+                        @if ($rol === 'medico')
+                            <div class="border-t pt-4 space-y-4">
+                                <div>
+                                    <h4 class="text-sm font-semibold text-gray-700">Datos tributarios (facturación electrónica)</h4>
+                                    <p class="text-xs text-gray-400">Las facturas de este médico se emiten con su RUC. Si lo deja vacío se usan los datos de SRI &gt; Configuración.</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">RUC</label>
+                                    <input wire:model="ruc" type="text" maxlength="13" placeholder="0912345678001"
+                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                    @error('ruc') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Razón social</label>
+                                    <input wire:model="razon_social" type="text" placeholder="Como consta en el RUC"
+                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                    @error('razon_social') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Nombre comercial (opcional)</label>
+                                    <input wire:model="nombre_comercial" type="text" 
+                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                    @error('nombre_comercial') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Dirección matriz</label>
+                                    <input wire:model="direccion_matriz" type="text" 
+                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                    @error('direccion_matriz') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Obligado a llevar contabilidad</label>
+                                        <select wire:model="obligado_contabilidad" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                            <option value="NO">NO</option>
+                                            <option value="SI">SI</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Régimen RIMPE</label>
+                                        <select wire:model="regimen_rimpe" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                            <option value="">No aplica</option>
+                                            @foreach (\App\Models\Medico::REGIMENES_RIMPE as $regimen)
+                                                <option value="{{ $regimen }}">{{ $regimen }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('regimen_rimpe') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Establecimiento</label>
+                                    <input wire:model="sri_establecimiento" type="text" maxlength="3"
+                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                    @error('sri_establecimiento') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                </div>
+                                    <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Punto de emisión</label>
+                                    <input wire:model="sri_pto_emi" type="text" maxlength="3"
+                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                    @error('sri_pto_emi') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                </div>
+                                </div>
+                            </div>
+                        @endif
+
                         <div class="flex justify-end gap-3 pt-4 border-t">
                             <button type="button" wire:click="resetForm"
                                 class="px-5 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition text-sm">

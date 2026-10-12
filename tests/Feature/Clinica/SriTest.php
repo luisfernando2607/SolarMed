@@ -99,6 +99,36 @@ class SriTest extends TestCase
         $this->assertSame('07', $tipo(null));
     }
 
+    public function test_usa_los_datos_tributarios_del_medico(): void
+    {
+        $factura = $this->factura(['ruc_emisor' => '0912345678001']);
+        $factura->setRelation('medico', new \App\Models\Medico([
+            'nombres' => 'Carlos', 'apellidos' => 'García', 'ruc' => '0912345678001', 'razon_social' => 'GARCIA CARLOS',
+            'direccion_matriz' => 'Av. 9 de Octubre', 'obligado_contabilidad' => 'NO',
+            'regimen_rimpe' => 'CONTRIBUYENTE RÉGIMEN RIMPE', 'sri_establecimiento' => '001', 'sri_pto_emi' => '002',
+        ]));
+
+        $r = app(SriXmlService::class)->generar($factura);
+        $xp = $this->xpath($r['xml']);
+
+        $this->assertSame('0912345678001', $xp->evaluate('string(//infoTributaria/ruc)'));
+        $this->assertSame('GARCIA CARLOS', $xp->evaluate('string(//infoTributaria/razonSocial)'));
+        $this->assertSame('Av. 9 de Octubre', $xp->evaluate('string(//infoTributaria/dirMatriz)'));
+        $this->assertSame('CONTRIBUYENTE RÉGIMEN RIMPE', $xp->evaluate('string(//infoTributaria/contribuyenteRimpe)'));
+        $this->assertSame('0912345678001', substr($r['clave_acceso'], 10, 13));
+    }
+
+    public function test_rechaza_generar_si_el_ruc_del_medico_cambio(): void
+    {
+        $factura = $this->factura(['ruc_emisor' => '0912345678001']);
+        $factura->setRelation('medico', new \App\Models\Medico([
+            'nombres' => 'Carlos', 'apellidos' => 'García', 'ruc' => '0999999999001', 'razon_social' => 'X', 'direccion_matriz' => 'Y',
+        ]));
+
+        $this->expectExceptionMessage('se numeró con el RUC 0912345678001');
+        app(SriXmlService::class)->generar($factura);
+    }
+
     public function test_firma_xades_bes_es_criptograficamente_valida(): void
     {
         $key = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA]);

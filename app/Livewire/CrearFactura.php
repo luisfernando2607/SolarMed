@@ -22,6 +22,7 @@ class CrearFactura extends Component
     #[Locked]
     public $items = [];
     public $descuento = 0;
+    public $medico_id;
     public $forma_pago = 'efectivo';
     public $referencia_pago;
     public $observaciones;
@@ -29,6 +30,7 @@ class CrearFactura extends Component
     protected function rules(): array
     {
         return [
+            'medico_id' => 'required|integer|exists:medicos,id',
             'items' => 'required|array|min:1',
             'items.*.servicio_id' => 'required|integer|exists:servicios_tarifario,id',
             'items.*.descripcion' => 'required|string|max:200',
@@ -52,6 +54,17 @@ class CrearFactura extends Component
             ->get();
 
         $this->autoDetectarServicios($paciente);
+        $this->medico_id = $this->medicoSugerido($paciente);
+    }
+
+    /** Médico que atendió al paciente más recientemente; si no hay, el médico que está facturando. */
+    protected function medicoSugerido(Paciente $paciente): ?int
+    {
+        $turno = $paciente->turnos()->whereIn('estado', ['completado', 'en_atencion'])->latest()->first();
+
+        return ($turno ? ExpedienteConsulta::where('turno_id', $turno->id)->value('medico_id') : null)
+            ?? ExpedienteConsulta::where('paciente_id', $paciente->id)->latest('fecha')->value('medico_id')
+            ?? \App\Models\Medico::where('user_id', Auth::id())->value('id');
     }
 
     public function resetPaciente(): void
@@ -60,6 +73,7 @@ class CrearFactura extends Component
         $this->serviciosDisponibles = [];
         $this->items = [];
         $this->descuento = 0;
+        $this->medico_id = null;
         $this->forma_pago = 'efectivo';
         $this->referencia_pago = null;
         $this->observaciones = null;
@@ -173,33 +187,12 @@ class CrearFactura extends Component
             ->latest()
             ->first();
 
-        $medicoId = $ultimoTurno?->medico_id;
-        $especialidadId = $ultimoTurno?->especialidad_id;
-
-        if (!$especialidadId) {
-            session()->flash('error', 'El paciente no tiene un turno con especialidad asignada.');
-            return;
-        }
-
-        if (!$medicoId) {
-            $consulta = ExpedienteConsulta::where('paciente_id', $this->selectedPaciente->id)
-                ->latest()->first();
-            $medicoId = $consulta?->medico_id;
-        }
-
-        if (!$medicoId) {
-            $medico = \App\Models\Medico::where('user_id', Auth::id())->first();
-            $medicoId = $medico?->id;
-        }
-
-        if (!$medicoId) {
-            $medicoId = \App\Models\Medico::first()?->id;
-        }
+        $medico = \App\Models\Medico::findOrFail($this->medico_id);
 
         $factura = app(FacturaService::class)->crear([
             'paciente_id' => $this->selectedPaciente->id,
-            'medico_id' => $medicoId,
-            'especialidad_id' => $especialidadId,
+            'medico_id' => $medico->id,
+            'especialidad_id' => $ultimoTurno?->especialidad_id ?? $medico->especialidad_id,
             'turno_id' => $ultimoTurno?->id,
             'user_id' => Auth::id(),
             'fecha' => now(),
@@ -230,6 +223,9 @@ class CrearFactura extends Component
 
         return view('livewire.crear-factura', [
             'pacientes' => $pacientes,
+            'medicos' => $this->selectedPaciente
+                ? \App\Models\Medico::where('activo', true)->orderBy('apellidos')->get()
+                : collect(),
         ])->layout('layouts.app');
     }
 }
