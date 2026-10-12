@@ -12,7 +12,19 @@ new #[Layout('layouts.guest')] class extends Component
     public function login(): void
     {
         $this->validate();
-        $this->form->authenticate();
+        $pendiente = $this->form->authenticate();
+
+        if ($pendiente) {
+            // Contraseña correcta, falta el código de verificación en dos pasos
+            Session::put('dos_factores.login', [
+                'id' => $pendiente->id,
+                'remember' => $this->form->remember,
+                'expira' => now()->addMinutes(10)->getTimestamp(),
+            ]);
+            $this->redirectRoute('dos-factores.desafio', navigate: true);
+            return;
+        }
+
         Session::regenerate();
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }

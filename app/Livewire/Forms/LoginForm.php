@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Forms;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -22,15 +23,19 @@ class LoginForm extends Form
     public bool $remember = false;
 
     /**
-     * Attempt to authenticate the request's credentials.
+     * Valida las credenciales. Si el usuario no usa verificación en dos pasos inicia sesión y devuelve null;
+     * si la usa, NO inicia sesión y devuelve el usuario para pedir el código.
      *
      * @throws ValidationException
      */
-    public function authenticate(): void
+    public function authenticate(): ?User
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only(['email', 'password']), $this->remember)) {
+        $provider = Auth::getProvider();
+        $user = $provider->retrieveByCredentials(['email' => $this->email]);
+
+        if (! $user || ! $provider->validateCredentials($user, ['password' => $this->password])) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -39,6 +44,14 @@ class LoginForm extends Form
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        if ($user->tieneDosFactores()) {
+            return $user;
+        }
+
+        Auth::login($user, $this->remember);
+
+        return null;
     }
 
     /**

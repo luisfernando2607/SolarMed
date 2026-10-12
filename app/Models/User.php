@@ -35,6 +35,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
     ];
 
     /**
@@ -47,11 +49,26 @@ class User extends Authenticatable
         return $this->hasOne(Medico::class);
     }
 
+    public function tieneDosFactores(): bool
+    {
+        return $this->two_factor_confirmed_at !== null && $this->two_factor_secret !== null;
+    }
+
+    /** ¿Su rol exige verificación en dos pasos? (TWO_FACTOR_ROLES en .env) */
+    public function requiereDosFactores(): bool
+    {
+        $roles = config('clinica.dos_factores_roles', []);
+        return $roles && $this->hasAnyRole($roles);
+    }
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_recovery_codes' => 'encrypted:array',
+            'two_factor_confirmed_at' => 'datetime',
         ];
     }
 }
