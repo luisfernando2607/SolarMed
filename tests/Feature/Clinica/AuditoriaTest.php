@@ -30,8 +30,7 @@ class AuditoriaTest extends TestCase
 
     public function test_ver_ficha_y_descargar_historia_quedan_registrados(): void
     {
-        Livewire::actingAs($this->medico)->test(ListaPacientes::class)
-            ->call('seleccionar', $this->paciente->id);
+        $this->actingAs($this->medico)->get(route('pacientes.ver', $this->paciente))->assertOk();
 
         $this->actingAs($this->medico)->get(route('pacientes.pdf', $this->paciente))->assertOk();
 

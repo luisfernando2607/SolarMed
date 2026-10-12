@@ -91,6 +91,10 @@ Route::get('atender/{turno}', AtenderTurno::class)
 Route::get('pacientes', ListaPacientes::class)
     ->middleware(['auth', 'can:pacientes.ver'])
     ->name('pacientes');
+Route::get('pacientes/{paciente}', \App\Livewire\FichaPaciente::class)
+    ->whereNumber('paciente')
+    ->middleware(['auth', 'can:pacientes.ver'])
+    ->name('pacientes.ver');
 
 // Consultas
 Route::get('consultas/crear/{turno}', CrearConsulta::class)

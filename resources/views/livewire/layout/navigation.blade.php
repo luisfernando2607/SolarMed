@@ -26,7 +26,7 @@ new class extends Component
                 ['Sala de espera', 'sala-espera', 'sala-espera*|turno.atender', 'turnos.ver', 'sala'],
             ]],
             ['Pacientes', [
-                ['Pacientes', 'pacientes', 'pacientes|pacientes.archivos|prenatal|certificados.*|pedidos.*', 'pacientes.ver', 'pacientes'],
+                ['Pacientes', 'pacientes', 'pacientes|pacientes.ver|pacientes.archivos|prenatal|certificados.*|pedidos.*', 'pacientes.ver', 'pacientes'],
                 ['Expedientes', 'expedientes', 'expedientes*|consultas.*', 'expediente.ver', 'expedientes'],
             ]],
             ['Facturación', [
@@ -98,6 +98,9 @@ new class extends Component
         </button>
         <x-application-logo class="h-8 w-auto max-w-[90px] object-contain" />
         <span class="font-semibold truncate" style="color: var(--m)">{{ $marca->nombre() }}</span>
+        <button type="button" @click="$dispatch('abrir-busqueda')" class="ml-auto p-2 -mr-2 rounded-lg text-gray-500 hover:bg-gray-100" aria-label="Buscar">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+        </button>
     </div>
 
     {{-- Fondo oscuro del menú en celular --}}
@@ -132,6 +135,18 @@ new class extends Component
                 :title="colapsado ? 'Expandir menú' : 'Contraer menú'" :aria-label="colapsado ? 'Expandir menú' : 'Contraer menú'">
             <svg class="w-3.5 h-3.5 transition-transform" :class="colapsado && 'rotate-180'" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
         </button>
+
+        {{-- Buscador (Ctrl+K) --}}
+        <div class="px-3 pb-3 shrink-0">
+            <button type="button" @click="$dispatch('abrir-busqueda'); menuAbierto = false"
+                    class="sb-item relative flex items-center gap-3 w-full px-3 py-2 rounded-xl border border-gray-200 bg-gray-50/70 text-sm text-gray-400 hover:text-gray-600 hover:border-gray-300 transition"
+                    :class="colapsado && 'lg:justify-center lg:px-0'" aria-label="Buscar">
+                <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                <span class="flex-1 text-left" :class="colapsado && 'lg:hidden'">Buscar…</span>
+                <kbd class="hidden lg:inline text-[10px] border border-gray-200 rounded px-1 bg-white" :class="colapsado && 'lg:!hidden'">Ctrl K</kbd>
+                <span class="sb-tip hidden" :class="colapsado && 'lg:block'">Buscar (Ctrl K)</span>
+            </button>
+        </div>
 
         <nav class="sb-nav flex-1 overflow-y-auto overflow-x-visible px-3 pb-4 space-y-5" :class="colapsado && 'lg:overflow-visible'">
             @foreach ($secciones as [$titulo, $items])

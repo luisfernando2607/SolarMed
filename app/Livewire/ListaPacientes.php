@@ -6,7 +6,6 @@ use Livewire\Component;
 use Livewire\Attributes\Locked;
 use Livewire\WithPagination;
 use App\Models\Paciente;
-use App\Models\ExpedienteConsulta;
 use Illuminate\Validation\Rule;
 
 class ListaPacientes extends Component
@@ -21,8 +20,6 @@ class ListaPacientes extends Component
     #[Locked]
     public string $sortDirection = 'desc';
     public ?Paciente $selected = null;
-    public $turnoActivo = null;
-    public $consultas = [];
 
     public bool $editMode = false;
     #[Locked]
@@ -110,30 +107,19 @@ class ListaPacientes extends Component
         $this->resetPage();
     }
 
-    public function seleccionar(Paciente $paciente): void
+    /** Desde la ficha del paciente se llega con ?editar={id} para abrir el formulario directamente */
+    public function mount(): void
     {
-        $this->editMode = false;
-        $this->selected = $paciente;
-        app(\App\Services\AuditoriaService::class)->registrar('ver', 'paciente', $paciente->id, $paciente->id, 'Ficha y últimas consultas');
-        $this->turnoActivo = $paciente->turnos()
-            ->whereIn('estado', ['esperando', 'en_atencion'])
-            ->whereDate('fecha', today())
-            ->latest()
-            ->first();
-
-        $this->consultas = ExpedienteConsulta::where('paciente_id', $paciente->id)
-            ->with('medico')
-            ->orderBy('fecha', 'desc')
-            ->take(10)
-            ->get();
+        $id = request()->integer('editar');
+        if ($id && auth()->user()->can('pacientes.editar') && ($paciente = Paciente::find($id))) {
+            $this->editar($paciente);
+        }
     }
 
     public function cerrarDetalle(): void
     {
         $this->selected = null;
         $this->editMode = false;
-        $this->turnoActivo = null;
-        $this->consultas = [];
     }
 
     public function editar(Paciente $paciente): void
@@ -173,7 +159,7 @@ class ListaPacientes extends Component
 
     public function cancelarEdicion(): void
     {
-        $this->editMode = false;
+        $this->cerrarDetalle();
         $this->editId = null;
         $this->reset(array_keys($this->rules()));
     }
