@@ -35,6 +35,13 @@ Route::get('admin/dashboard', \App\Livewire\AdminDashboard::class)
     ->middleware(['auth', 'can:configuracion.editar'])
     ->name('admin.dashboard');
 
+// Imagen de la firma del médico autenticado (solo para la vista previa en su perfil)
+Route::get('perfil/firma', function () {
+    $medico = App\Models\Medico::where('user_id', auth()->id())->firstOrFail();
+    abort_unless($medico->firmaRuta(), 404);
+    return response()->file($medico->firmaRuta(), ['Cache-Control' => 'private, no-store']);
+})->middleware(['auth'])->name('firma.ver');
+
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
@@ -117,6 +124,45 @@ Route::get('pacientes/archivos/{archivo}', function (App\Models\PacienteArchivo 
 Route::get('prenatal/{paciente}', \App\Livewire\ControlPrenatalPaciente::class)
     ->middleware(['auth', 'can:expediente.ver'])
     ->name('prenatal');
+
+// Pedidos de exámenes
+Route::get('pedidos-examenes/crear/{paciente}', \App\Livewire\CrearPedidoExamenes::class)
+    ->middleware(['auth', 'can:expediente.crear'])
+    ->name('pedidos.crear');
+
+Route::get('pedidos-examenes/pdf/{pedido}', function (App\Models\PedidoExamen $pedido) {
+    $pedido->load('paciente', 'medico.especialidad');
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'pedido_examenes', $pedido->id, $pedido->paciente_id, "PDF pedido de exámenes {$pedido->numero()}");
+    return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.pedido-examenes', ['p' => $pedido])
+        ->setPaper('a5', 'portrait')
+        ->stream("pedido_examenes_{$pedido->numero()}.pdf");
+})->middleware(['auth', 'can:expediente.ver'])->name('pedidos.pdf');
+
+// Certificados médicos
+Route::get('certificados/crear/{paciente}', \App\Livewire\CrearCertificado::class)
+    ->middleware(['auth', 'can:expediente.crear'])
+    ->name('certificados.crear');
+
+Route::get('certificados/pdf/{certificado}', function (App\Models\CertificadoMedico $certificado) {
+    $certificado->load('paciente', 'medico.especialidad');
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'certificado', $certificado->id, $certificado->paciente_id, "PDF certificado {$certificado->numero()}");
+    $qr = base64_encode((string) SimpleSoftwareIO\QrCode\Facades\QrCode::format('svg')->size(160)->margin(0)->generate($certificado->urlVerificacion()));
+    return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.certificado', ['c' => $certificado, 'qr' => $qr])
+        ->setPaper('a4', 'portrait')
+        ->stream("certificado_{$certificado->numero()}.pdf");
+})->middleware(['auth', 'can:expediente.ver'])->name('certificados.pdf');
+
+// Verificación pública de certificados (sin diagnóstico; datos personales parcialmente ocultos)
+Route::get('verificar/{codigo}', function (string $codigo) {
+    $c = App\Models\CertificadoMedico::with('paciente', 'medico')->where('codigo_verificacion', strtoupper($codigo))->first();
+    $ocultar = fn (?string $t) => collect(preg_split('/\s+/', trim((string) $t)))->filter()
+        ->map(fn ($w) => mb_substr($w, 0, 1) . str_repeat('*', max(2, mb_strlen($w) - 1)))->implode(' ');
+    return view('certificados.verificar', [
+        'c' => $c,
+        'pacienteOculto' => $c ? $ocultar($c->paciente?->nombre_completo) : null,
+        'cedulaOculta' => $c ? str_repeat('*', max(0, strlen((string) $c->paciente?->cedula) - 3)) . substr((string) $c->paciente?->cedula, -3) : null,
+    ]);
+})->middleware('throttle:30,1')->name('certificados.verificar');
 
 // Expedientes clínicos
 Route::get('expedientes', ListaExpedientes::class)

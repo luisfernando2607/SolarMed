@@ -19,6 +19,14 @@
                 </div>
             </div>
 
+            @if (\App\Models\Medico::where('user_id', auth()->id())->exists())
+                <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg" id="firma">
+                    <div class="max-w-xl">
+                        <livewire:profile.firma-medico-form />
+                    </div>
+                </div>
+            @endif
+
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg" id="dos-factores">
                 <div class="max-w-xl">
                     <livewire:profile.dos-factores-form />

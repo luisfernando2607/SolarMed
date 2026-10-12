@@ -130,6 +130,15 @@ Aún requieren cambio de código: los permisos de cada rol (`RolesSeeder`) y la 
 
 ---
 
+## 📄 Documentos médicos
+
+- **Firma y sello:** cada médico sube su imagen desde **Perfil**; se imprime en recetas, certificados, pedidos de exámenes e informes de ecografía.
+- **Certificado médico** (atención o reposo) desde la atención o la ficha del paciente, con **código QR de verificación**. La página `/verificar/{código}` confirma su autenticidad sin mostrar el diagnóstico.
+  > Para que terceros (p. ej. un empleador) puedan verificar, `APP_URL` debe ser una dirección **pública** con HTTPS.
+- **Pedido de exámenes** con el catálogo de laboratorio e imagen editable en **Configuración**.
+
+---
+
 ## 🔐 Usuarios y permisos
 
 No hay registro público: los usuarios los crea un administrador en **Usuarios**. Cada ruta exige un

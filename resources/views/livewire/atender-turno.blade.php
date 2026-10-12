@@ -154,6 +154,18 @@
                                         + Ecografía
                                     </a>
                                 @endcan
+                                @can('expediente.crear')
+                                    <a href="{{ route('pedidos.crear', ['paciente' => $turno->paciente_id, 'consulta' => $consulta->id]) }}" wire:navigate
+                                       class="px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-50 rounded-lg hover:bg-amber-100 transition">
+                                        + Exámenes
+                                    </a>
+                                @endcan
+                                @can('expediente.crear')
+                                    <a href="{{ route('certificados.crear', ['paciente' => $turno->paciente_id, 'consulta' => $consulta->id]) }}" wire:navigate
+                                       class="px-3 py-1.5 text-xs font-medium text-sky-700 bg-sky-50 rounded-lg hover:bg-sky-100 transition">
+                                        + Certificado
+                                    </a>
+                                @endcan
                                 <a href="{{ route('recetas.crear', $turno->id) }}" wire:navigate
                                    class="px-3 py-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition">
                                     + Receta

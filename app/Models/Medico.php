@@ -24,6 +24,16 @@ class Medico extends Model {
         'CONTRIBUYENTE NEGOCIO POPULAR - RÉGIMEN RIMPE',
     ];
 
+    /** Ruta en disco de la imagen de firma y sello (almacenamiento privado), si existe */
+    public function firmaRuta(): ?string
+    {
+        if (!$this->firma_path) {
+            return null;
+        }
+        $ruta = \Illuminate\Support\Facades\Storage::disk('private')->path($this->firma_path);
+        return is_file($ruta) ? $ruta : null;
+    }
+
     public function getNombreCompletoAttribute(): string {
         return "Dr. {$this->nombres} {$this->apellidos}";
     }

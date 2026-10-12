@@ -541,6 +541,18 @@
 
                             {{-- Botones de acción --}}
                             <div class="mt-6 pt-4 border-t flex flex-wrap gap-3">
+                                @can('expediente.crear')
+                                    <a href="{{ route('pedidos.crear', $selected->id) }}" wire:navigate
+                                       class="px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition">
+                                        Pedido de exámenes
+                                    </a>
+                                @endcan
+                                @can('expediente.crear')
+                                    <a href="{{ route('certificados.crear', $selected->id) }}" wire:navigate
+                                       class="px-4 py-2 bg-sky-600 text-white text-sm font-medium rounded-lg hover:bg-sky-700 transition">
+                                        Certificado
+                                    </a>
+                                @endcan
                                 @can('expediente.ver')
                                     <a href="{{ route('pacientes.archivos', $selected->id) }}" wire:navigate
                                        class="px-4 py-2 bg-slate-600 text-white text-sm font-medium rounded-lg hover:bg-slate-700 transition">
