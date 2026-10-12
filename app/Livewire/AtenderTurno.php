@@ -18,6 +18,7 @@ class AtenderTurno extends Component
     public Turno $turno;
     public ?Paciente $paciente = null;
     public $consultasAnteriores = [];
+    public $recetasRecientes = [];
 
     public bool $showForm = false;
 
@@ -31,6 +32,11 @@ class AtenderTurno extends Component
             $this->consultasAnteriores = ExpedienteConsulta::where('paciente_id', $this->paciente->id)
                 ->with('medico')
                 ->orderBy('fecha', 'desc')
+                ->take(5)
+                ->get();
+            $this->recetasRecientes = \App\Models\Receta::where('paciente_id', $this->paciente->id)
+                ->with('medico')
+                ->latest('fecha')->latest('id')
                 ->take(5)
                 ->get();
         }

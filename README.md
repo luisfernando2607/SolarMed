@@ -122,6 +122,11 @@ Cada médico factura con **su propio RUC** y su propia numeración (`001-001-000
 5. **Anular una factura autorizada**: en la factura, *Emitir nota de crédito* con el motivo. La nota de
    crédito electrónica (codDoc 04) se genera, firma y envía al SRI; al ser autorizada, la factura queda anulada.
 
+6. **Envío por correo**: al autorizarse, la factura o nota de crédito se envía sola al correo del paciente
+   (PDF + XML autorizado). También se puede enviar o reenviar a otro correo desde la factura. Configurar
+   `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD` y `MAIL_FROM_ADDRESS` en `.env`
+   (con `MAIL_MAILER=log` los correos solo se escriben en el log).
+
 > El certificado `.p12` de cada médico debe corresponder a su RUC; de lo contrario el SRI rechaza el
 > comprobante. Probar siempre primero en ambiente de pruebas.
 

@@ -153,6 +153,33 @@
             </div>
         @endif
 
+        {{-- ====== RECETAS ====== --}}
+        @if (session('receta_creada'))
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg p-4 mb-6 flex items-center justify-between">
+                <span>Receta guardada.</span>
+                <a href="{{ route('recetas.pdf', session('receta_creada')) }}" target="_blank"
+                   class="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition">Imprimir receta</a>
+            </div>
+        @endif
+        @if (count($recetasRecientes) > 0)
+            <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Recetas recientes</h2>
+                <div class="divide-y">
+                    @foreach ($recetasRecientes as $receta)
+                        <div class="py-2 flex items-center justify-between gap-3 text-sm">
+                            <div class="min-w-0">
+                                <span class="font-medium">{{ $receta->fecha->format('d/m/Y') }}</span>
+                                <span class="text-gray-500">· {{ $receta->medico?->nombre_completo }}</span>
+                                <p class="text-gray-600 truncate">{{ collect($receta->medicamentos)->pluck('medicamento')->filter()->implode(', ') }}</p>
+                            </div>
+                            <a href="{{ route('recetas.pdf', $receta->id) }}" target="_blank"
+                               class="shrink-0 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition">PDF</a>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
         {{-- ====== FORMULARIO DE NUEVA CONSULTA (INLINE) ====== --}}
         @if ($turno->paciente)
             <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">

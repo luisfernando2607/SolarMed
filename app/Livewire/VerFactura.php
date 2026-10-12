@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Factura;
 use App\Models\NotaCredito;
+use App\Jobs\EnviarComprobantePorCorreo;
 use App\Services\AuditoriaService;
 use App\Services\ComprobanteSriService;
 use App\Services\NotaCreditoService;
@@ -14,6 +15,7 @@ class VerFactura extends Component
 {
     public Factura $factura;
     public string $motivo_nota_credito = '';
+    public string $correo_envio = '';
 
     /** Estados en los que el comprobante todavía no fue recibido por el SRI */
     public const ESTADOS_SIN_ENVIAR = [null, 'pendiente', 'xml_generado', 'firmado', 'rechazado'];
@@ -22,6 +24,27 @@ class VerFactura extends Component
     {
         $this->factura = $factura->loadMissing('paciente', 'medico.user', 'user', 'items.servicio', 'especialidad', 'notaCredito');
         app(AuditoriaService::class)->registrar('ver', 'factura', $factura->id, $factura->paciente_id, $factura->numero_factura);
+        $this->correo_envio = (string) ($factura->paciente?->email ?? '');
+    }
+
+    /** Envía (o reenvía) por correo la factura o su nota de crédito autorizada. */
+    public function enviarCorreo(string $documento = 'factura'): void
+    {
+        $this->authorize('facturas.crear');
+        $this->validate(
+            ['correo_envio' => 'required|email|max:150'],
+            ['correo_envio.required' => 'Ingrese el correo del paciente.', 'correo_envio.email' => 'El correo no es válido.']
+        );
+
+        $comprobante = $documento === 'nota_credito' ? $this->factura->notaCredito : $this->factura;
+        if (!$comprobante || $comprobante->estado_sri !== 'autorizado') {
+            $this->dispatch('notify', message: 'Solo se envían comprobantes autorizados por el SRI.', type: 'error');
+            return;
+        }
+
+        EnviarComprobantePorCorreo::dispatch($comprobante, $this->correo_envio);
+        $this->dispatch('notify', message: "Se enviará a {$this->correo_envio} en unos segundos.", type: 'success');
+        $this->recargar();
     }
 
     public function anular(): void

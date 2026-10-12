@@ -17,6 +17,7 @@ class RegistroAcceso extends Model
         'crear' => 'Creó',
         'editar' => 'Editó',
         'eliminar' => 'Eliminó',
+        'enviar' => 'Envió',
     ];
 
     protected $fillable = ['user_id', 'accion', 'recurso', 'recurso_id', 'paciente_id', 'detalle', 'ip', 'user_agent'];
