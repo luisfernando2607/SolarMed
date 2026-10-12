@@ -12,12 +12,12 @@
     </head>
     <body class="font-sans antialiased">
         {{-- menuAbierto: menú en celular · colapsado: barra lateral solo con íconos (se recuerda en el navegador) --}}
-        <div class="min-h-screen bg-gray-100"
+        <div class="min-h-screen bg-[#f7f7f5]"
              x-data="{ menuAbierto: false, colapsado: $persist(false).as('sidebar-colapsado') }"
              x-on:livewire:navigated.window="menuAbierto = false">
             <livewire:layout.navigation />
 
-            <div class="transition-all duration-200 lg:pl-64" :class="colapsado ? 'lg:!pl-16' : 'lg:pl-64'">
+            <div class="transition-all duration-200 lg:pl-64" :class="colapsado ? 'lg:!pl-[72px]' : 'lg:pl-64'">
                 @if (isset($header))
                     <header class="bg-white shadow">
                         <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">

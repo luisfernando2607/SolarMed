@@ -13,7 +13,6 @@ use Carbon\Carbon;
 
 class AdminDashboard extends Component
 {
-    public string $periodo = 'mensual';
 
     // Expresiones de fecha según el motor (MySQL en producción, SQLite en las pruebas)
     private function sqlMes(string $col): string
@@ -32,94 +31,107 @@ class AdminDashboard extends Component
         return DB::getDriverName() === 'sqlite' ? "CAST(strftime('%H', {$col}) AS INTEGER)" : "HOUR({$col})";
     }
 
+    /** Variación porcentual; null si no hay base de comparación */
+    private function variacion(float $actual, float $anterior): ?float
+    {
+        return $anterior > 0 ? round(($actual - $anterior) / $anterior * 100, 1) : null;
+    }
+
+    /** Últimos N meses como ['2026-05' => 'may', …] (incluye meses sin datos) */
+    private function ultimosMeses(int $n): array
+    {
+        $meses = [];
+        for ($i = $n - 1; $i >= 0; $i--) {
+            $m = Carbon::today()->startOfMonth()->subMonths($i);
+            $meses[$m->format('Y-m')] = ucfirst($m->translatedFormat('M'));
+        }
+        return $meses;
+    }
+
     public function render()
     {
         $this->authorize('configuracion.editar');
 
-        $totalPacientes = Paciente::count();
-        $totalTurnos = Turno::count();
-        $totalConsultas = ExpedienteConsulta::count();
-        $totalFacturado = Factura::where('estado', 'pagada')->sum('total');
+        // ── Indicadores del mes (con el mes anterior para comparar) ──
+        [$iniMes, $finMes] = [now()->startOfMonth(), now()->endOfMonth()];
+        [$iniAnt, $finAnt] = [now()->subMonthNoOverflow()->startOfMonth(), now()->subMonthNoOverflow()->endOfMonth()];
 
-        $porSexo = Paciente::select('sexo', DB::raw('count(*) as total'))
-            ->whereNotNull('sexo')
-            ->groupBy('sexo')
-            ->pluck('total', 'sexo');
+        $facturasMes = Factura::where('estado', 'pagada')->whereBetween('fecha', [$iniMes, $finMes]);
+        $facturasAnt = Factura::where('estado', 'pagada')->whereBetween('fecha', [$iniAnt, $finAnt]);
+        $ingresosMes = (float) (clone $facturasMes)->sum('total');
+        $ingresosAnt = (float) (clone $facturasAnt)->sum('total');
+        $nFacturasMes = (clone $facturasMes)->count();
+        $nFacturasAnt = (clone $facturasAnt)->count();
+        $consultasMes = ExpedienteConsulta::whereBetween('fecha', [$iniMes, $finMes])->count();
+        $consultasAnt = ExpedienteConsulta::whereBetween('fecha', [$iniAnt, $finAnt])->count();
+        $pacientesMes = Paciente::whereBetween('created_at', [$iniMes, $finMes])->count();
+        $pacientesAnt = Paciente::whereBetween('created_at', [$iniAnt, $finAnt])->count();
+        $ticketMes = $nFacturasMes ? $ingresosMes / $nFacturasMes : 0;
+        $ticketAnt = $nFacturasAnt ? $ingresosAnt / $nFacturasAnt : 0;
 
-        $porCiudad = Paciente::select('ciudad', DB::raw('count(*) as total'))
-            ->whereNotNull('ciudad')
-            ->where('ciudad', '!=', '')
-            ->groupBy('ciudad')
-            ->orderBy('total', 'desc')
-            ->limit(10)
-            ->get();
-
-        $rangosEdad = [
-            '0-12' => Paciente::whereNotNull('fecha_nacimiento')->get()->filter(fn ($p) => $p->edad !== null && $p->edad <= 12)->count(),
-            '13-18' => Paciente::whereNotNull('fecha_nacimiento')->get()->filter(fn ($p) => $p->edad !== null && $p->edad >= 13 && $p->edad <= 18)->count(),
-            '19-35' => Paciente::whereNotNull('fecha_nacimiento')->get()->filter(fn ($p) => $p->edad !== null && $p->edad >= 19 && $p->edad <= 35)->count(),
-            '36-50' => Paciente::whereNotNull('fecha_nacimiento')->get()->filter(fn ($p) => $p->edad !== null && $p->edad >= 36 && $p->edad <= 50)->count(),
-            '51-65' => Paciente::whereNotNull('fecha_nacimiento')->get()->filter(fn ($p) => $p->edad !== null && $p->edad >= 51 && $p->edad <= 65)->count(),
-            '65+' => Paciente::whereNotNull('fecha_nacimiento')->get()->filter(fn ($p) => $p->edad !== null && $p->edad > 65)->count(),
+        $kpis = [
+            ['titulo' => 'Ingresos del mes', 'valor' => '$' . number_format($ingresosMes, 2), 'delta' => $this->variacion($ingresosMes, $ingresosAnt), 'detalle' => "{$nFacturasMes} facturas pagadas"],
+            ['titulo' => 'Consultas del mes', 'valor' => number_format($consultasMes), 'delta' => $this->variacion($consultasMes, $consultasAnt), 'detalle' => 'Mes anterior: ' . number_format($consultasAnt)],
+            ['titulo' => 'Pacientes nuevos', 'valor' => number_format($pacientesMes), 'delta' => $this->variacion($pacientesMes, $pacientesAnt), 'detalle' => number_format(Paciente::count()) . ' pacientes en total'],
+            ['titulo' => 'Ticket promedio', 'valor' => '$' . number_format($ticketMes, 2), 'delta' => $this->variacion($ticketMes, $ticketAnt), 'detalle' => 'Por factura pagada'],
         ];
 
-        $turnosUltimosMeses = Turno::select(
+        // ── Series de 6 meses (con meses vacíos en cero) ──
+        $meses = $this->ultimosMeses(6);
+        $desde = Carbon::today()->startOfMonth()->subMonths(5);
+
+        $facturacion = Factura::select(DB::raw($this->sqlMes('fecha') . ' as mes'), DB::raw('COALESCE(SUM(total), 0) as monto'))
+            ->where('estado', 'pagada')->where('fecha', '>=', $desde)
+            ->groupBy('mes')->pluck('monto', 'mes');
+
+        $turnos = Turno::select(
             DB::raw($this->sqlMes('fecha') . ' as mes'),
-            DB::raw('count(*) as total'),
             DB::raw("SUM(CASE WHEN estado = 'completado' THEN 1 ELSE 0 END) as completados"),
-            DB::raw("SUM(CASE WHEN estado = 'cancelado' THEN 1 ELSE 0 END) as cancelados")
-        )
-            ->where('fecha', '>=', Carbon::today()->subMonths(6))
-            ->groupBy('mes')
-            ->orderBy('mes')
-            ->get();
-
-        $motivosData = ExpedienteConsulta::select(
-            'motivo_consulta',
-            'especialidad_id',
+            DB::raw("SUM(CASE WHEN estado = 'cancelado' THEN 1 ELSE 0 END) as cancelados"),
             DB::raw('count(*) as total')
-        )
-            ->with('especialidad')
-            ->whereNotNull('motivo_consulta')
-            ->groupBy('motivo_consulta', 'especialidad_id')
-            ->orderBy('motivo_consulta')
-            ->get();
+        )->where('fecha', '>=', $desde)->groupBy('mes')->get()->keyBy('mes');
 
-        $motivosLabels = $motivosData->groupBy('motivo_consulta')
-            ->map(fn($g) => $g->sum('total'))
-            ->sortDesc()
-            ->take(10)
-            ->keys()
-            ->map(fn($m) => Str::limit($m, 42));
+        $totalTurnos6 = (int) $turnos->sum('total');
+        $tasaCancelacion = $totalTurnos6 ? round($turnos->sum('cancelados') / $totalTurnos6 * 100, 1) : 0;
 
-        $especialidades = $motivosData->pluck('especialidad.nombre')->unique()->filter()->values();
-        $especialidadColores = ['#1D9E75', '#378ADD', '#D4537E', '#BA7517'];
+        $series = [
+            'meses' => array_values($meses),
+            'facturacion' => array_map(fn ($m) => round((float) ($facturacion[$m] ?? 0), 2), array_keys($meses)),
+            'completados' => array_map(fn ($m) => (int) ($turnos[$m]->completados ?? 0), array_keys($meses)),
+            'cancelados' => array_map(fn ($m) => (int) ($turnos[$m]->cancelados ?? 0), array_keys($meses)),
+            'otros' => array_map(fn ($m) => (int) (($turnos[$m]->total ?? 0) - ($turnos[$m]->completados ?? 0) - ($turnos[$m]->cancelados ?? 0)), array_keys($meses)),
+        ];
 
-        $motivosGrid = [];
-        foreach ($motivosData as $row) {
-            $key = Str::limit($row->motivo_consulta, 42);
-            $esp = $row->especialidad?->nombre ?? 'Sin especificar';
-            $motivosGrid[$key][$esp] = ($motivosGrid[$key][$esp] ?? 0) + $row->total;
-        }
+        // ── Rankings ──
+        $motivos = ExpedienteConsulta::select('motivo_consulta', DB::raw('count(*) as total'))
+            ->whereNotNull('motivo_consulta')->where('motivo_consulta', '!=', '')
+            ->groupBy('motivo_consulta')->orderByDesc('total')->limit(8)->get()
+            ->map(fn ($r) => ['etiqueta' => Str::limit($r->motivo_consulta, 38), 'total' => (int) $r->total]);
 
-        $motivosDatasets = $especialidades->map(fn($esp, $i) => [
-            'label' => $esp,
-            'data' => $motivosLabels->map(fn($ml) => $motivosGrid[$ml][$esp] ?? 0)->values(),
-            'backgroundColor' => $especialidadColores[$i % count($especialidadColores)],
-        ]);
+        $diagnosticos = ExpedienteConsulta::select('codigo_cie10', 'diagnostico', DB::raw('count(*) as total'))
+            ->whereNotNull('codigo_cie10')->where('codigo_cie10', '!=', '')
+            ->groupBy('codigo_cie10', 'diagnostico')->orderByDesc('total')->limit(8)->get()
+            ->map(fn ($d) => ['etiqueta' => $d->codigo_cie10 . ' · ' . Str::limit($d->diagnostico ?? 'Sin diagnóstico', 30), 'total' => (int) $d->total]);
 
-        $facturacionMensual = Factura::select(
-            DB::raw($this->sqlMes('fecha') . ' as mes'),
-            DB::raw('count(*) as total_facturas'),
-            DB::raw('COALESCE(SUM(total), 0) as monto')
-        )
-            ->where('estado', 'pagada')
-            ->where('fecha', '>=', Carbon::today()->subMonths(6))
-            ->groupBy('mes')
-            ->orderBy('mes')
-            ->get();
+        $ciudades = Paciente::select('ciudad', DB::raw('count(*) as total'))
+            ->whereNotNull('ciudad')->where('ciudad', '!=', '')
+            ->groupBy('ciudad')->orderByDesc('total')->limit(6)->get();
 
-        // Heatmap: turnos por día de semana y hora
+        $porSexo = Paciente::select('sexo', DB::raw('count(*) as total'))
+            ->whereNotNull('sexo')->groupBy('sexo')->pluck('total', 'sexo');
+
+        // Edad: una sola consulta (antes cargaba todos los pacientes 6 veces)
+        $edades = Paciente::whereNotNull('fecha_nacimiento')->pluck('fecha_nacimiento')->map(fn ($f) => Carbon::parse($f)->age);
+        $rangosEdad = [
+            '0–12' => $edades->filter(fn ($e) => $e <= 12)->count(),
+            '13–18' => $edades->filter(fn ($e) => $e >= 13 && $e <= 18)->count(),
+            '19–35' => $edades->filter(fn ($e) => $e >= 19 && $e <= 35)->count(),
+            '36–50' => $edades->filter(fn ($e) => $e >= 36 && $e <= 50)->count(),
+            '51–65' => $edades->filter(fn ($e) => $e >= 51 && $e <= 65)->count(),
+            '65+' => $edades->filter(fn ($e) => $e > 65)->count(),
+        ];
+
+        // ── Mapa de calor: turnos por día y hora (3 meses) ──
         $heatmap = Turno::select(
             DB::raw($this->sqlDiaSemana('fecha') . ' as dia_num'),
             DB::raw($this->sqlHora('hora_registro') . ' as hora'),
@@ -127,63 +139,34 @@ class AdminDashboard extends Component
         )
             ->whereNotNull('hora_registro')
             ->where('fecha', '>=', Carbon::today()->subMonths(3))
-            ->where(DB::raw($this->sqlDiaSemana('fecha')), '<=', 7)
-            ->where(DB::raw($this->sqlHora('hora_registro')), '>=', 8)
+            ->where(DB::raw($this->sqlHora('hora_registro')), '>=', 7)
             ->where(DB::raw($this->sqlHora('hora_registro')), '<=', 19)
-            ->groupBy('dia_num', 'hora')
-            ->orderBy('dia_num')
-            ->orderBy('hora')
-            ->get();
+            ->groupBy('dia_num', 'hora')->get();
 
-        $diasSemana = [2 => 'Lun', 3 => 'Mar', 4 => 'Mie', 5 => 'Jue', 6 => 'Vie', 7 => 'Sab', 1 => 'Dom'];
-        $horas = range(8, 19);
+        $diasSemana = [2 => 'Lun', 3 => 'Mar', 4 => 'Mié', 5 => 'Jue', 6 => 'Vie', 7 => 'Sáb', 1 => 'Dom'];
+        $horas = range(7, 19);
         $heatGrid = [];
-        foreach ($horas as $h) {
-            foreach ($diasSemana as $num => $label) {
-                $heatGrid[$h][$num] = 0;
-            }
-        }
         $maxHeat = 0;
         foreach ($heatmap as $row) {
-            $heatGrid[$row->hora][$row->dia_num] = $row->total;
-            $maxHeat = max($maxHeat, $row->total);
+            $heatGrid[(int) $row->hora][(int) $row->dia_num] = (int) $row->total;
+            $maxHeat = max($maxHeat, (int) $row->total);
         }
 
-        // Diagnósticos más frecuentes
-        $topDiagnosticos = ExpedienteConsulta::select(
-            'codigo_cie10',
-            'diagnostico',
-            DB::raw('count(*) as total')
-        )
-            ->whereNotNull('codigo_cie10')
-            ->where('codigo_cie10', '!=', '')
-            ->groupBy('codigo_cie10', 'diagnostico')
-            ->orderBy('total', 'desc')
-            ->limit(10)
-            ->get()
-            ->map(fn($d) => [
-                'codigo' => $d->codigo_cie10,
-                'diagnostico' => Str::limit($d->diagnostico ?? 'Sin diagnóstico', 40),
-                'total' => $d->total,
-            ]);
-
         return view('livewire.admin-dashboard', [
-            'totalPacientes' => $totalPacientes,
-            'totalTurnos' => $totalTurnos,
-            'totalConsultas' => $totalConsultas,
-            'totalFacturado' => $totalFacturado,
+            'kpis' => $kpis,
+            'series' => $series,
+            'tasaCancelacion' => $tasaCancelacion,
+            'totalTurnos6' => $totalTurnos6,
+            'totalFacturado6' => array_sum($series['facturacion']),
+            'motivos' => $motivos,
+            'diagnosticos' => $diagnosticos,
+            'ciudades' => $ciudades,
             'porSexo' => $porSexo,
-            'porCiudad' => $porCiudad,
             'rangosEdad' => $rangosEdad,
-            'turnosUltimosMeses' => $turnosUltimosMeses,
-            'motivosLabels' => $motivosLabels,
-            'motivosDatasets' => $motivosDatasets,
-            'facturacionMensual' => $facturacionMensual,
             'heatGrid' => $heatGrid,
             'maxHeat' => $maxHeat,
             'diasSemana' => $diasSemana,
             'horas' => $horas,
-            'topDiagnosticos' => $topDiagnosticos,
         ])->layout('layouts.app');
     }
 }
