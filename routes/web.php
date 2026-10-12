@@ -176,6 +176,11 @@ Route::get('notas-credito/xml/{notaCredito}', function (App\Models\NotaCredito $
         ->download($notaCredito->xml_autorizado_path, "nota_credito_{$notaCredito->numero}.xml", ['Content-Type' => 'application/xml']);
 })->middleware(['auth', 'can:facturas.ver'])->name('notas-credito.xml');
 
+// Reporte mensual de ventas para el contador
+Route::get('reportes/ventas', \App\Livewire\ReporteVentas::class)
+    ->middleware(['auth', 'can:reportes.ver'])
+    ->name('reportes.ventas');
+
 // Auditoría de accesos a datos clínicos (solo admin)
 Route::get('auditoria', \App\Livewire\Auditoria::class)
     ->middleware(['auth', 'can:configuracion.editar'])

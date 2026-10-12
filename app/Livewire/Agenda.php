@@ -192,7 +192,12 @@ class Agenda extends Component
             return false;
         }
 
-        $cita->update(['fecha_hora' => $nuevoInicio, 'duracion_min' => $duracion]);
+        $cita->update([
+            'fecha_hora' => $nuevoInicio,
+            'duracion_min' => $duracion,
+            // Si cambió el día, el recordatorio debe enviarse de nuevo con la nueva fecha
+            'recordatorio_enviado_at' => $cita->fecha_hora->isSameDay($nuevoInicio) ? $cita->recordatorio_enviado_at : null,
+        ]);
         $this->dispatch('notify', message: 'Cita reprogramada para el ' . $nuevoInicio->format('d/m/Y H:i') . '.', type: 'success');
         return true;
     }
