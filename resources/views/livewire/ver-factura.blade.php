@@ -126,12 +126,34 @@
                                         @case('recibido') bg-blue-100 text-blue-700 @break
                                         @case('firmado') bg-yellow-100 text-yellow-700 @break
                                         @case('xml_generado') bg-gray-100 text-gray-600 @break
-                                        @case('rechazado') bg-red-100 text-red-700 @break
+                                        @case('enviado') bg-blue-100 text-blue-700 @break
+                                        @case('rechazado')
+                                        @case('no_autorizado')
+                                        @case('error_envio')
+                                        @case('error_autorizacion') bg-red-100 text-red-700 @break
                                         @default bg-gray-100 text-gray-600
                                     @endswitch">{{ $factura->estado_sri }}</span>
                             </div>
                         @endif
+                        @if ($factura->fecha_autorizacion)
+                            <div>
+                                <span class="text-gray-500">Fecha autorización:</span>
+                                <p class="text-xs text-gray-900 mt-0.5">{{ $factura->fecha_autorizacion->format('d/m/Y H:i') }}</p>
+                            </div>
+                        @endif
                     </div>
+                    @if (!empty($factura->mensajes_sri))
+                        <div class="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-800 space-y-1">
+                            <p class="font-semibold">Mensajes del SRI</p>
+                            @foreach ($factura->mensajes_sri as $m)
+                                <p>
+                                    <span class="font-mono">[{{ $m['identificador'] ?? '' }}]</span>
+                                    {{ $m['mensaje'] ?? '' }}
+                                    @if (!empty($m['informacionAdicional'])) — {{ $m['informacionAdicional'] }} @endif
+                                </p>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             @endif
 
@@ -147,34 +169,56 @@
                         Imprimir ticket
                     </a>
                     {{-- SRI actions --}}
+                    @if ($factura->estado_sri === 'autorizado' && $factura->xml_autorizado_path)
+                        <a href="{{ route('facturas.xml', $factura->id) }}"
+                           class="px-5 py-2.5 bg-green-700 text-white text-sm font-medium rounded-lg hover:bg-green-800 transition">
+                            Descargar XML autorizado
+                        </a>
+                    @endif
                     @can('facturas.crear')
-                        @if (!$factura->xml_enviado_path)
-                            <button wire:click="generarXml"
-                                class="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
-                                Generar XML SRI
-                            </button>
-                        @elseif (!$factura->xml_autorizado_path)
-                            <button wire:click="firmarXml"
-                                class="px-5 py-2.5 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition">
-                                Firmar XML
-                            </button>
-                        @elseif ($factura->estado_sri === 'firmado' || $factura->estado_sri === 'xml_generado')
-                            <button wire:click="enviarSri" wire:loading.attr="disabled" wire:target="enviarSri"
-                                class="px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition disabled:opacity-50">
-                                <span wire:loading.remove wire:target="enviarSri">Enviar al SRI</span>
-                                <span wire:loading wire:target="enviarSri">Enviando...</span>
-                            </button>
-                        @elseif ($factura->estado_sri === 'enviado' || $factura->estado_sri === 'recibido')
-                            <button wire:click="autorizarSri" wire:loading.attr="disabled" wire:target="autorizarSri"
-                                class="px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition disabled:opacity-50">
-                                <span wire:loading.remove wire:target="autorizarSri">Autorizar SRI</span>
-                                <span wire:loading wire:target="autorizarSri">Autorizando...</span>
-                            </button>
+                        @if ($factura->estado !== 'anulada')
+                            @switch($factura->estado_sri ?? 'pendiente')
+                                @case('pendiente')
+                                @case('rechazado')
+                                @case('no_autorizado')
+                                    <button wire:click="generarXml"
+                                        class="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+                                        {{ ($factura->estado_sri ?? 'pendiente') === 'pendiente' ? 'Generar XML SRI' : 'Regenerar XML SRI' }}
+                                    </button>
+                                    @break
+                                @case('xml_generado')
+                                    <button wire:click="generarXml"
+                                        class="px-5 py-2.5 border border-blue-600 text-blue-700 text-sm font-medium rounded-lg hover:bg-blue-50 transition">
+                                        Regenerar XML
+                                    </button>
+                                    <button wire:click="firmarXml"
+                                        class="px-5 py-2.5 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition">
+                                        Firmar XML
+                                    </button>
+                                    @break
+                                @case('firmado')
+                                @case('error_envio')
+                                    <button wire:click="enviarSri" wire:loading.attr="disabled" wire:target="enviarSri"
+                                        class="px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition disabled:opacity-50">
+                                        <span wire:loading.remove wire:target="enviarSri">{{ $factura->estado_sri === 'error_envio' ? 'Reintentar envío al SRI' : 'Enviar al SRI' }}</span>
+                                        <span wire:loading wire:target="enviarSri">Enviando...</span>
+                                    </button>
+                                    @break
+                                @case('enviado')
+                                @case('recibido')
+                                @case('error_autorizacion')
+                                    <button wire:click="autorizarSri" wire:loading.attr="disabled" wire:target="autorizarSri"
+                                        class="px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition disabled:opacity-50">
+                                        <span wire:loading.remove wire:target="autorizarSri">Consultar autorización SRI</span>
+                                        <span wire:loading wire:target="autorizarSri">Consultando...</span>
+                                    </button>
+                                    @break
+                            @endswitch
                         @endif
                     @endcan
                     @if ($factura->estado === 'pagada')
                         @can('facturas.anular')
-                            @php $sriBloqueado = $factura->estado_sri && $factura->estado_sri !== 'pendiente'; @endphp
+                            @php $sriBloqueado = !in_array($factura->estado_sri, \App\Livewire\VerFactura::ESTADOS_SIN_ENVIAR, true); @endphp
                             <button x-data
                                 x-on:click="{{ $sriBloqueado ? 'Swal.fire({icon: \'info\', title: \'Bloqueado por SRI\', text: \'Esta factura ya fue enviada al SRI y no puede ser anulada.\'})' : 'Swal.fire({icon: \'warning\', title: \'¿Anular factura?\', text: \'' . $factura->numero_factura . '. Esta acción no se puede deshacer.\', showCancelButton: true, confirmButtonColor: \'#dc2626\', cancelButtonColor: \'#6b7280\', confirmButtonText: \'Sí, anular\', cancelButtonText: \'Cancelar\'}).then((result) => { if (result.isConfirmed) $wire.anular() })' }}"
                                 class="px-5 py-2.5 {{ $sriBloqueado ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700' }} text-white text-sm font-medium rounded-lg transition inline-flex items-center gap-1.5">

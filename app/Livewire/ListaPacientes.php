@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\Attributes\Locked;
 use Livewire\WithPagination;
 use App\Models\Paciente;
 use App\Models\ExpedienteConsulta;
@@ -13,13 +14,18 @@ class ListaPacientes extends Component
     use WithPagination;
 
     public string $busqueda = '';
+    private const ORDENABLES = ['apellidos', 'cedula', 'created_at', 'nombres', 'sexo'];
+
+    #[Locked]
     public string $sortBy = 'created_at';
+    #[Locked]
     public string $sortDirection = 'desc';
     public ?Paciente $selected = null;
     public $turnoActivo = null;
     public $consultas = [];
 
     public bool $editMode = false;
+    #[Locked]
     public $editId = null;
 
     public $nombres;
@@ -91,6 +97,10 @@ class ListaPacientes extends Component
 
     public function ordenarPor($field): void
     {
+        if (!in_array($field, self::ORDENABLES, true)) {
+            return;
+        }
+
         if ($this->sortBy === $field) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
         } else {
@@ -105,7 +115,7 @@ class ListaPacientes extends Component
         $this->editMode = false;
         $this->selected = $paciente;
         $this->turnoActivo = $paciente->turnos()
-            ->whereIn('estado', ['esperando', 'atencion'])
+            ->whereIn('estado', ['esperando', 'en_atencion'])
             ->whereDate('fecha', today())
             ->latest()
             ->first();
@@ -210,6 +220,18 @@ class ListaPacientes extends Component
     public function eliminarPaciente(Paciente $paciente): void
     {
         $this->authorize('pacientes.eliminar');
+
+        $tieneHistorial = $paciente->consultas()->exists()
+            || $paciente->ecografias()->exists()
+            || $paciente->citas()->exists()
+            || $paciente->archivos()->exists()
+            || \App\Models\ControlPrenatal::where('paciente_id', $paciente->id)->exists()
+            || \App\Models\Factura::where('paciente_id', $paciente->id)->exists();
+
+        if ($tieneHistorial) {
+            $this->dispatch('notify', message: 'No se puede eliminar: el paciente tiene historia clínica o facturas registradas.', type: 'error');
+            return;
+        }
 
         $paciente->delete();
 

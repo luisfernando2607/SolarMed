@@ -7,18 +7,21 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Factura extends Model {
     protected $fillable = [
-        'numero_factura', 'clave_acceso', 'numero_autorizacion', 'ambiente_sri',
+        'numero_factura', 'ruc_emisor', 'clave_acceso', 'numero_autorizacion', 'ambiente_sri',
         'paciente_id', 'medico_id', 'especialidad_id',
         'turno_id', 'cita_id', 'user_id', 'fecha',
         'subtotal', 'descuento', 'total', 'forma_pago',
         'referencia_pago', 'estado', 'estado_sri',
-        'xml_enviado_path', 'xml_autorizado_path', 'observaciones',
+        'xml_enviado_path', 'xml_firmado_path', 'xml_autorizado_path', 'observaciones',
+        'fecha_autorizacion', 'mensajes_sri',
     ];
     protected $casts = [
         'fecha' => 'date',
         'subtotal' => 'decimal:2',
         'descuento' => 'decimal:2',
         'total' => 'decimal:2',
+        'fecha_autorizacion' => 'datetime',
+        'mensajes_sri' => 'array',
     ];
 
     public function paciente(): BelongsTo     { return $this->belongsTo(Paciente::class); }

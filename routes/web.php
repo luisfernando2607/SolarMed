@@ -32,7 +32,7 @@ Route::get('dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('admin/dashboard', \App\Livewire\AdminDashboard::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:configuracion.editar'])
     ->name('admin.dashboard');
 
 Route::view('profile', 'profile')
@@ -41,36 +41,36 @@ Route::view('profile', 'profile')
 
 // Recepcionista — sala de espera
 Route::get('sala-espera', SalaEspera::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:turnos.ver'])
     ->name('sala-espera');
 
 // Recepcionista — crear turno manual
 Route::get('turnos/crear', \App\Livewire\CrearTurnoRecepcion::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:turnos.ver'])
     ->name('turnos.crear');
 
 // Médico — atender un turno
 Route::get('atender/{turno}', AtenderTurno::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:expediente.ver'])
     ->name('turno.atender');
 
 // Pacientes
 Route::get('pacientes', ListaPacientes::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:pacientes.ver'])
     ->name('pacientes');
 
 // Consultas
 Route::get('consultas/crear/{turno}', CrearConsulta::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:expediente.crear'])
     ->name('consultas.crear');
 
 Route::get('consultas/editar/{consulta}', EditarConsulta::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:expediente.crear'])
     ->name('consultas.editar');
 
 // Ecografías
 Route::get('ecografias/crear/{turno}', CrearEcografia::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:ecografias.crear'])
     ->name('ecografias.crear');
 
 Route::get('ecografias/pdf/{ecografia}', function (Ecografia $ecografia) {
@@ -78,56 +78,64 @@ Route::get('ecografias/pdf/{ecografia}', function (Ecografia $ecografia) {
     return Pdf::loadView('pdf.ecografia', ['eco' => $ecografia])
         ->setPaper('a4', 'portrait')
         ->stream("ecografia_{$ecografia->id}.pdf");
-})->middleware(['auth'])->name('ecografias.pdf');
+})->middleware(['auth', 'can:ecografias.ver'])->name('ecografias.pdf');
 
 // Recetas
 Route::get('recetas/crear/{turno}', CrearReceta::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:expediente.crear'])
     ->name('recetas.crear');
 
 // Expedientes clínicos
 Route::get('expedientes', ListaExpedientes::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:expediente.ver'])
     ->name('expedientes');
 
 Route::get('expedientes/crear', CrearConsultaSinTurno::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:expediente.crear'])
     ->name('expedientes.crear');
 
 // Usuarios (solo admin)
 Route::get('usuarios', GestionUsuarios::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:usuarios.ver'])
     ->name('usuarios');
 
 // Facturación
 Route::get('facturas', ListaFacturas::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:facturas.ver'])
     ->name('facturas');
 
 Route::get('facturas/crear', CrearFactura::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:facturas.crear'])
     ->name('facturas.crear');
 
 Route::get('facturas/{factura}', VerFactura::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:facturas.ver'])
     ->name('facturas.ver');
 
 // Factura PDF
 Route::get('facturas/pdf/{factura}', function (App\Models\Factura $factura) {
     $factura->load('paciente', 'medico', 'items');
-    return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.factura', ['factura' => $factura])
-        ->setPaper([0, 0, 226, 400], 'portrait')
+    $emisor = app(App\Services\SriConfigService::class)->emisor($factura->medico);
+    return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.factura', ['factura' => $factura, 'emisor' => $emisor])
+        ->setPaper([0, 0, 226, $factura->clave_acceso ? 500 : 430], 'portrait')
         ->stream("factura_{$factura->numero_factura}.pdf");
-})->middleware(['auth'])->name('facturas.pdf');
+})->middleware(['auth', 'can:facturas.ver'])->name('facturas.pdf');
+
+// XML autorizado por el SRI (para entregar al cliente)
+Route::get('facturas/xml/{factura}', function (App\Models\Factura $factura) {
+    abort_unless($factura->estado_sri === 'autorizado' && $factura->xml_autorizado_path, 404);
+    return Illuminate\Support\Facades\Storage::disk('private')
+        ->download($factura->xml_autorizado_path, "factura_{$factura->numero_factura}.xml", ['Content-Type' => 'application/xml']);
+})->middleware(['auth', 'can:facturas.ver'])->name('facturas.xml');
 
 // Tarifario (solo admin)
 Route::get('tarifario', GestionTarifario::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:configuracion.editar'])
     ->name('tarifario');
 
 // SRI (solo admin)
 Route::get('sri/configuracion', \App\Livewire\SriConfigPage::class)
-    ->middleware(['auth'])
+    ->middleware(['auth', 'can:configuracion.editar'])
     ->name('sri.config');
 
 // Historial paciente PDF
@@ -136,6 +144,6 @@ Route::get('pacientes/pdf/{paciente}', function (App\Models\Paciente $paciente) 
     return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.historial-paciente', ['paciente' => $paciente])
         ->setPaper('a4', 'portrait')
         ->stream("historial_{$paciente->id}.pdf");
-})->middleware(['auth'])->name('pacientes.pdf');
+})->middleware(['auth', 'can:expediente.ver'])->name('pacientes.pdf');
 
 require __DIR__.'/auth.php';

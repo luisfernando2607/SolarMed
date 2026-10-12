@@ -7,6 +7,7 @@ use Livewire\Attributes\Layout;
 use App\Models\Paciente;
 use App\Models\Especialidad;
 use App\Services\TurnoService;
+use App\Exceptions\TurnoException;
 use Illuminate\Support\Facades\Auth;
 
 class CrearTurnoRecepcion extends Component
@@ -183,15 +184,19 @@ class CrearTurnoRecepcion extends Component
             $turno = app(TurnoService::class)->registrarDesdeQR(
                 array_merge($this->toArray(), [
                     'medico_id' => null,
-                ])
+                ]),
+                sobrescribirPaciente: true
             );
 
             $this->turnoCreado = "{$turno->prefijo}{$turno->numero_turno}";
             $this->resetExcept(['especialidades', 'turnoCreado', 'error', 'creando', 'busqueda']);
             $this->pacienteSeleccionado = null;
             $this->motivosDisponibles = [];
-        } catch (\Exception $e) {
+        } catch (TurnoException $e) {
             $this->error = $e->getMessage();
+        } catch (\Throwable $e) {
+            report($e);
+            $this->error = 'No se pudo registrar el turno. Revise los datos e intente nuevamente.';
         }
 
         $this->creando = false;

@@ -5,19 +5,25 @@ namespace App\Services;
 use App\Models\Turno;
 use App\Models\Paciente;
 use App\Models\Especialidad;
+use App\Exceptions\TurnoException;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class TurnoService
 {
     public function siguienteNumero(int $especialidadId, string $fecha): int
     {
         $ultimo = Turno::where('especialidad_id', $especialidadId)
-            ->where('fecha', $fecha)
+            ->whereDate('fecha', $fecha)
             ->max('numero_turno');
         return ($ultimo ?? 0) + 1;
     }
 
-    public function registrarDesdeQR(array $datos): Turno
+    /**
+     * @param bool $sobrescribirPaciente true cuando lo registra personal autenticado (recepción).
+     *        Desde el formulario público solo se completan los campos vacíos de un paciente existente.
+     */
+    public function registrarDesdeQR(array $datos, bool $sobrescribirPaciente = false): Turno
     {
         $limite = (int) config('clinica.turno_rate_limit', 3);
         $hoy = Carbon::today()->toDateString();
@@ -25,21 +31,13 @@ class TurnoService
         $espId = (int) $datos['especialidad_id'];
 
         $turnosHoy = Turno::where('cedula', $cedula)
-            ->where('fecha', $hoy)
+            ->whereDate('fecha', $hoy)
             ->whereNotIn('estado', ['cancelado'])
             ->count();
 
         if ($turnosHoy >= $limite) {
-            throw new \Exception("Ha alcanzado el límite de $limite turnos por día.");
+            throw new TurnoException("Ha alcanzado el límite de $limite turnos por día.");
         }
-
-        $especialidad = Especialidad::findOrFail($espId);
-        $prefijos = config('clinica.especialidades_prefijos', []);
-        $prefijo = strtoupper($prefijos[$especialidad->codigo] ?? $especialidad->codigo[0]);
-        $numero = $this->siguienteNumero($espId, $hoy);
-
-        // Buscar o crear el paciente con todos los datos
-        $paciente = Paciente::where('cedula', $cedula)->first();
 
         $datosPaciente = [
             'nombres' => $datos['nombres'],
@@ -62,25 +60,44 @@ class TurnoService
             'enfermedades_familiares' => $datos['enfermedades_familiares'] ?? null,
         ];
 
-        if ($paciente) {
-            $paciente->update($datosPaciente);
-        } else {
-            $paciente = Paciente::create($datosPaciente);
-        }
+        return DB::transaction(function () use ($datos, $datosPaciente, $sobrescribirPaciente, $cedula, $espId, $hoy) {
+            // Bloquea la especialidad para que dos registros simultáneos no tomen el mismo número
+            $especialidad = Especialidad::lockForUpdate()->findOrFail($espId);
+            $prefijos = config('clinica.especialidades_prefijos', []);
+            $prefijo = strtoupper($prefijos[$especialidad->codigo] ?? $especialidad->codigo[0]);
+            $numero = $this->siguienteNumero($espId, $hoy);
 
-        return Turno::create([
-            'numero_turno' => $numero,
-            'prefijo' => $prefijo,
-            'especialidad_id' => $espId,
-            'paciente_id' => $paciente->id,
-            'nombre_temporal' => "{$datos['nombres']} {$datos['apellidos']}",
-            'cedula' => $cedula,
-            'telefono' => $datos['telefono'] ?? null,
-            'motivo' => $datos['motivo'] ?? null,
-            'estado' => 'esperando',
-            'fecha' => $hoy,
-            'hora_registro' => now(),
-        ]);
+            $paciente = Paciente::where('cedula', $cedula)->first();
+
+            if (!$paciente) {
+                $paciente = Paciente::create($datosPaciente);
+            } elseif ($sobrescribirPaciente) {
+                $paciente->update($datosPaciente);
+            } else {
+                $vacios = array_filter(
+                    $datosPaciente,
+                    fn ($valor, $campo) => $valor !== null && $valor !== '' && blank($paciente->{$campo}),
+                    ARRAY_FILTER_USE_BOTH
+                );
+                if ($vacios) {
+                    $paciente->update($vacios);
+                }
+            }
+
+            return Turno::create([
+                'numero_turno' => $numero,
+                'prefijo' => $prefijo,
+                'especialidad_id' => $espId,
+                'paciente_id' => $paciente->id,
+                'nombre_temporal' => "{$datos['nombres']} {$datos['apellidos']}",
+                'cedula' => $cedula,
+                'telefono' => $datos['telefono'] ?? null,
+                'motivo' => $datos['motivo'] ?? null,
+                'estado' => 'esperando',
+                'fecha' => $hoy,
+                'hora_registro' => now(),
+            ]);
+        });
     }
 
     public function llamar(Turno $turno): void

@@ -6,6 +6,8 @@ use Livewire\Component;
 use Livewire\Attributes\Layout;
 use App\Models\Especialidad;
 use App\Services\TurnoService;
+use App\Exceptions\TurnoException;
+use Illuminate\Support\Facades\RateLimiter;
 
 class FormularioTurno extends Component
 {
@@ -123,14 +125,27 @@ class FormularioTurno extends Component
             'motivo' => 'required|string|max:100',
         ]);
 
+        // Límite por IP para evitar que el formulario público se use para llenar la base de datos
+        $claveLimite = 'turno-publico:' . request()->ip();
+        if (RateLimiter::tooManyAttempts($claveLimite, 10)) {
+            $this->error = 'Demasiados registros desde este dispositivo. Intente más tarde o acérquese a recepción.';
+            $this->turnoAsignado = null;
+            return;
+        }
+        RateLimiter::hit($claveLimite, 3600);
+
         try {
             $turno = app(TurnoService::class)->registrarDesdeQR($this->toArray());
 
             $this->turnoAsignado = "{$turno->prefijo}{$turno->numero_turno}";
             $this->error = null;
             $this->reset(array_keys($this->except(['especialidades', 'turnoAsignado', 'error'])));
-        } catch (\Exception $e) {
+        } catch (TurnoException $e) {
             $this->error = $e->getMessage();
+            $this->turnoAsignado = null;
+        } catch (\Throwable $e) {
+            report($e);
+            $this->error = 'No se pudo registrar el turno. Intente nuevamente o acérquese a recepción.';
             $this->turnoAsignado = null;
         }
     }

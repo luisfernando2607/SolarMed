@@ -9,11 +9,11 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 SET SQL_MODE = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
-CREATE DATABASE IF NOT EXISTS clinica_santa_martha
+CREATE DATABASE IF NOT EXISTS solarmed
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE clinica_santa_martha;
+USE solarmed;
 
 
 -- ============================================================

@@ -138,6 +138,20 @@
             @if (count($items) > 0)
                 <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Información de pago</h2>
+                    <div class="mb-4">
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Médico emisor *</label>
+                        <select wire:model="medico_id"
+                            class="w-full sm:w-2/3 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                            <option value="">Seleccione el médico...</option>
+                            @foreach ($medicos as $m)
+                                <option value="{{ $m->id }}">
+                                    {{ $m->nombre_completo }} — {{ $m->ruc ? 'RUC ' . $m->ruc : 'sin RUC (usa datos de la clínica)' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-gray-400 mt-1">La factura se emite con el RUC y la numeración de este médico.</p>
+                        @error('medico_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Forma de pago *</label>

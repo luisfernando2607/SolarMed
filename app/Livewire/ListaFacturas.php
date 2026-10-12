@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\Attributes\Locked;
 use Livewire\WithPagination;
 use App\Models\Factura;
 use Carbon\Carbon;
@@ -13,11 +14,19 @@ class ListaFacturas extends Component
 
     public string $busqueda = '';
     public string $filtroEstado = '';
+    private const ORDENABLES = ['created_at', 'estado', 'forma_pago', 'numero_factura', 'total'];
+
+    #[Locked]
     public string $sortBy = 'created_at';
+    #[Locked]
     public string $sortDirection = 'desc';
 
     public function ordenarPor($field): void
     {
+        if (!in_array($field, self::ORDENABLES, true)) {
+            return;
+        }
+
         if ($this->sortBy === $field) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
         } else {

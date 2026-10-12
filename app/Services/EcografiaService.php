@@ -16,7 +16,7 @@ class EcografiaService {
         $pdf = Pdf::loadView('pdf.ecografia', ['eco' => $eco])
                   ->setPaper('a4', 'portrait');
 
-        $nombre = "eco_{$eco->paciente_id}_{$eco->id}_{$eco->fecha}.pdf";
+        $nombre = "eco_{$eco->paciente_id}_{$eco->id}_" . $eco->fecha?->format('Y-m-d') . ".pdf";
         $ruta   = "pacientes/{$eco->paciente_id}/ecografias/{$nombre}";
 
         Storage::disk('private')->put($ruta, $pdf->output());

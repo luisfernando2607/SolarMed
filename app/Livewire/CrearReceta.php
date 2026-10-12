@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\Attributes\Locked;
 use App\Models\Turno;
 use App\Models\Receta;
 use App\Models\Medico;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 class CrearReceta extends Component
 {
     public Turno $turno;
+    #[Locked]
     public $paciente_id;
     public $medicamentos = [];
     public $observaciones;

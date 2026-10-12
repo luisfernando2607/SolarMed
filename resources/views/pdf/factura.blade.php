@@ -26,8 +26,19 @@
 </head>
 <body>
     <div class="encabezado center">
-        <h1>{{ config('app.name', 'CLÍNICA') }}</h1>
-        <p>RUC: {{ $factura->medico?->user?->cedula ?? config('app.ruc', '1234567890001') }}</p>
+        <img src="{{ public_path('images/SolarMed-bn.jpg') }}" alt="Solar Med" style="height: 50px; margin-bottom: 4px;">
+        <h1>{{ $emisor['nombre_comercial'] ?: config('app.name', 'CLÍNICA') }}</h1>
+        @if ($emisor['razon_social'])
+            <p>{{ $emisor['razon_social'] }}</p>
+        @endif
+        <p>RUC: {{ $factura->ruc_emisor ?: ($emisor['ruc'] ?: '--') }}</p>
+        @if ($emisor['direccion'])
+            <p>{{ $emisor['direccion'] }}</p>
+        @endif
+        @if ($emisor['regimen_rimpe'])
+            <p>{{ $emisor['regimen_rimpe'] }}</p>
+        @endif
+        <p>Obligado a llevar contabilidad: {{ $emisor['obligado_contabilidad'] }}</p>
         <p>Tel: {{ config('app.telefono', '044619253') }}</p>
         <p>Ecuador</p>
         <div class="double-line"></div>
@@ -84,6 +95,18 @@
     @if ($factura->observaciones)
         <div class="line"></div>
         <p style="font-size:9px;"><strong>Obs:</strong> {{ $factura->observaciones }}</p>
+    @endif
+
+    @if ($factura->clave_acceso && in_array($factura->estado_sri, ['enviado', 'autorizado'], true))
+        <div class="line"></div>
+        <div style="font-size:8px;">
+            <p><strong>{{ $factura->estado_sri === 'autorizado' ? 'AUTORIZACIÓN SRI' : 'CLAVE DE ACCESO (en proceso de autorización)' }}</strong></p>
+            <p style="word-break:break-all; font-family:monospace;">{{ $factura->numero_autorizacion ?: $factura->clave_acceso }}</p>
+            @if ($factura->fecha_autorizacion)
+                <p>Fecha autorización: {{ $factura->fecha_autorizacion->format('d/m/Y H:i:s') }}</p>
+            @endif
+            <p>Ambiente: {{ $factura->ambiente_sri === '2' ? 'PRODUCCIÓN' : 'PRUEBAS' }} · Emisión: NORMAL</p>
+        </div>
     @endif
 
     <div class="double-line"></div>
