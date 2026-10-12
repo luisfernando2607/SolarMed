@@ -108,7 +108,7 @@ class NotaCreditoTest extends TestCase
         $this->assertTrue(app(SriXmlService::class)->claveAccesoValida($r['clave_acceso']));
     }
 
-    public function test_flujo_completo_anula_la_factura(): void
+    public function test_flujo_completo_se_autoriza_solo_y_anula_la_factura(): void
     {
         Http::fakeSequence()
             ->push($this->soap('recepcion', '<RespuestaRecepcionComprobante><estado>RECIBIDA</estado><comprobantes/></RespuestaRecepcionComprobante>'))
@@ -121,8 +121,8 @@ class NotaCreditoTest extends TestCase
             ->assertHasErrors(['motivo_nota_credito' => 'required'])
             ->set('motivo_nota_credito', 'Error en el cobro')
             ->call('emitirNotaCredito')
-            ->assertHasNoErrors()
-            ->call('autorizarNotaCredito');
+            ->assertHasNoErrors();
+        // La autorización la consulta el job en segundo plano (cola síncrona en pruebas)
 
         $nota = NotaCredito::sole();
         $this->assertSame('autorizado', $nota->estado_sri);

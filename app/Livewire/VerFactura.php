@@ -4,28 +4,25 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Factura;
-use App\Services\SriXmlService;
-use App\Services\SriSignService;
-use App\Services\SriWebService;
+use App\Models\NotaCredito;
+use App\Services\AuditoriaService;
+use App\Services\ComprobanteSriService;
 use App\Services\NotaCreditoService;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class VerFactura extends Component
 {
     public Factura $factura;
-    public bool $enviando = false;
-    public bool $autorizando = false;
     public string $motivo_nota_credito = '';
+
+    /** Estados en los que el comprobante todavía no fue recibido por el SRI */
+    public const ESTADOS_SIN_ENVIAR = [null, 'pendiente', 'xml_generado', 'firmado', 'rechazado'];
 
     public function mount(Factura $factura): void
     {
         $this->factura = $factura->loadMissing('paciente', 'medico.user', 'user', 'items.servicio', 'especialidad', 'notaCredito');
-        app(\App\Services\AuditoriaService::class)->registrar('ver', 'factura', $factura->id, $factura->paciente_id, $factura->numero_factura);
+        app(AuditoriaService::class)->registrar('ver', 'factura', $factura->id, $factura->paciente_id, $factura->numero_factura);
     }
-
-    /** Estados en los que el comprobante todavía no fue recibido por el SRI */
-    public const ESTADOS_SIN_ENVIAR = [null, 'pendiente', 'xml_generado', 'firmado', 'rechazado', 'error_envio'];
 
     public function anular(): void
     {
@@ -37,128 +34,22 @@ class VerFactura extends Component
         }
 
         $this->factura->update(['estado' => 'anulada']);
-        $this->factura->refresh();
+        $this->recargar();
         $this->dispatch('notify', message: 'Factura anulada.', type: 'success');
     }
 
-    public function generarXml(): void
+    /** Genera, firma y envía la factura; la autorización se consulta sola en segundo plano. */
+    public function emitirSri(): void
     {
         $this->authorize('facturas.crear');
-
-        if (!in_array($this->factura->estado_sri, [null, 'pendiente', 'xml_generado', 'firmado', 'rechazado', 'no_autorizado'], true)) {
-            $this->dispatch('notify', message: 'El comprobante ya fue recibido por el SRI; no se puede regenerar.', type: 'error');
-            return;
-        }
-
-        try {
-            if (!$this->factura->items || $this->factura->items->isEmpty()) {
-                $this->dispatch('notify', message: 'La factura no tiene items. No se puede generar el XML.', type: 'error');
-                return;
-            }
-
-            $result = app(SriXmlService::class)->generar($this->factura);
-            $path = "sri/xml_enviado_{$this->factura->id}.xml";
-            Storage::disk('private')->put($path, $result['xml']);
-
-            $this->factura->updateQuietly([
-                'xml_enviado_path' => $path,
-                'xml_firmado_path' => null,
-                'clave_acceso' => $result['clave_acceso'],
-                'estado_sri' => 'xml_generado',
-                'mensajes_sri' => null,
-            ]);
-            $this->factura->refresh();
-            $this->dispatch('notify', message: 'XML generado exitosamente.', type: 'success');
-        } catch (\Exception $e) {
-            Log::error('Error generando XML SRI para factura ' . $this->factura->id . ': ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-            ]);
-            $this->dispatch('notify', message: 'Error al generar XML: ' . $e->getMessage(), type: 'error');
-        }
+        $this->procesar($this->factura, 'Factura');
     }
 
-    public function firmarXml(): void
-    {
-        $this->authorize('facturas.crear');
-
-        if (!$this->factura->medico) {
-            $this->dispatch('notify', message: 'La factura no tiene médico asignado.', type: 'error');
-            return;
-        }
-
-        if (!$this->factura->xml_enviado_path) {
-            $this->dispatch('notify', message: 'Primero debe generar el XML.', type: 'error');
-            return;
-        }
-
-        if (!app(SriXmlService::class)->claveAccesoValida($this->factura->clave_acceso)) {
-            $this->dispatch('notify', message: 'La clave de acceso de este XML no es válida. Use "Regenerar XML" antes de firmar.', type: 'error');
-            return;
-        }
-
-        try {
-            $xmlEnviado = Storage::disk('private')->get($this->factura->xml_enviado_path);
-            $xmlFirmado = app(SriSignService::class)->firmar($xmlEnviado, $this->factura->medico);
-            $path = "sri/xml_firmado_{$this->factura->id}.xml";
-            Storage::disk('private')->put($path, $xmlFirmado);
-            $this->factura->update([
-                'xml_firmado_path' => $path,
-                'estado_sri' => 'firmado',
-            ]);
-            $this->factura->refresh();
-            $this->dispatch('notify', message: 'XML firmado exitosamente.', type: 'success');
-        } catch (\Exception $e) {
-            Log::error('Error firmando XML SRI factura ' . $this->factura->id . ': ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-            ]);
-            $this->dispatch('notify', message: 'Error al firmar XML: ' . $e->getMessage(), type: 'error');
-        }
-    }
-
-    public function enviarSri(): void
-    {
-        $this->authorize('facturas.crear');
-        $this->enviando = true;
-
-        try {
-            $result = app(SriWebService::class)->enviar($this->factura);
-            $this->factura->refresh();
-            $msg = $result['estado'] === 'RECIBIDA'
-                ? 'Comprobante recibido por el SRI. Ahora consulte la autorización.'
-                : 'El SRI devolvió el comprobante: ' . $this->resumenMensajes($result['mensajes']);
-            $this->dispatch('notify', message: $msg, type: $result['estado'] === 'RECIBIDA' ? 'success' : 'warning');
-        } catch (\Exception $e) {
-            Log::error('Error enviando al SRI factura ' . $this->factura->id . ': ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-            ]);
-            $this->dispatch('notify', message: 'Error al enviar al SRI: ' . $e->getMessage(), type: 'error');
-        } finally {
-            $this->enviando = false;
-        }
-    }
-
+    /** Consulta manual de autorización (normalmente lo hace el proceso en segundo plano). */
     public function autorizarSri(): void
     {
         $this->authorize('facturas.crear');
-        $this->autorizando = true;
-
-        try {
-            $result = app(SriWebService::class)->autorizar($this->factura);
-            $this->factura->refresh();
-            [$msg, $tipo] = match ($result['estado']) {
-                'AUTORIZADO' => ['Factura autorizada por el SRI. Nro: ' . ($result['numeroAutorizacion'] ?? ''), 'success'],
-                'EN PROCESO' => ['El SRI aún está procesando el comprobante. Consulte nuevamente en unos minutos.', 'info'],
-                default => ['Factura no autorizada: ' . $this->resumenMensajes($result['mensajes']), 'warning'],
-            };
-            $this->dispatch('notify', message: $msg, type: $tipo);
-        } catch (\Exception $e) {
-            Log::error('Error autorizando en SRI factura ' . $this->factura->id . ': ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-            ]);
-            $this->dispatch('notify', message: 'Error al autorizar: ' . $e->getMessage(), type: 'error');
-        } finally {
-            $this->autorizando = false;
-        }
+        $this->consultarAutorizacion($this->factura, 'Factura');
     }
 
     public function emitirNotaCredito(): void
@@ -171,48 +62,68 @@ class VerFactura extends Component
 
         app(NotaCreditoService::class)->crear($this->factura, $this->motivo_nota_credito, auth()->id());
         $this->motivo_nota_credito = '';
-        $this->factura->refresh()->load('notaCredito');
+        $this->recargar();
         $this->procesarNotaCredito();
     }
 
     public function procesarNotaCredito(): void
     {
         $this->authorize('facturas.anular');
-        $nota = $this->factura->notaCredito;
-        if (!$nota) return;
-
-        try {
-            $result = app(NotaCreditoService::class)->procesar($nota);
-            $msg = $result['estado'] === 'RECIBIDA'
-                ? 'Nota de crédito recibida por el SRI. Ahora consulte la autorización.'
-                : 'El SRI devolvió la nota de crédito: ' . $this->resumenMensajes($result['mensajes']);
-            $this->dispatch('notify', message: $msg, type: $result['estado'] === 'RECIBIDA' ? 'success' : 'warning');
-        } catch (\Exception $e) {
-            Log::error('Error procesando nota de crédito ' . $nota->id . ': ' . $e->getMessage());
-            $this->dispatch('notify', message: 'Nota de crédito: ' . $e->getMessage(), type: 'error');
+        if ($nota = $this->factura->notaCredito) {
+            $this->procesar($nota, 'Nota de crédito');
         }
-
-        $this->factura->refresh()->load('notaCredito');
     }
 
     public function autorizarNotaCredito(): void
     {
         $this->authorize('facturas.anular');
-        $nota = $this->factura->notaCredito;
-        if (!$nota) return;
+        if ($nota = $this->factura->notaCredito) {
+            $this->consultarAutorizacion($nota, 'Nota de crédito');
+        }
+    }
 
+    /** Llamado por wire:poll mientras el SRI procesa el comprobante */
+    public function actualizarEstado(): void
+    {
+        $this->recargar();
+    }
+
+    private function procesar(Factura|NotaCredito $comprobante, string $nombre): void
+    {
         try {
-            $result = app(NotaCreditoService::class)->autorizar($nota);
+            $result = app(ComprobanteSriService::class)->procesar($comprobante);
+            if ($result['estado'] === 'RECIBIDA') {
+                $this->dispatch('notify', message: "{$nombre} recibida por el SRI. La autorización se consultará automáticamente.", type: 'success');
+            } else {
+                $this->dispatch('notify', message: "El SRI devolvió el comprobante: " . $this->resumenMensajes($result['mensajes']), type: 'warning');
+            }
+        } catch (\Exception $e) {
+            Log::error("Error emitiendo {$nombre} al SRI: " . $e->getMessage(), ['id' => $comprobante->id]);
+            $this->dispatch('notify', message: "{$nombre}: " . $e->getMessage(), type: 'error');
+        }
+
+        $this->recargar();
+    }
+
+    private function consultarAutorizacion(Factura|NotaCredito $comprobante, string $nombre): void
+    {
+        try {
+            $result = app(ComprobanteSriService::class)->autorizar($comprobante);
             [$msg, $tipo] = match ($result['estado']) {
-                'AUTORIZADO' => ['Nota de crédito autorizada. La factura quedó anulada.', 'success'],
-                'EN PROCESO' => ['El SRI aún está procesando la nota de crédito. Consulte nuevamente en unos minutos.', 'info'],
-                default => ['Nota de crédito no autorizada: ' . $this->resumenMensajes($result['mensajes']), 'warning'],
+                'AUTORIZADO' => ["{$nombre} autorizada por el SRI.", 'success'],
+                'EN PROCESO' => ['El SRI aún está procesando el comprobante. Se seguirá consultando automáticamente.', 'info'],
+                default => ["{$nombre} no autorizada: " . $this->resumenMensajes($result['mensajes']), 'warning'],
             };
             $this->dispatch('notify', message: $msg, type: $tipo);
         } catch (\Exception $e) {
-            $this->dispatch('notify', message: 'Nota de crédito: ' . $e->getMessage(), type: 'error');
+            $this->dispatch('notify', message: "{$nombre}: " . $e->getMessage(), type: 'error');
         }
 
+        $this->recargar();
+    }
+
+    private function recargar(): void
+    {
         $this->factura->refresh()->load('notaCredito');
     }
 

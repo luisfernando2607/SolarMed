@@ -2,7 +2,11 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+// Retoma comprobantes que quedaron pendientes con el SRI (requiere el cron de schedule:run)
+Schedule::command('sri:reintentar')->everyFifteenMinutes()->withoutOverlapping();

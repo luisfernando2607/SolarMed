@@ -101,8 +101,15 @@
             @endif
 
             {{-- Estado SRI --}}
+            @php
+                $enProcesoSri = in_array($factura->estado_sri, ['enviado', 'error_envio', 'error_autorizacion'], true)
+                    || in_array($factura->notaCredito?->estado_sri, ['enviado', 'error_envio', 'error_autorizacion'], true);
+            @endphp
             @if ($factura->clave_acceso || $factura->estado_sri)
-                <div class="p-6 border-b bg-blue-50">
+                <div class="p-6 border-b bg-blue-50" @if ($enProcesoSri) wire:poll.15s="actualizarEstado" @endif>
+                    @if ($enProcesoSri)
+                        <p class="text-xs text-indigo-700 mb-2">El SRI está procesando el comprobante. Esta sección se actualiza sola.</p>
+                    @endif
                     <h3 class="font-semibold text-gray-700 mb-2">Facturación electrónica SRI</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                         @if ($factura->clave_acceso)
@@ -212,16 +219,16 @@
                                    class="px-4 py-2 bg-green-700 text-white text-sm font-medium rounded-lg hover:bg-green-800 transition">XML autorizado</a>
                             @endif
                             @can('facturas.anular')
-                                @if (in_array($nc->estado_sri, [...\App\Services\NotaCreditoService::ESTADOS_REGENERABLES, 'error_envio'], true))
+                                @if (in_array($nc->estado_sri, [...\App\Services\ComprobanteSriService::REGENERABLES, 'firmado'], true))
                                     <button wire:click="procesarNotaCredito" wire:loading.attr="disabled" wire:target="procesarNotaCredito"
                                         class="px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition disabled:opacity-50">
                                         <span wire:loading.remove wire:target="procesarNotaCredito">{{ $nc->estado_sri === 'pendiente' ? 'Enviar al SRI' : 'Reintentar envío al SRI' }}</span>
                                         <span wire:loading wire:target="procesarNotaCredito">Enviando...</span>
                                     </button>
-                                @elseif (in_array($nc->estado_sri, ['enviado', 'error_autorizacion'], true))
+                                @elseif (in_array($nc->estado_sri, ['enviado', 'error_envio', 'error_autorizacion'], true))
                                     <button wire:click="autorizarNotaCredito" wire:loading.attr="disabled" wire:target="autorizarNotaCredito"
                                         class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition disabled:opacity-50">
-                                        <span wire:loading.remove wire:target="autorizarNotaCredito">Consultar autorización</span>
+                                        <span wire:loading.remove wire:target="autorizarNotaCredito">Consultar autorización ahora</span>
                                         <span wire:loading wire:target="autorizarNotaCredito">Consultando...</span>
                                     </button>
                                 @endif
@@ -251,43 +258,20 @@
                     @endif
                     @can('facturas.crear')
                         @if ($factura->estado !== 'anulada')
-                            @switch($factura->estado_sri ?? 'pendiente')
-                                @case('pendiente')
-                                @case('rechazado')
-                                @case('no_autorizado')
-                                    <button wire:click="generarXml"
-                                        class="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
-                                        {{ ($factura->estado_sri ?? 'pendiente') === 'pendiente' ? 'Generar XML SRI' : 'Regenerar XML SRI' }}
-                                    </button>
-                                    @break
-                                @case('xml_generado')
-                                    <button wire:click="generarXml"
-                                        class="px-5 py-2.5 border border-blue-600 text-blue-700 text-sm font-medium rounded-lg hover:bg-blue-50 transition">
-                                        Regenerar XML
-                                    </button>
-                                    <button wire:click="firmarXml"
-                                        class="px-5 py-2.5 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition">
-                                        Firmar XML
-                                    </button>
-                                    @break
-                                @case('firmado')
-                                @case('error_envio')
-                                    <button wire:click="enviarSri" wire:loading.attr="disabled" wire:target="enviarSri"
-                                        class="px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition disabled:opacity-50">
-                                        <span wire:loading.remove wire:target="enviarSri">{{ $factura->estado_sri === 'error_envio' ? 'Reintentar envío al SRI' : 'Enviar al SRI' }}</span>
-                                        <span wire:loading wire:target="enviarSri">Enviando...</span>
-                                    </button>
-                                    @break
-                                @case('enviado')
-                                @case('recibido')
-                                @case('error_autorizacion')
-                                    <button wire:click="autorizarSri" wire:loading.attr="disabled" wire:target="autorizarSri"
-                                        class="px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition disabled:opacity-50">
-                                        <span wire:loading.remove wire:target="autorizarSri">Consultar autorización SRI</span>
-                                        <span wire:loading wire:target="autorizarSri">Consultando...</span>
-                                    </button>
-                                    @break
-                            @endswitch
+                            @php $estadoSri = $factura->estado_sri ?? 'pendiente'; @endphp
+                            @if (in_array($estadoSri, ['pendiente', 'xml_generado', 'firmado', 'rechazado', 'no_autorizado'], true))
+                                <button wire:click="emitirSri" wire:loading.attr="disabled" wire:target="emitirSri"
+                                    class="px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition disabled:opacity-50">
+                                    <span wire:loading.remove wire:target="emitirSri">{{ in_array($estadoSri, ['rechazado', 'no_autorizado'], true) ? 'Corregir y reenviar al SRI' : 'Emitir al SRI' }}</span>
+                                    <span wire:loading wire:target="emitirSri">Enviando al SRI...</span>
+                                </button>
+                            @elseif (in_array($estadoSri, ['enviado', 'recibido', 'error_envio', 'error_autorizacion'], true))
+                                <button wire:click="autorizarSri" wire:loading.attr="disabled" wire:target="autorizarSri"
+                                    class="px-5 py-2.5 border border-indigo-600 text-indigo-700 text-sm font-medium rounded-lg hover:bg-indigo-50 transition disabled:opacity-50">
+                                    <span wire:loading.remove wire:target="autorizarSri">Consultar autorización ahora</span>
+                                    <span wire:loading wire:target="autorizarSri">Consultando...</span>
+                                </button>
+                            @endif
                         @endif
                     @endcan
                     @if ($factura->estado === 'pagada')
