@@ -5,15 +5,22 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder {
     public function run(): void {
+        // Datos base: seguros de ejecutar en cualquier instalación (no borran nada)
         $this->call([
             RolesSeeder::class,
             EspecialidadesSeeder::class,
             ConfiguracionSeeder::class,
             TarifarioSeeder::class,
-            AdminSeeder::class,
-            UsuariosSeeder::class,
             Cie10Seeder::class,
-            DatosDemoSeeder::class,
+            AdminSeeder::class,
         ]);
+
+        // Usuarios y datos de demostración: solo en desarrollo local
+        if (app()->environment('local')) {
+            $this->call([
+                UsuariosSeeder::class,
+                DatosDemoSeeder::class,
+            ]);
+        }
     }
 }

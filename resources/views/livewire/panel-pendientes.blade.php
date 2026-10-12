@@ -34,7 +34,7 @@
         <div class="bg-white border rounded-xl p-5">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="font-semibold text-gray-800">Embarazos que requieren atención</h3>
-                <span class="text-xs text-gray-500">{{ $embarazos['activos'] }} embarazos activos</span>
+                <span class="text-xs text-gray-500">{{ $embarazos['activos'] }} {{ $embarazos['activos'] === 1 ? 'embarazo activo' : 'embarazos activos' }}</span>
             </div>
             @forelse ($embarazos['atencion'] as $item)
                 <a href="{{ route('prenatal', $item['embarazo']->paciente_id) }}" wire:navigate
