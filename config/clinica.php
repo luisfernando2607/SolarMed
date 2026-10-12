@@ -3,6 +3,8 @@ return [
     'nombre'            => env('CLINICA_NOMBRE', 'SolarMed Software'),
     'turno_rate_limit'  => env('TURNO_RATE_LIMIT', 3),
     'max_archivo_kb'    => 5120,
+    // Roles obligados a usar verificación en dos pasos, separados por coma (p. ej. "admin,medico")
+    'dos_factores_roles' => array_values(array_filter(array_map('trim', explode(',', (string) env('TWO_FACTOR_ROLES', ''))))),
     'mimes_permitidos'  => ['pdf','jpg','jpeg','png'],
     /*
      * Exámenes del control prenatal por trimestre (checklist). Ajustar según la guía clínica que siga

@@ -106,6 +106,19 @@ permiso (`routes/web.php`) y los roles se definen en `database/seeders/RolesSeed
 | secretaria | Turnos, sala de espera, facturación |
 | enfermeria | Ver turnos y pacientes |
 
+## Verificación en dos pasos (2FA)
+
+Cada usuario la activa en **Perfil** con una app autenticadora (Google Authenticator, Microsoft
+Authenticator o Authy) y recibe 8 códigos de recuperación de un solo uso. Para exigirla a ciertos roles:
+
+```
+TWO_FACTOR_ROLES=admin,medico
+```
+
+Los usuarios de esos roles que aún no la tengan solo podrán entrar a su perfil hasta activarla.
+Si alguien pierde el teléfono y sus códigos, un admin puede desactivarla desde la base de datos
+(`two_factor_secret`, `two_factor_recovery_codes` y `two_factor_confirmed_at` en `NULL`).
+
 ## Facturación electrónica SRI
 
 Cada médico factura con **su propio RUC** y su propia numeración (`001-001-000000001` por RUC).

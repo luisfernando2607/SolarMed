@@ -9,6 +9,9 @@ Route::middleware('guest')->group(function () {
     Volt::route('login', 'pages.auth.login')
         ->name('login');
 
+    Volt::route('dos-factores', 'pages.auth.dos-factores')
+        ->name('dos-factores.desafio');
+
     Volt::route('forgot-password', 'pages.auth.forgot-password')
         ->name('password.request');
 
