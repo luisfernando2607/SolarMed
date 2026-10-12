@@ -49,10 +49,12 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Motivo de consulta *</label>
                     <textarea wire:model="motivo_consulta" rows="2" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
                     @error('motivo_consulta') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    @include('livewire.partials.consulta-tipo-atencion')
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Anamnesis</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Enfermedad o problema actual</label>
                     <textarea wire:model="anamnesis" rows="3" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                    @include('livewire.partials.consulta-revision-sistemas')
                 </div>
             </div>
         </div>
@@ -105,6 +107,7 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Diagnóstico *</label>
                         <textarea wire:model="diagnostico" rows="2" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
                         @error('diagnostico') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        @include('livewire.partials.consulta-tipo-diagnostico')
                     </div>
                     <div class="relative" x-data="{ open: false }">
                         <label class="block text-sm font-medium text-gray-700 mb-1">CIE-10</label>

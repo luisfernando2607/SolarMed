@@ -101,10 +101,12 @@
                                             <label class="{{ $etiqueta }}">Motivo de consulta *</label>
                                             <textarea wire:model="motivo_consulta" rows="2" class="{{ $campo }}"></textarea>
                                             @error('motivo_consulta') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                            @include('livewire.partials.consulta-tipo-atencion')
                                         </div>
                                         <div>
-                                            <label class="{{ $etiqueta }}">Anamnesis</label>
+                                            <label class="{{ $etiqueta }}">Enfermedad o problema actual</label>
                                             <textarea wire:model="anamnesis" rows="3" class="{{ $campo }}"></textarea>
+                                            @include('livewire.partials.consulta-revision-sistemas')
                                         </div>
                                     </div>
                                 </div>
@@ -157,6 +159,7 @@
                                                 <label class="{{ $etiqueta }}">Diagnóstico *</label>
                                                 <textarea wire:model="diagnostico" rows="2" class="{{ $campo }}"></textarea>
                                                 @error('diagnostico') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                                @include('livewire.partials.consulta-tipo-diagnostico')
                                             </div>
                                             <div class="relative" x-data="{ open: false }">
                                                 <label class="{{ $etiqueta }}">CIE-10</label>

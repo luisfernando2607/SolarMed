@@ -47,6 +47,8 @@ class AtenderTurno extends Component
         $this->showForm = !$this->showForm;
         if (!$this->showForm) {
             $this->resetForm();
+        } else {
+            $this->sugerirTipoAtencion($this->turno->paciente_id, $this->turno->especialidad_id);
         }
     }
 
