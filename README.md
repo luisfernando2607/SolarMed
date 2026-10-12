@@ -6,16 +6,18 @@ Sistema de gestión clínica integral para **SolarMed Software**, una consulta p
 
 ## Funcionalidades
 
-- **Módulo de turnos** — Sistema de colas en tiempo real con auto-registro del paciente (kiosco virtual), numeración secuencial por especialidad y seguimiento de estados (esperando, en atención, completado, cancelado).
-- **Atención médica** — Panel del doctor para gestionar pacientes desde la sala de espera, crear consultas clínicas, diagnósticos CIE-10, solicitar ecografías y recetar medicamentos.
-- **Historia clínica (Expedientes)** — Registro completo de consultas del paciente con búsqueda, anamnesis, examen físico, diagnóstico, tratamiento y referencias.
-- **Módulo de control prenatal** — Seguimiento especializado de embarazos con semanas de gestación, FPP, peso materno, presión arterial, altura uterina, latidos fetales y checklists.
-- **Ecografías** — Reportes detallados con mediciones biométricas estándar (DBP, CC, CA, LF), peso fetal estimado y generación de PDF.
-- **Agendamiento de citas** — Calendario interactivo FullCalendar con citas por especialidad codificadas por color.
-- **Facturación electrónica SRI** — Facturación completa con integración SRI: generación de XML, firma digital con certificado .p12, envío vía SOAP, numeración autorizada y PDF en formato ticket (226x400pts).
-- **Gestión de archivos** — Carga y categorización de documentos del paciente (resultados de laboratorio, imágenes, referencias, fotos).
-- **Dashboard administrativo** — Estadísticas con gráficos (pacientes por sexo/edad/ciudad, tendencias de turnos, facturación mensual, mapa de calor de atención, diagnósticos más frecuentes).
-- **Control de usuarios y permisos** — RBAC completo con roles (admin, secretaria, médico) y permisos granulares vía Spatie.
+- **Módulo de turnos** — Colas en tiempo real con auto-registro del paciente (kiosco virtual), numeración secuencial por especialidad y seguimiento de estados (esperando, en atención, completado, cancelado).
+- **Atención médica** — Panel del médico para atender desde la sala de espera: consultas clínicas con diagnóstico CIE-10, ecografías y recetas.
+- **Historia clínica (Expedientes)** — Consultas con anamnesis, examen físico, diagnóstico, tratamiento y referencias. Solo el autor corrige y cada corrección queda versionada con su motivo.
+- **Control prenatal** — Embarazos por paciente: edad gestacional y FPP desde la FUM, controles (peso, PA, altura uterina, FCF, presentación, movimientos fetales, edemas) con alertas clínicas, checklist de exámenes por trimestre (`config/clinica.php`) y cierre con desenlace.
+- **Recetas** — Receta en PDF (A5) con alergias resaltadas, vinculada a la consulta.
+- **Ecografías** — Informes con biometría fetal (DBP, CC, CA, LF), peso fetal estimado y PDF.
+- **Facturación electrónica SRI** — Factura y nota de crédito electrónicas con el RUC de cada médico, firma XAdES-BES, autorización automática en segundo plano y envío al paciente por correo (PDF + XML).
+- **Auditoría** — Registro de quién vio, descargó o modificó datos clínicos (LOPDP).
+- **Dashboard administrativo** — Estadísticas (pacientes por sexo/edad/ciudad, turnos, facturación mensual, diagnósticos frecuentes).
+- **Usuarios y permisos** — Roles (admin, médico, secretaria, enfermería) y permisos por ruta vía Spatie.
+
+**Pendiente:** agenda de citas (la tabla `citas` existe, falta la pantalla) y gestión de archivos del paciente (`ArchivoService` existe, falta la pantalla).
 
 ## Tecnologías
 

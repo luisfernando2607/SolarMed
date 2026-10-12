@@ -19,6 +19,7 @@ class Paciente extends Model {
     public function consultas(): HasMany { return $this->hasMany(ExpedienteConsulta::class); }
     public function ecografias(): HasMany{ return $this->hasMany(Ecografia::class); }
     public function archivos(): HasMany  { return $this->hasMany(PacienteArchivo::class); }
+    public function embarazos(): HasMany { return $this->hasMany(Embarazo::class)->latest('fum'); }
 
     public function getNombreCompletoAttribute(): string {
         return "{$this->nombres} {$this->apellidos}";

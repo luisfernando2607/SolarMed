@@ -94,6 +94,11 @@ Route::get('recetas/pdf/{receta}', function (App\Models\Receta $receta) {
         ->stream("receta_{$receta->id}.pdf");
 })->middleware(['auth', 'can:expediente.ver'])->name('recetas.pdf');
 
+// Control prenatal
+Route::get('prenatal/{paciente}', \App\Livewire\ControlPrenatalPaciente::class)
+    ->middleware(['auth', 'can:expediente.ver'])
+    ->name('prenatal');
+
 // Expedientes clínicos
 Route::get('expedientes', ListaExpedientes::class)
     ->middleware(['auth', 'can:expediente.ver'])
