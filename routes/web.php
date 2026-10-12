@@ -44,6 +44,11 @@ Route::get('sala-espera', SalaEspera::class)
     ->middleware(['auth', 'can:turnos.ver'])
     ->name('sala-espera');
 
+// Agenda de citas
+Route::get('agenda', \App\Livewire\Agenda::class)
+    ->middleware(['auth', 'can:turnos.ver'])
+    ->name('agenda');
+
 // Recepcionista — crear turno manual
 Route::get('turnos/crear', \App\Livewire\CrearTurnoRecepcion::class)
     ->middleware(['auth', 'can:turnos.ver'])
