@@ -12,6 +12,7 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use App\Services\SriSignService;
 
@@ -72,11 +73,11 @@ class GestionUsuarios extends Component
         }
 
         if ($this->editMode) {
-            $rules['password'] = 'nullable|string|min:8|confirmed';
+            $rules['password'] = ['nullable', 'string', Password::defaults(), 'confirmed'];
             $rules['p12_file'] = 'nullable|file|mimes:p12,pfx|max:2048';
             $rules['p12_password'] = 'required_with:p12_file|nullable|string|max:255';
         } else {
-            $rules['password'] = 'required|string|min:8|confirmed';
+            $rules['password'] = ['required', 'string', Password::defaults(), 'confirmed'];
         }
 
         return $rules;
@@ -87,7 +88,9 @@ class GestionUsuarios extends Component
         'email.required' => 'El email es obligatorio.',
         'email.unique' => 'Este email ya está registrado.',
         'password.required' => 'La contraseña es obligatoria.',
-        'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+        'password.min' => 'La contraseña debe tener al menos :min caracteres.',
+        'password.letters' => 'La contraseña debe incluir letras.',
+        'password.numbers' => 'La contraseña debe incluir números.',
         'password.confirmed' => 'Las contraseñas no coinciden.',
         'rol.required' => 'Debe seleccionar un rol.',
         'p12_file.mimes' => 'El archivo debe ser .p12 o .pfx.',
@@ -155,7 +158,9 @@ class GestionUsuarios extends Component
         ];
 
         if ($this->password) {
+            // Clave asignada por el administrador: la persona debe cambiarla al entrar (AM 5216-A Art. 15)
             $data['password'] = Hash::make($this->password);
+            $data['debe_cambiar_password'] = true;
         }
 
         if ($this->editMode) {
@@ -172,7 +177,6 @@ class GestionUsuarios extends Component
 
             $this->dispatch('notify', message: 'Usuario actualizado exitosamente.', type: 'success');
         } else {
-            $data['password'] = Hash::make($this->password);
             $user = User::create($data);
             $user->assignRole($this->rol);
 

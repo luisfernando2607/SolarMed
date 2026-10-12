@@ -3,6 +3,7 @@
 namespace App\Livewire\Forms;
 
 use App\Models\User;
+use App\Services\AuditoriaService;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -37,6 +38,8 @@ class LoginForm extends Form
 
         if (! $user || ! $provider->validateCredentials($user, ['password' => $this->password])) {
             RateLimiter::hit($this->throttleKey());
+            app(AuditoriaService::class)->registrar('login_fallido', 'sesion', null, null,
+                ($user ? 'Contraseña incorrecta' : 'Correo no registrado') . ': ' . mb_substr($this->email, 0, 120), $user?->id);
 
             throw ValidationException::withMessages([
                 'form.email' => trans('auth.failed'),
@@ -64,6 +67,8 @@ class LoginForm extends Form
         }
 
         event(new Lockout(request()));
+        app(AuditoriaService::class)->registrar('bloqueo', 'sesion', null, null, 'Demasiados intentos: ' . mb_substr($this->email, 0, 120),
+            User::where('email', $this->email)->value('id'));
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
 

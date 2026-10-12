@@ -74,6 +74,17 @@
                                 <td class="px-5 py-3 hidden md:table-cell text-gray-600 font-mono text-[13px]">{{ $u->cedula ?? '—' }}</td>
                                 <td class="px-5 py-3">
                                     <span class="px-2 py-0.5 rounded-full text-xs font-medium capitalize {{ $tonosRol[$rolNombre] ?? 'bg-gray-100 text-gray-600' }}">{{ $rolNombre ?? 'Sin rol' }}</span>
+                                    {{-- Requisitos AM 5216-A: clave personal y acuerdo de confidencialidad --}}
+                                    <span class="mt-1 flex flex-wrap gap-1">
+                                        @if ($u->debe_cambiar_password)
+                                            <span class="px-1.5 py-0.5 rounded text-[11px] bg-amber-50 text-amber-700" title="Aún usa la clave asignada; deberá cambiarla al entrar">Clave temporal</span>
+                                        @endif
+                                        @if ($u->confidencialidad_aceptada_at)
+                                            <span class="px-1.5 py-0.5 rounded text-[11px] bg-gray-100 text-gray-500" title="Aceptó el acuerdo de confidencialidad el {{ $u->confidencialidad_aceptada_at->format('d/m/Y H:i') }}">Confidencialidad ✓</span>
+                                        @else
+                                            <span class="px-1.5 py-0.5 rounded text-[11px] bg-amber-50 text-amber-700">Sin acuerdo de confidencialidad</span>
+                                        @endif
+                                    </span>
                                 </td>
                                 <td class="px-5 py-3 hidden lg:table-cell">
                                     @if ($u->medico)

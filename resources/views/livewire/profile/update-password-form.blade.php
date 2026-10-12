@@ -28,9 +28,12 @@ new class extends Component
             throw $e;
         }
 
-        Auth::user()->update([
+        Auth::user()->forceFill([
             'password' => Hash::make($validated['password']),
-        ]);
+            'debe_cambiar_password' => false,
+            'password_cambiado_at' => now(),
+        ])->save();
+        app(\App\Services\AuditoriaService::class)->registrar('cambiar_password', 'cuenta', Auth::id(), null, 'Desde el perfil');
 
         $this->reset('current_password', 'password', 'password_confirmation');
 
