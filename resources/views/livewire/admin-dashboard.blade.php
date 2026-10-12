@@ -25,6 +25,10 @@
 </style>
 
 
+<div class="mb-6 mt-2">
+    <livewire:panel-pendientes />
+</div>
+
 <div class="charts-grid mb-8">
 
     {{-- ── Row 1: Turnos + Facturación (span2) ── --}}

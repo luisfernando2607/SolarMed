@@ -15,6 +15,23 @@ class AdminDashboard extends Component
 {
     public string $periodo = 'mensual';
 
+    // Expresiones de fecha según el motor (MySQL en producción, SQLite en las pruebas)
+    private function sqlMes(string $col): string
+    {
+        return DB::getDriverName() === 'sqlite' ? "strftime('%Y-%m', {$col})" : "DATE_FORMAT({$col}, '%Y-%m')";
+    }
+
+    /** 1 = domingo … 7 = sábado, como DAYOFWEEK de MySQL */
+    private function sqlDiaSemana(string $col): string
+    {
+        return DB::getDriverName() === 'sqlite' ? "(CAST(strftime('%w', {$col}) AS INTEGER) + 1)" : "DAYOFWEEK({$col})";
+    }
+
+    private function sqlHora(string $col): string
+    {
+        return DB::getDriverName() === 'sqlite' ? "CAST(strftime('%H', {$col}) AS INTEGER)" : "HOUR({$col})";
+    }
+
     public function render()
     {
         $this->authorize('configuracion.editar');
@@ -47,7 +64,7 @@ class AdminDashboard extends Component
         ];
 
         $turnosUltimosMeses = Turno::select(
-            DB::raw("DATE_FORMAT(fecha, '%Y-%m') as mes"),
+            DB::raw($this->sqlMes('fecha') . ' as mes'),
             DB::raw('count(*) as total'),
             DB::raw("SUM(CASE WHEN estado = 'completado' THEN 1 ELSE 0 END) as completados"),
             DB::raw("SUM(CASE WHEN estado = 'cancelado' THEN 1 ELSE 0 END) as cancelados")
@@ -92,7 +109,7 @@ class AdminDashboard extends Component
         ]);
 
         $facturacionMensual = Factura::select(
-            DB::raw("DATE_FORMAT(fecha, '%Y-%m') as mes"),
+            DB::raw($this->sqlMes('fecha') . ' as mes'),
             DB::raw('count(*) as total_facturas'),
             DB::raw('COALESCE(SUM(total), 0) as monto')
         )
@@ -104,15 +121,15 @@ class AdminDashboard extends Component
 
         // Heatmap: turnos por día de semana y hora
         $heatmap = Turno::select(
-            DB::raw("DAYOFWEEK(fecha) as dia_num"),
-            DB::raw("HOUR(hora_registro) as hora"),
+            DB::raw($this->sqlDiaSemana('fecha') . ' as dia_num'),
+            DB::raw($this->sqlHora('hora_registro') . ' as hora'),
             DB::raw('count(*) as total')
         )
             ->whereNotNull('hora_registro')
             ->where('fecha', '>=', Carbon::today()->subMonths(3))
-            ->where(DB::raw("DAYOFWEEK(fecha)"), '<=', 7)
-            ->where(DB::raw("HOUR(hora_registro)"), '>=', 8)
-            ->where(DB::raw("HOUR(hora_registro)"), '<=', 19)
+            ->where(DB::raw($this->sqlDiaSemana('fecha')), '<=', 7)
+            ->where(DB::raw($this->sqlHora('hora_registro')), '>=', 8)
+            ->where(DB::raw($this->sqlHora('hora_registro')), '<=', 19)
             ->groupBy('dia_num', 'hora')
             ->orderBy('dia_num')
             ->orderBy('hora')
