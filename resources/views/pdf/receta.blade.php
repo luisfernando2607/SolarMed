@@ -19,8 +19,6 @@
         .med-nombre { font-size: 12px; font-weight: bold; }
         .med-detalle { margin-top: 2px; }
         .obs { background: #ecfdf5; padding: 8px; border-radius: 4px; margin-top: 12px; }
-        .firma { margin-top: 55px; text-align: center; }
-        .firma .linea { border-top: 1px solid #333; width: 60%; margin: 0 auto 4px; }
         .footer { position: fixed; bottom: -6mm; left: 0; right: 0; text-align: center; font-size: 9px; color: #888; }
     </style>
 </head>
@@ -86,11 +84,7 @@
         <div class="obs"><strong>Indicaciones generales:</strong> {{ $receta->observaciones }}</div>
     @endif
 
-    <div class="firma">
-        <div class="linea"></div>
-        {{ $receta->medico?->nombre_completo }}<br>
-        <span class="muted">Firma y sello</span>
-    </div>
+    @include('pdf.partials.firma', ['medico' => $receta->medico])
 
     <div class="footer">Documento generado el {{ now()->format('d/m/Y H:i') }} · {{ $marca->nombre() }}@if ($marca->direccion()) · {{ $marca->direccion() }}@endif</div>
 </body>

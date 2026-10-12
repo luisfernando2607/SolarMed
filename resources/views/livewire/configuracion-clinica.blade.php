@@ -108,6 +108,23 @@
         </section>
 
         <section class="bg-white rounded-xl shadow-sm border p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-1">Catálogo de exámenes</h2>
+            <p class="text-xs text-gray-500 mb-4">Lista que aparece al emitir un pedido de exámenes (uno por línea). Los pedidos ya emitidos no cambian.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Laboratorio</label>
+                    <textarea wire:model="examenesLaboratorio" rows="10" class="w-full rounded-lg border-gray-300 shadow-sm text-sm"></textarea>
+                    @error('examenesLaboratorio') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Imagen y procedimientos</label>
+                    <textarea wire:model="examenesImagen" rows="10" class="w-full rounded-lg border-gray-300 shadow-sm text-sm"></textarea>
+                    @error('examenesImagen') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm border p-6">
             <div class="flex items-start justify-between gap-4 mb-1">
                 <h2 class="text-lg font-semibold text-gray-900">Alertas del control prenatal</h2>
                 <button type="button" wire:click="restaurarPrenatal" class="text-xs text-blue-600 hover:underline shrink-0">Restaurar valores sugeridos</button>

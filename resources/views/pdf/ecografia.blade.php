@@ -66,6 +66,8 @@
         <div class="conclusion">{{ $eco->conclusion ?? 'Sin hallazgos relevantes.' }}</div>
     </div>
 
+    @include('pdf.partials.firma', ['medico' => $eco->medico])
+
     <div class="footer">
         <p>Documento generado electrónicamente el {{ now()->format('d/m/Y H:i') }}</p>
         <p>{{ $marca->nombre() }}@if ($marca->contacto()) &mdash; {{ $marca->contacto() }}@endif</p>

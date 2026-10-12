@@ -21,6 +21,17 @@ class AjustesService
         'marca.color' => '#0F6E56',
         'marca.logo' => null,      // ruta relativa a public/ (null = logo incluido)
         'marca.logo_bn' => null,   // versión en blanco y negro para tickets
+        // Catálogo para el pedido de exámenes
+        'examenes.laboratorio' => [
+            'Biometría hemática', 'Glucosa en ayunas', 'Hemoglobina glicosilada (HbA1c)', 'Urea', 'Creatinina', 'Ácido úrico',
+            'Perfil lipídico', 'TGO / TGP', 'TSH', 'T4 libre', 'Proteína C reactiva (PCR)', 'Grupo sanguíneo y factor Rh',
+            'Prueba de embarazo (β-hCG)', 'VDRL', 'VIH', 'Hepatitis B (HBsAg)', 'EMO (examen de orina)', 'Urocultivo',
+            'Coproparasitario',
+        ],
+        'examenes.imagen' => [
+            'Ecografía obstétrica', 'Ecografía pélvica', 'Ecografía transvaginal', 'Ecografía abdominal', 'Ecografía mamaria',
+            'Mamografía', 'Radiografía de tórax', 'Papanicolaou', 'Colposcopia',
+        ],
         // Agenda
         'agenda.tipos' => ['Consulta general', 'Consulta ginecológica', 'Control prenatal', 'Ecografía', 'Control post-parto', 'Planificación familiar', 'Otro'],
         'agenda.duraciones' => [15, 20, 30, 40, 45, 60, 90],

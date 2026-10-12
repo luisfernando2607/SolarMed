@@ -16,6 +16,10 @@ class ConfiguracionClinica extends Component
     public $marca_nombre, $marca_subtitulo, $marca_direccion, $marca_telefono, $marca_email, $marca_color;
     public $logo;
 
+    // Catálogo de exámenes
+    public string $examenesLaboratorio = '';
+    public string $examenesImagen = '';
+
     // Agenda
     public string $tiposTexto = '';
     public string $duracionesTexto = '';
@@ -42,6 +46,8 @@ class ConfiguracionClinica extends Component
         foreach (['nombre', 'subtitulo', 'direccion', 'telefono', 'email', 'color'] as $campo) {
             $this->{"marca_{$campo}"} = $a->get("marca.{$campo}");
         }
+        $this->examenesLaboratorio = implode("\n", $a->get('examenes.laboratorio'));
+        $this->examenesImagen = implode("\n", $a->get('examenes.imagen'));
         $this->tiposTexto = implode("\n", $a->get('agenda.tipos'));
         $this->duracionesTexto = implode(', ', $a->get('agenda.duraciones'));
         $this->duracion_defecto = $a->get('agenda.duracion_defecto');
@@ -71,6 +77,8 @@ class ConfiguracionClinica extends Component
             ->filter(fn ($d) => $d >= 5 && $d <= 480)->unique()->sort()->values()->all();
 
         $this->validate([
+            'examenesLaboratorio' => 'required|string|max:5000',
+            'examenesImagen' => 'required|string|max:5000',
             'tiposTexto' => 'required|string|max:2000',
             'duracionesTexto' => 'required|string|max:200',
             'duracion_defecto' => 'required|integer',
@@ -121,7 +129,10 @@ class ConfiguracionClinica extends Component
             return;
         }
 
+        $lineas = fn (string $t) => collect(preg_split('/\R/', $t))->map(fn ($x) => mb_substr(trim($x), 0, 80))->filter()->unique()->values()->all();
         $valores = [
+            'examenes.laboratorio' => $lineas($this->examenesLaboratorio),
+            'examenes.imagen' => $lineas($this->examenesImagen),
             'marca.nombre' => trim($this->marca_nombre),
             'marca.subtitulo' => trim((string) $this->marca_subtitulo),
             'marca.direccion' => trim((string) $this->marca_direccion),
