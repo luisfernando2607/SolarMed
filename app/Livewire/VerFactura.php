@@ -21,11 +21,14 @@ class VerFactura extends Component
         $this->factura = $factura->loadMissing('paciente', 'medico.user', 'user', 'items.servicio', 'especialidad');
     }
 
+    /** Estados en los que el comprobante todavía no fue recibido por el SRI */
+    public const ESTADOS_SIN_ENVIAR = [null, 'pendiente', 'xml_generado', 'firmado', 'rechazado', 'error_envio'];
+
     public function anular(): void
     {
         $this->authorize('facturas.anular');
 
-        if ($this->factura->estado_sri && $this->factura->estado_sri !== 'pendiente') {
+        if (!in_array($this->factura->estado_sri, self::ESTADOS_SIN_ENVIAR, true)) {
             $this->dispatch('notify', message: 'No se puede anular una factura ya enviada al SRI.', type: 'error');
             return;
         }
@@ -39,6 +42,11 @@ class VerFactura extends Component
     {
         $this->authorize('facturas.crear');
 
+        if (!in_array($this->factura->estado_sri, [null, 'pendiente', 'xml_generado', 'firmado', 'rechazado', 'no_autorizado'], true)) {
+            $this->dispatch('notify', message: 'El comprobante ya fue recibido por el SRI; no se puede regenerar.', type: 'error');
+            return;
+        }
+
         try {
             if (!$this->factura->items || $this->factura->items->isEmpty()) {
                 $this->dispatch('notify', message: 'La factura no tiene items. No se puede generar el XML.', type: 'error');
@@ -51,8 +59,10 @@ class VerFactura extends Component
 
             $this->factura->updateQuietly([
                 'xml_enviado_path' => $path,
+                'xml_firmado_path' => null,
                 'clave_acceso' => $result['clave_acceso'],
                 'estado_sri' => 'xml_generado',
+                'mensajes_sri' => null,
             ]);
             $this->factura->refresh();
             $this->dispatch('notify', message: 'XML generado exitosamente.', type: 'success');
@@ -78,13 +88,18 @@ class VerFactura extends Component
             return;
         }
 
+        if (!app(SriXmlService::class)->claveAccesoValida($this->factura->clave_acceso)) {
+            $this->dispatch('notify', message: 'La clave de acceso de este XML no es válida. Use "Regenerar XML" antes de firmar.', type: 'error');
+            return;
+        }
+
         try {
             $xmlEnviado = Storage::disk('private')->get($this->factura->xml_enviado_path);
             $xmlFirmado = app(SriSignService::class)->firmar($xmlEnviado, $this->factura->medico);
             $path = "sri/xml_firmado_{$this->factura->id}.xml";
             Storage::disk('private')->put($path, $xmlFirmado);
             $this->factura->update([
-                'xml_autorizado_path' => $path,
+                'xml_firmado_path' => $path,
                 'estado_sri' => 'firmado',
             ]);
             $this->factura->refresh();
@@ -106,8 +121,8 @@ class VerFactura extends Component
             $result = app(SriWebService::class)->enviar($this->factura);
             $this->factura->refresh();
             $msg = $result['estado'] === 'RECIBIDA'
-                ? 'Comprobante recibido por el SRI.'
-                : 'El SRI rechazó el comprobante.';
+                ? 'Comprobante recibido por el SRI. Ahora consulte la autorización.'
+                : 'El SRI devolvió el comprobante: ' . $this->resumenMensajes($result['mensajes']);
             $this->dispatch('notify', message: $msg, type: $result['estado'] === 'RECIBIDA' ? 'success' : 'warning');
         } catch (\Exception $e) {
             Log::error('Error enviando al SRI factura ' . $this->factura->id . ': ' . $e->getMessage(), [
@@ -127,10 +142,12 @@ class VerFactura extends Component
         try {
             $result = app(SriWebService::class)->autorizar($this->factura);
             $this->factura->refresh();
-            $msg = $result['estado'] === 'AUTORIZADO'
-                ? 'Factura autorizada por el SRI. Nro: ' . ($result['numeroAutorizacion'] ?? '')
-                : 'Factura no autorizada.';
-            $this->dispatch('notify', message: $msg, type: $result['estado'] === 'AUTORIZADO' ? 'success' : 'warning');
+            [$msg, $tipo] = match ($result['estado']) {
+                'AUTORIZADO' => ['Factura autorizada por el SRI. Nro: ' . ($result['numeroAutorizacion'] ?? ''), 'success'],
+                'EN PROCESO' => ['El SRI aún está procesando el comprobante. Consulte nuevamente en unos minutos.', 'info'],
+                default => ['Factura no autorizada: ' . $this->resumenMensajes($result['mensajes']), 'warning'],
+            };
+            $this->dispatch('notify', message: $msg, type: $tipo);
         } catch (\Exception $e) {
             Log::error('Error autorizando en SRI factura ' . $this->factura->id . ': ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
@@ -139,6 +156,11 @@ class VerFactura extends Component
         } finally {
             $this->autorizando = false;
         }
+    }
+
+    private function resumenMensajes(array $mensajes): string
+    {
+        return collect($mensajes)->map(fn ($m) => trim("{$m['mensaje']} {$m['informacionAdicional']}"))->implode(' | ') ?: 'sin detalle';
     }
 
     public function render()

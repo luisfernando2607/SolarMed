@@ -146,7 +146,7 @@ class GestionUsuarios extends Component
     private function verificarP12(): void
     {
         $contenido = file_get_contents($this->p12_file->getRealPath());
-        if (!openssl_pkcs12_read($contenido, $certs, (string) $this->p12_password)) {
+        if (!SriSignService::leerP12($contenido, (string) $this->p12_password)) {
             throw ValidationException::withMessages([
                 'p12_password' => 'No se pudo abrir el certificado: la contraseña es incorrecta o el archivo no es válido.',
             ]);

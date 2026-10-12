@@ -116,9 +116,16 @@ Route::get('facturas/{factura}', VerFactura::class)
 Route::get('facturas/pdf/{factura}', function (App\Models\Factura $factura) {
     $factura->load('paciente', 'medico', 'items');
     return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.factura', ['factura' => $factura])
-        ->setPaper([0, 0, 226, 400], 'portrait')
+        ->setPaper([0, 0, 226, $factura->clave_acceso ? 470 : 400], 'portrait')
         ->stream("factura_{$factura->numero_factura}.pdf");
 })->middleware(['auth', 'can:facturas.ver'])->name('facturas.pdf');
+
+// XML autorizado por el SRI (para entregar al cliente)
+Route::get('facturas/xml/{factura}', function (App\Models\Factura $factura) {
+    abort_unless($factura->estado_sri === 'autorizado' && $factura->xml_autorizado_path, 404);
+    return Illuminate\Support\Facades\Storage::disk('private')
+        ->download($factura->xml_autorizado_path, "factura_{$factura->numero_factura}.xml", ['Content-Type' => 'application/xml']);
+})->middleware(['auth', 'can:facturas.ver'])->name('facturas.xml');
 
 // Tarifario (solo admin)
 Route::get('tarifario', GestionTarifario::class)

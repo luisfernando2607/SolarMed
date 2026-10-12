@@ -87,6 +87,18 @@
         <p style="font-size:9px;"><strong>Obs:</strong> {{ $factura->observaciones }}</p>
     @endif
 
+    @if ($factura->clave_acceso && in_array($factura->estado_sri, ['enviado', 'autorizado'], true))
+        <div class="line"></div>
+        <div style="font-size:8px;">
+            <p><strong>{{ $factura->estado_sri === 'autorizado' ? 'AUTORIZACIÓN SRI' : 'CLAVE DE ACCESO (en proceso de autorización)' }}</strong></p>
+            <p style="word-break:break-all; font-family:monospace;">{{ $factura->numero_autorizacion ?: $factura->clave_acceso }}</p>
+            @if ($factura->fecha_autorizacion)
+                <p>Fecha autorización: {{ $factura->fecha_autorizacion->format('d/m/Y H:i:s') }}</p>
+            @endif
+            <p>Ambiente: {{ $factura->ambiente_sri === '2' ? 'PRODUCCIÓN' : 'PRUEBAS' }} · Emisión: NORMAL</p>
+        </div>
+    @endif
+
     <div class="double-line"></div>
 
     <div class="footer">
