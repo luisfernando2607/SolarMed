@@ -26,6 +26,8 @@ class RolesSeeder extends Seeder {
             'configuracion.ver', 'configuracion.editar',
             // Usuarios
             'usuarios.ver', 'usuarios.gestionar',
+            // Auditoría (también se crean en la migración add_permisos_auditoria)
+            'auditoria.ver', 'auditoria.gestionar',
         ];
 
         foreach ($permisos as $p) {
@@ -50,5 +52,8 @@ class RolesSeeder extends Seeder {
 
         $enfermeria = Role::firstOrCreate(['name' => 'enfermeria']);
         $enfermeria->syncPermissions(['turnos.ver', 'pacientes.ver']);
+
+        $auditor = Role::firstOrCreate(['name' => 'auditor']);
+        $auditor->syncPermissions(['auditoria.ver', 'auditoria.gestionar', 'pacientes.ver', 'expediente.ver', 'ecografias.ver']);
     }
 }

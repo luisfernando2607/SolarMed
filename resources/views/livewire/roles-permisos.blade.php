@@ -1,5 +1,5 @@
 @php
-    $nombresRol = ['admin' => 'Administrador', 'medico' => 'Médico', 'secretaria' => 'Secretaría', 'enfermeria' => 'Enfermería'];
+    $nombresRol = ['admin' => 'Administrador', 'medico' => 'Médico', 'secretaria' => 'Secretaría', 'enfermeria' => 'Enfermería', 'auditor' => 'Auditor'];
 @endphp
 <div>
 <div class="max-w-6xl mx-auto py-8 px-4">

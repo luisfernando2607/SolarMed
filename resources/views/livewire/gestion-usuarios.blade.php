@@ -34,6 +34,7 @@
                 'medico' => 'bg-blue-50 text-blue-700',
                 'secretaria' => 'bg-amber-50 text-amber-700',
                 'enfermeria' => 'bg-emerald-50 text-emerald-700',
+                'auditor' => 'bg-slate-100 text-slate-700',
             ];
         @endphp
 

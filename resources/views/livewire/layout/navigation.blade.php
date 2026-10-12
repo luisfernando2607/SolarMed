@@ -33,6 +33,9 @@ new class extends Component
                 ['Facturas', 'facturas', 'facturas*', 'facturas.ver', 'facturas'],
                 ['Reportes', 'reportes.ventas', 'reportes*', 'reportes.ver', 'reportes'],
             ]],
+            ['Auditoría', [
+                ['Registro de accesos', 'auditoria', 'auditoria*', 'auditoria.ver', 'auditoria'],
+            ]],
             ['Administración', [
                 ['Usuarios', 'usuarios', 'usuarios*', 'usuarios.ver', 'usuarios'],
                 ['Roles y permisos', 'roles', 'roles*', 'configuracion.editar', 'roles'],
@@ -40,7 +43,6 @@ new class extends Component
                 ['Tarifario', 'tarifario', 'tarifario*', 'configuracion.editar', 'tarifario'],
                 ['SRI', 'sri.config', 'sri.*', 'configuracion.editar', 'sri'],
                 ['Configuración', 'configuracion', 'configuracion*', 'configuracion.editar', 'configuracion'],
-                ['Auditoría', 'auditoria', 'auditoria*', 'configuracion.editar', 'auditoria'],
             ]],
         ]];
     }
