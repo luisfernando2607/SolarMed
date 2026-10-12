@@ -17,6 +17,7 @@
              x-data="{ menuAbierto: false, colapsado: $persist(false).as('sidebar-colapsado') }"
              x-on:livewire:navigated.window="menuAbierto = false">
             <livewire:layout.navigation />
+            <livewire:busqueda-global />
 
             {{-- Avisos de toda la app: $this->dispatch('notify', message: …, type: success|error|warning|info)
                  o session()->flash('notify', [...]) antes de redirigir --}}

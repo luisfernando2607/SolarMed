@@ -35,13 +35,13 @@
                             @endphp
                             <tr class="hover:bg-gray-50/70 transition">
                                 <td class="px-5 py-3">
-                                    <button wire:click="seleccionar({{ $p->id }})" class="flex items-center gap-3 text-left group">
+                                    <a href="{{ route('pacientes.ver', $p) }}" wire:navigate class="flex items-center gap-3 text-left group">
                                         <span class="flex items-center justify-center w-9 h-9 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold shrink-0">{{ $ini }}</span>
                                         <span class="min-w-0">
                                             <span class="block font-medium text-gray-900 group-hover:text-blue-700 truncate">{{ $p->nombre_completo }}</span>
                                             <span class="block text-xs text-gray-500 font-mono">{{ $p->cedula }}</span>
                                         </span>
-                                    </button>
+                                    </a>
                                 </td>
                                 <td class="px-5 py-3 text-gray-600 hidden md:table-cell">{{ $p->telefono ?: '—' }}</td>
                                 <td class="px-5 py-3">
@@ -51,9 +51,9 @@
                                 <td class="px-5 py-3 text-gray-500 hidden lg:table-cell">{{ $p->created_at->format('d/m/Y') }}</td>
                                 <td class="px-5 py-3">
                                     <div class="flex items-center justify-end gap-1">
-                                        <button wire:click="seleccionar({{ $p->id }})" class="p-2 rounded-lg text-gray-400 hover:text-blue-700 hover:bg-blue-50 transition" title="Ver ficha" aria-label="Ver ficha">
+                                        <a href="{{ route('pacientes.ver', $p) }}" wire:navigate class="p-2 rounded-lg text-gray-400 hover:text-blue-700 hover:bg-blue-50 transition" title="Ver ficha" aria-label="Ver ficha">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                        </button>
+                                        </a>
                                         @can('pacientes.editar')
                                             <button wire:click="editar({{ $p->id }})" class="p-2 rounded-lg text-gray-400 hover:text-gray-800 hover:bg-gray-100 transition" title="Editar" aria-label="Editar">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
@@ -94,10 +94,10 @@
             @endif
         </div>
 
-        {{-- Modal detalle / edición --}}
-        @if ($selected)
+        {{-- Modal de edición (la ficha completa está en pacientes.ver) --}}
+        @if ($selected && $editMode)
             <div class="fixed inset-0 bg-black/40 z-50 flex items-start justify-center p-4 pt-12 overflow-y-auto"
-                 wire:click.self="cerrarDetalle">
+                 wire:click.self="cancelarEdicion">
                 <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full {{ $editMode ? 'max-w-3xl' : '' }}">
 
                     @if ($editMode)
@@ -354,173 +354,6 @@
                             </form>
                         </div>
 
-                    @else
-                        {{-- ====== VISTA DE DETALLE (tabs) ====== --}}
-                        <div class="p-6">
-                            {{-- Header --}}
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-medium text-sm flex-shrink-0">
-                                        {{ strtoupper(substr($selected->nombres, 0, 1)) }}{{ strtoupper(substr($selected->apellidos, 0, 1)) }}
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-gray-900 text-base leading-tight">{{ $selected->nombre_completo }}</p>
-                                        <div class="flex items-center gap-2 mt-1">
-                                            @if ($selected->sexo === 'femenino')
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-pink-50 text-pink-700">Femenino</span>
-                                            @else
-                                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">Masculino</span>
-                                            @endif
-                                            <span class="text-xs text-gray-400">{{ $selected->cedula }}</span>
-                                            @if ($selected->edad)
-                                                <span class="text-xs text-gray-400">· {{ $selected->edad }} años</span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                                <button wire:click="cerrarDetalle" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-                            </div>
-
-                            {{-- Tabs --}}
-                            <div x-data="{ tab: 'datos' }">
-                                <div class="flex border-b border-gray-100 mb-4">
-                                    <button @click="tab = 'datos'"
-                                        :class="tab === 'datos' ? 'border-blue-600 text-blue-600 font-medium' : 'border-transparent text-gray-400 hover:text-gray-600'"
-                                        class="px-4 py-3 text-sm border-b-2 -mb-px transition">Datos personales</button>
-                                    <button @click="tab = 'clinico'"
-                                        :class="tab === 'clinico' ? 'border-blue-600 text-blue-600 font-medium' : 'border-transparent text-gray-400 hover:text-gray-600'"
-                                        class="px-4 py-3 text-sm border-b-2 -mb-px transition">Clínico</button>
-                                    <button @click="tab = 'consultas'"
-                                        :class="tab === 'consultas' ? 'border-blue-600 text-blue-600 font-medium' : 'border-transparent text-gray-400 hover:text-gray-600'"
-                                        class="px-4 py-3 text-sm border-b-2 -mb-px transition flex items-center gap-1.5">
-                                        Fichas médicas
-                                        @if (count($consultas) > 0)
-                                            <span class="px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 text-xs">{{ count($consultas) }}</span>
-                                        @endif
-                                    </button>
-                                </div>
-
-                                <div class="max-h-[420px] overflow-y-auto">
-                                    {{-- TAB: DATOS PERSONALES --}}
-                                    <div x-show="tab === 'datos'">
-                                        <p class="text-xs font-medium uppercase tracking-wider text-gray-400 mb-3 pb-2 border-b border-gray-100">Contacto</p>
-                                        <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
-                                            <div><p class="text-xs text-gray-400">Teléfono</p><p class="text-gray-800">{{ $selected->telefono ?? '--' }}</p></div>
-                                            <div><p class="text-xs text-gray-400">Teléfono alternativo</p><p class="text-gray-800">{{ $selected->telefono_secundario ?? '--' }}</p></div>
-                                            <div><p class="text-xs text-gray-400">Email</p><p class="text-gray-800">{{ $selected->email ?? '--' }}</p></div>
-                                            <div><p class="text-xs text-gray-400">Ciudad</p><p class="text-gray-800">{{ $selected->ciudad ?? '--' }}</p></div>
-                                            <div class="col-span-2"><p class="text-xs text-gray-400">Dirección</p><p class="text-gray-800">{{ $selected->direccion ?? '--' }}</p></div>
-                                            <div><p class="text-xs text-gray-400">Ocupación</p><p class="text-gray-800">{{ $selected->ocupacion ?? '--' }}</p></div>
-                                            <div><p class="text-xs text-gray-400">Referido por</p><p class="text-gray-800">{{ $selected->referido_por ?? '--' }}</p></div>
-                                        </div>
-                                        @if ($selected->sexo === 'femenino')
-                                        <p class="text-xs font-medium uppercase tracking-wider text-gray-400 mt-5 mb-3 pb-2 border-b border-gray-100">Gineco-obstétrico</p>
-                                        <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
-                                            <div><p class="text-xs text-gray-400">FUM</p><p class="text-gray-800">{{ $selected->fum ? \Carbon\Carbon::parse($selected->fum)->format('d/m/Y') : '--' }}</p></div>
-                                            <div><p class="text-xs text-gray-400">Método anticonceptivo</p><p class="text-gray-800">{{ $selected->metodo_anticonceptivo ?? '--' }}</p></div>
-                                            <div><p class="text-xs text-gray-400">Gestas</p><p class="text-gray-800">{{ $selected->gestas ?? '--' }}</p></div>
-                                            <div><p class="text-xs text-gray-400">Partos</p><p class="text-gray-800">{{ $selected->partos ?? '--' }}</p></div>
-                                            <div><p class="text-xs text-gray-400">Cesáreas</p><p class="text-gray-800">{{ $selected->cesareas ?? '--' }}</p></div>
-                                            <div><p class="text-xs text-gray-400">Abortos</p><p class="text-gray-800">{{ $selected->abortos ?? '--' }}</p></div>
-                                        </div>
-                                        @endif
-                                    </div>
-
-                                    {{-- TAB: CLÍNICO --}}
-                                    <div x-show="tab === 'clinico'">
-                                        <p class="text-xs font-medium uppercase tracking-wider text-gray-400 mb-3">Signos y medidas</p>
-                                        <div class="grid grid-cols-3 gap-3 mb-4">
-                                            <div class="bg-gray-50 rounded-lg p-3 text-center">
-                                                <p class="text-lg font-semibold text-gray-800">{{ $selected->grupo_sanguineo ?? '--' }}</p>
-                                                <p class="text-xs text-gray-400 mt-0.5">Grupo sanguíneo</p>
-                                            </div>
-                                            <div class="bg-gray-50 rounded-lg p-3 text-center">
-                                                <p class="text-lg font-semibold text-gray-800">{{ $selected->peso ? $selected->peso.' kg' : '--' }}</p>
-                                                <p class="text-xs text-gray-400 mt-0.5">Peso</p>
-                                            </div>
-                                            <div class="bg-gray-50 rounded-lg p-3 text-center">
-                                                <p class="text-lg font-semibold text-gray-800">{{ $selected->altura ? $selected->altura.' m' : '--' }}</p>
-                                                <p class="text-xs text-gray-400 mt-0.5">Altura</p>
-                                            </div>
-                                        </div>
-                                        <p class="text-xs font-medium uppercase tracking-wider text-gray-400 mb-3 pb-2 border-b border-gray-100">Antecedentes</p>
-                                        <div class="space-y-3 text-sm">
-                                            <div><p class="text-xs text-gray-400">Medicamentos actuales</p><p class="text-gray-800">{{ $selected->medicamentos ?? 'Ninguno' }}</p></div>
-                                            <div><p class="text-xs text-gray-400">Cirugías previas</p><p class="text-gray-800">{{ $selected->cirugias ?? 'Ninguna' }}</p></div>
-                                            <div><p class="text-xs text-gray-400">Alergias</p><p class="text-gray-800 {{ $selected->alergias ? 'text-red-600' : '' }}">{{ $selected->alergias ?? 'Ninguna' }}</p></div>
-                                            <div><p class="text-xs text-gray-400">Antecedentes personales</p><p class="text-gray-800">{{ $selected->antecedentes ?? 'Ninguno' }}</p></div>
-                                            <div><p class="text-xs text-gray-400">Antecedentes familiares</p><p class="text-gray-800">{{ $selected->enfermedades_familiares ?? 'Ninguno' }}</p></div>
-                                        </div>
-                                    </div>
-
-                                    {{-- TAB: FICHAS MÉDICAS --}}
-                                    <div x-show="tab === 'consultas'">
-                                        @if (count($consultas) > 0)
-                                            <div class="divide-y divide-gray-100 mt-2">
-                                                @foreach ($consultas as $consulta)
-                                                <div class="flex items-start gap-4 py-3">
-                                                    <div class="text-xs text-gray-400 min-w-[64px] pt-0.5 leading-relaxed">
-                                                        {{ $consulta->fecha->format('d/m/Y') }}<br>
-                                                        {{ $consulta->fecha->format('H:i') }}
-                                                    </div>
-                                                    <div class="flex-1 min-w-0">
-                                                        <p class="text-sm font-medium text-gray-800">{{ $consulta->motivo_consulta }}</p>
-                                                        <p class="text-xs text-gray-500 mt-0.5">{{ $consulta->diagnostico }} · {{ $consulta->medico?->nombre_completo ?? '--' }}</p>
-                                                        @if ($consulta->codigo_cie10)
-                                                            <span class="inline-block mt-1 px-2 py-0.5 rounded-full bg-gray-100 text-xs text-gray-500 border border-gray-200">CIE-10: {{ $consulta->codigo_cie10 }}</span>
-                                                        @endif
-                                                    </div>
-                                                    @can('update', $consulta)
-                                                    <a href="{{ route('consultas.editar', $consulta->id) }}" wire:navigate
-                                                       class="shrink-0 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition">Editar</a>
-                                                    @endcan
-                                                </div>
-                                                @endforeach
-                                            </div>
-                                        @else
-                                            <p class="text-sm text-gray-400 text-center py-8">Sin fichas médicas registradas</p>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Botones de acción --}}
-                            <div class="mt-6 pt-4 border-t flex flex-wrap gap-3">
-                                @can('expediente.crear')
-                                    <a href="{{ route('pedidos.crear', $selected->id) }}" wire:navigate
-                                       class="px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition">
-                                        Pedido de exámenes
-                                    </a>
-                                @endcan
-                                @can('expediente.crear')
-                                    <a href="{{ route('certificados.crear', $selected->id) }}" wire:navigate
-                                       class="px-4 py-2 bg-sky-600 text-white text-sm font-medium rounded-lg hover:bg-sky-700 transition">
-                                        Certificado
-                                    </a>
-                                @endcan
-                                @can('expediente.ver')
-                                    <a href="{{ route('pacientes.archivos', $selected->id) }}" wire:navigate
-                                       class="px-4 py-2 bg-slate-600 text-white text-sm font-medium rounded-lg hover:bg-slate-700 transition">
-                                        Archivos
-                                    </a>
-                                @endcan
-                                @if ($selected->sexo === 'femenino')
-                                    @can('expediente.ver')
-                                        <a href="{{ route('prenatal', $selected->id) }}" wire:navigate
-                                           class="px-4 py-2 bg-pink-600 text-white text-sm font-medium rounded-lg hover:bg-pink-700 transition">
-                                            Control prenatal
-                                        </a>
-                                    @endcan
-                                @endif
-                                <a href="{{ route('pacientes.pdf', $selected->id) }}"
-                                   class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    Descargar historial PDF
-                                </a>
-                            </div>
-                        </div>
                     @endif
 
                 </div>
