@@ -16,7 +16,7 @@
 
         {{-- Tabla --}}
         <div class="bg-white rounded-2xl border border-gray-200/80 overflow-hidden">
-            <div class="overflow-x-auto">
+            <div class="relative overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="text-xs text-gray-500 border-b border-gray-100">
                         <tr>

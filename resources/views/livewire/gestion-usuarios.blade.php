@@ -1,166 +1,148 @@
 <div>
     <div class="max-w-7xl mx-auto py-8 px-4">
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold text-gray-900">Usuarios</h1>
-            <span class="text-sm text-gray-500">{{ $usuarios->total() }} registros</span>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-3 mb-6">
-            <input wire:model.live.debounce.300ms="busqueda" type="text"
-                class="w-full max-w-md rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                placeholder="Buscar por nombre o email...">
+        {{-- Encabezado --}}
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Usuarios</h1>
+                <p class="text-sm text-gray-500 mt-1">{{ number_format($usuarios->total()) }} {{ $usuarios->total() === 1 ? 'cuenta con acceso' : 'cuentas con acceso' }} al sistema</p>
+            </div>
             @can('usuarios.gestionar')
-                <button wire:click="crear"
-                    class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
-                    + Nuevo usuario
+                <button wire:click="crear" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-sm transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                    Nuevo usuario
                 </button>
             @endcan
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-            <div class="overflow-x-auto">
+        <div class="mb-4">
+            <div class="relative sm:max-w-md">
+                <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                <input wire:model.live.debounce.300ms="busqueda" type="search"
+                    class="w-full pl-10 rounded-xl border-gray-200 bg-white shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Buscar por nombre o email…">
+            </div>
+        </div>
+
+        @php
+            $flecha = function (string $campo) use ($sortBy, $sortDirection) {
+                return $sortBy === $campo
+                    ? '<svg class="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="' . ($sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7') . '"/></svg>'
+                    : '<svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>';
+            };
+            $tonosRol = [
+                'admin' => 'bg-violet-50 text-violet-700',
+                'medico' => 'bg-blue-50 text-blue-700',
+                'secretaria' => 'bg-amber-50 text-amber-700',
+                'enfermeria' => 'bg-emerald-50 text-emerald-700',
+            ];
+        @endphp
+
+        <div class="bg-white rounded-2xl border border-gray-200/80 overflow-hidden">
+            <div class="relative overflow-x-auto">
                 <table class="w-full text-sm">
-                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                    <thead class="text-xs text-gray-500 border-b border-gray-100">
                         <tr>
-                            <th class="text-left px-4 py-3">#</th>
-                            <th class="text-left px-4 py-3">
-                                <button wire:click="ordenarPor('name')" class="flex items-center gap-1 hover:text-gray-700">
-                                    Nombre
-                                    @if ($sortBy === 'name')
-                                        <svg class="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"/></svg>
-                                    @else
-                                        <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
-                                    @endif
-                                </button>
-                            </th>
-                            <th class="text-left px-4 py-3">
-                                <button wire:click="ordenarPor('email')" class="flex items-center gap-1 hover:text-gray-700">
-                                    Email
-                                    @if ($sortBy === 'email')
-                                        <svg class="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"/></svg>
-                                    @else
-                                        <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
-                                    @endif
-                                </button>
-                            </th>
-                            <th class="text-left px-4 py-3">
-                                <button wire:click="ordenarPor('cedula')" class="flex items-center gap-1 hover:text-gray-700">
-                                    Cédula
-                                    @if ($sortBy === 'cedula')
-                                        <svg class="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"/></svg>
-                                    @else
-                                        <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
-                                    @endif
-                                </button>
-                            </th>
-                            <th class="text-left px-4 py-3">Rol</th>
-                            <th class="text-left px-4 py-3">Certificado</th>
-                            <th class="text-left px-4 py-3">
-                                <button wire:click="ordenarPor('created_at')" class="flex items-center gap-1 hover:text-gray-700">
-                                    Registro
-                                    @if ($sortBy === 'created_at')
-                                        <svg class="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"/></svg>
-                                    @else
-                                        <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
-                                    @endif
-                                </button>
-                            </th>
-                            <th class="text-center px-4 py-3">
-                                <svg class="w-4 h-4 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" title="Acciones">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
-                                </svg>
-                            </th>
+                            <th class="text-left font-medium px-5 py-3"><button wire:click="ordenarPor('name')" class="inline-flex items-center gap-1 hover:text-gray-800">Usuario {!! $flecha('name') !!}</button></th>
+                            <th class="text-left font-medium px-5 py-3 hidden md:table-cell"><button wire:click="ordenarPor('cedula')" class="inline-flex items-center gap-1 hover:text-gray-800">Cédula {!! $flecha('cedula') !!}</button></th>
+                            <th class="text-left font-medium px-5 py-3">Rol</th>
+                            <th class="text-left font-medium px-5 py-3 hidden lg:table-cell">Facturación</th>
+                            <th class="text-left font-medium px-5 py-3 hidden sm:table-cell"><button wire:click="ordenarPor('created_at')" class="inline-flex items-center gap-1 hover:text-gray-800">Alta {!! $flecha('created_at') !!}</button></th>
+                            <th class="px-5 py-3"><span class="sr-only">Acciones</span></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse ($usuarios as $u)
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="px-4 py-3 text-gray-400">{{ $u->id }}</td>
-                                <td class="px-4 py-3 font-medium">{{ $u->name }}</td>
-                                <td class="px-4 py-3 text-gray-500">{{ $u->email }}</td>
-                                <td class="px-4 py-3 text-gray-500 font-mono text-xs">{{ $u->cedula ?? '--' }}</td>
-                                <td class="px-4 py-3">
-                                    <span class="inline-block px-2 py-0.5 text-xs font-medium rounded-full
-                                        @switch($u->roles->first()?->name)
-                                            @case('admin') bg-purple-100 text-purple-700 @break
-                                            @case('medico') bg-blue-100 text-blue-700 @break
-                                            @case('secretaria') bg-amber-100 text-amber-700 @break
-                                            @case('enfermeria') bg-green-100 text-green-700 @break
-                                            @default bg-gray-100 text-gray-600
-                                        @endswitch">
-                                        {{ $u->roles->first()?->name ?? 'Sin rol' }}
-                                    </span>
-                                </td>
-                                <td class="px-4 py-3 text-center">
-                                    @if ($u->medico && $u->medico->p12_path)
-                                        <span class="inline-flex items-center gap-0.5 text-xs text-green-600">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                            .p12
+                            @php
+                                $partes = preg_split('/\s+/', trim((string) $u->name)) ?: [];
+                                $ini = mb_strtoupper(mb_substr($partes[0] ?? '', 0, 1) . mb_substr($partes[1] ?? '', 0, 1));
+                                $rolNombre = $u->roles->first()?->name;
+                            @endphp
+                            <tr class="hover:bg-gray-50/70 transition">
+                                <td class="px-5 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <span class="flex items-center justify-center w-9 h-9 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold shrink-0">{{ $ini ?: '?' }}</span>
+                                        <span class="min-w-0">
+                                            <span class="block font-medium text-gray-900 truncate max-w-[150px] sm:max-w-[220px]">
+                                                {{ $u->name }}
+                                                @if ($u->id === auth()->id())<span class="ml-1 text-xs font-normal text-gray-400">(usted)</span>@endif
+                                            </span>
+                                            <span class="block text-xs text-gray-500 truncate max-w-[150px] sm:max-w-[220px]">{{ $u->email }}</span>
                                         </span>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-3 hidden md:table-cell text-gray-600 font-mono text-[13px]">{{ $u->cedula ?? '—' }}</td>
+                                <td class="px-5 py-3">
+                                    <span class="px-2 py-0.5 rounded-full text-xs font-medium capitalize {{ $tonosRol[$rolNombre] ?? 'bg-gray-100 text-gray-600' }}">{{ $rolNombre ?? 'Sin rol' }}</span>
+                                </td>
+                                <td class="px-5 py-3 hidden lg:table-cell">
+                                    @if ($u->medico)
+                                        <div class="flex flex-wrap gap-1">
+                                            <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $u->medico->ruc ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700' }}">{{ $u->medico->ruc ? 'RUC' : 'Sin RUC' }}</span>
+                                            <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $u->medico->p12_path ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700' }}">{{ $u->medico->p12_path ? 'Firma .p12' : 'Sin .p12' }}</span>
+                                        </div>
                                     @else
-                                        <span class="text-xs text-gray-400">--</span>
+                                        <span class="text-xs text-gray-400">No aplica</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 text-gray-500 whitespace-nowrap">{{ $u->created_at->format('d/m/Y') }}</td>
-                                <td class="px-4 py-3 text-center">
+                                <td class="px-5 py-3 hidden sm:table-cell text-gray-500 whitespace-nowrap">{{ $u->created_at->format('d/m/Y') }}</td>
+                                <td class="px-5 py-3 text-right whitespace-nowrap">
                                     @can('usuarios.gestionar')
-                                        <div class="flex items-center justify-center gap-1.5">
-                                            <button wire:click="editar({{ $u->id }})"
-                                                class="p-1.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-lg transition"
-                                                title="Editar">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                                </svg>
+                                        <button wire:click="editar({{ $u->id }})"
+                                            class="inline-flex p-2 rounded-lg text-gray-400 hover:text-blue-700 hover:bg-blue-50 transition"
+                                            title="Editar" aria-label="Editar usuario">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
+                                        </button>
+                                        @if ($u->id !== auth()->id())
+                                            <button x-data
+                                                x-on:click="Swal.fire({
+                                                    icon: 'warning',
+                                                    title: '¿Eliminar usuario?',
+                                                    text: {{ \Illuminate\Support\Js::from($u->name . '. Esta acción no se puede deshacer.') }},
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: '#dc2626',
+                                                    cancelButtonColor: '#6b7280',
+                                                    confirmButtonText: 'Sí, eliminar',
+                                                    cancelButtonText: 'Cancelar'
+                                                }).then((result) => { if (result.isConfirmed) $wire.eliminar({{ $u->id }}) })"
+                                                class="inline-flex p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition"
+                                                title="Eliminar" aria-label="Eliminar usuario">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
                                             </button>
-                                            @if ($u->id !== auth()->id())
-                                                <button x-data
-                                                    x-on:click="Swal.fire({
-                                                        icon: 'warning',
-                                                        title: '¿Eliminar usuario?',
-                                                        text: {{ \Illuminate\Support\Js::from($u->name . '. Esta acción no se puede deshacer.') }},
-                                                        showCancelButton: true,
-                                                        confirmButtonColor: '#dc2626',
-                                                        cancelButtonColor: '#6b7280',
-                                                        confirmButtonText: 'Sí, eliminar',
-                                                        cancelButtonText: 'Cancelar'
-                                                    }).then((result) => { if (result.isConfirmed) $wire.eliminar({{ $u->id }}) })"
-                                                    class="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition"
-                                                    title="Eliminar">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                                    </svg>
-                                                </button>
-                                            @endif
-                                        </div>
+                                        @endif
                                     @endcan
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="8" class="px-4 py-8 text-center text-gray-400">No se encontraron usuarios</td></tr>
+                            <tr>
+                                <td colspan="6" class="px-5 py-14 text-center">
+                                    <p class="text-sm font-medium text-gray-700">{{ $busqueda ? 'No hay usuarios para esta búsqueda' : 'Aún no hay usuarios' }}</p>
+                                    <p class="text-xs text-gray-400 mt-1">{{ $busqueda ? 'Pruebe con otro nombre o email.' : 'Cree el primero desde "Nuevo usuario".' }}</p>
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
             @if ($usuarios->hasPages())
-                <div class="p-4 border-t">{{ $usuarios->links() }}</div>
+                <div class="p-4 border-t border-gray-100">{{ $usuarios->links() }}</div>
             @endif
         </div>
 
         {{-- Modal crear / editar --}}
         @if ($editMode || $editId === 0)
-            <div class="fixed inset-0 bg-black/40 z-50 flex items-start justify-center p-4 pt-12 overflow-y-auto"
+            <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 flex items-start justify-center p-4 pt-12 overflow-y-auto"
                  wire:click.self="resetForm">
-                <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6">
+                <div class="bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 max-w-lg w-full p-6">
                     <div class="flex justify-between items-start mb-6">
                         <h2 class="text-xl font-bold text-gray-900">{{ $editMode ? 'Editar usuario' : 'Nuevo usuario' }}</h2>
-                        <button wire:click="resetForm" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                        <button wire:click="resetForm" class="p-1.5 -m-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition" aria-label="Cerrar"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
                     </div>
 
                     <form wire:submit="guardar" class="space-y-4">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Nombre *</label>
                             <input wire:model="name" type="text"
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
                                 placeholder="Nombre completo">
                             @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -168,7 +150,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Email *</label>
                             <input wire:model="email" type="email"
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
                                 placeholder="correo@ejemplo.com">
                             @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -176,7 +158,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Cédula / RUC</label>
                             <input wire:model="cedula" type="text" maxlength="13"
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
                                 placeholder="Cédula o RUC">
                             @error('cedula') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -184,7 +166,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Contraseña {{ $editMode ? '(dejar vacío para mantener)' : '*' }}</label>
                             <input wire:model="password" type="password"
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
                                 placeholder="{{ $editMode ? 'Nueva contraseña' : 'Contraseña' }}">
                             @error('password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -192,14 +174,14 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Confirmar contraseña {{ $editMode ? '(dejar vacío para mantener)' : '*' }}</label>
                             <input wire:model="password_confirmation" type="password"
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
                                 placeholder="Repetir contraseña">
                         </div>
 
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Rol *</label>
                             <select wire:model.live="rol"
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                                 <option value="">Seleccione un rol...</option>
                                 @foreach ($roles as $r)
                                     <option value="{{ $r->name }}">{{ ucfirst($r->name) }}</option>
@@ -223,13 +205,13 @@
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Contraseña del certificado</label>
                                 <input wire:model="p12_password" type="password" autocomplete="new-password"
-                                    class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm py-2">
+                                    class="w-full rounded-xl border-gray-200 focus:border-blue-500 focus:ring-blue-500 text-sm py-2">
                                 @error('p12_password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                         @endif
 
                         @if ($rol === 'medico')
-                            <div class="border-t pt-4 space-y-4">
+                            <div class="border-t border-gray-100 pt-4 space-y-4">
                                 <div>
                                     <h4 class="text-sm font-semibold text-gray-700">Datos tributarios (facturación electrónica)</h4>
                                     <p class="text-xs text-gray-400">Las facturas de este médico se emiten con su RUC. Si lo deja vacío se usan los datos de SRI &gt; Configuración.</p>
@@ -237,38 +219,38 @@
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">RUC</label>
                                     <input wire:model="ruc" type="text" maxlength="13" placeholder="0912345678001"
-                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                                     @error('ruc') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">Razón social</label>
                                     <input wire:model="razon_social" type="text" placeholder="Como consta en el RUC"
-                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                                     @error('razon_social') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">Nombre comercial (opcional)</label>
                                     <input wire:model="nombre_comercial" type="text" 
-                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                                     @error('nombre_comercial') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">Dirección matriz</label>
                                     <input wire:model="direccion_matriz" type="text" 
-                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                                     @error('direccion_matriz') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                 </div>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-xs font-medium text-gray-600 mb-1">Obligado a llevar contabilidad</label>
-                                        <select wire:model="obligado_contabilidad" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        <select wire:model="obligado_contabilidad" class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                                             <option value="NO">NO</option>
                                             <option value="SI">SI</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium text-gray-600 mb-1">Régimen RIMPE</label>
-                                        <select wire:model="regimen_rimpe" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        <select wire:model="regimen_rimpe" class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                                             <option value="">No aplica</option>
                                             @foreach (\App\Models\Medico::REGIMENES_RIMPE as $regimen)
                                                 <option value="{{ $regimen }}">{{ $regimen }}</option>
@@ -281,26 +263,26 @@
                                     <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">Establecimiento</label>
                                     <input wire:model="sri_establecimiento" type="text" maxlength="3"
-                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                                     @error('sri_establecimiento') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                 </div>
                                     <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">Punto de emisión</label>
                                     <input wire:model="sri_pto_emi" type="text" maxlength="3"
-                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                                     @error('sri_pto_emi') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                 </div>
                                 </div>
                             </div>
                         @endif
 
-                        <div class="flex justify-end gap-3 pt-4 border-t">
+                        <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
                             <button type="button" wire:click="resetForm"
-                                class="px-5 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition text-sm">
+                                class="px-5 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition text-sm">
                                 Cancelar
                             </button>
                             <button type="submit"
-                                class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition shadow-sm text-sm">
+                                class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition shadow-sm text-sm">
                                 {{ $editMode ? 'Guardar cambios' : 'Crear usuario' }}
                             </button>
                         </div>

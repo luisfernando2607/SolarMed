@@ -1,82 +1,99 @@
 <div>
     <div class="max-w-7xl mx-auto py-8 px-4">
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold text-gray-900">Expedientes Clínicos</h1>
-            <span class="text-sm text-gray-500">{{ $consultas->total() }} registros</span>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-3 mb-6">
-            <input wire:model.live.debounce.300ms="busqueda" type="text"
-                class="w-full max-w-md rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                placeholder="Buscar por paciente (nombre, cédula)...">
-            <a href="{{ route('pacientes') }}" wire:navigate
-               class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
-                + Nueva consulta
+        {{-- Encabezado --}}
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Expedientes clínicos</h1>
+                <p class="text-sm text-gray-500 mt-1">{{ number_format($consultas->total()) }} {{ $consultas->total() === 1 ? 'consulta registrada' : 'consultas registradas' }}</p>
+            </div>
+            <a href="{{ route('pacientes') }}" wire:navigate class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-sm transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                Nueva consulta
             </a>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-            <div class="overflow-x-auto">
+        <div class="mb-4">
+            <div class="relative sm:max-w-md">
+                <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                <input wire:model.live.debounce.300ms="busqueda" type="search"
+                    class="w-full pl-10 rounded-xl border-gray-200 bg-white shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Buscar por paciente (nombre o cédula)…">
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-200/80 overflow-hidden">
+            <div class="relative overflow-x-auto">
                 <table class="w-full text-sm">
-                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                    <thead class="text-xs text-gray-500 border-b border-gray-100">
                         <tr>
-                            <th class="text-left px-4 py-3">#</th>
-                            <th class="text-left px-4 py-3">Paciente</th>
-                            <th class="text-left px-4 py-3">Cédula</th>
-                            <th class="text-left px-4 py-3">Médico</th>
-                            <th class="text-left px-4 py-3">Tipo</th>
-                            <th class="text-left px-4 py-3">Motivo</th>
-                            <th class="text-left px-4 py-3">Diagnóstico</th>
-                            <th class="text-left px-4 py-3">
-                                <button wire:click="ordenarPor('fecha')" class="flex items-center gap-1 hover:text-gray-700">
+                            <th class="text-left font-medium px-5 py-3">Paciente</th>
+                            <th class="text-left font-medium px-5 py-3 hidden md:table-cell">Médico</th>
+                            <th class="text-left font-medium px-5 py-3">Motivo y diagnóstico</th>
+                            <th class="text-left font-medium px-5 py-3">
+                                <button wire:click="ordenarPor('fecha')" class="inline-flex items-center gap-1 hover:text-gray-800">
                                     Fecha
                                     @if ($sortBy === 'fecha')
-                                        <svg class="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"/></svg>
+                                        <svg class="w-3 h-3 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $sortDirection === 'asc' ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"/></svg>
                                     @else
-                                        <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
+                                        <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/></svg>
                                     @endif
                                 </button>
                             </th>
-                            <th class="text-center px-4 py-3">
-                                <svg class="w-4 h-4 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" title="Acciones">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
-                                </svg>
-                            </th>
+                            <th class="px-5 py-3"><span class="sr-only">Acciones</span></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse ($consultas as $c)
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="px-4 py-3 text-gray-400">{{ $c->id }}</td>
-                                <td class="px-4 py-3 font-medium">{{ $c->paciente?->nombre_completo ?? '--' }}</td>
-                                <td class="px-4 py-3 text-gray-500">{{ $c->paciente?->cedula ?? '--' }}</td>
-                                <td class="px-4 py-3">{{ $c->medico?->nombre_completo ?? '--' }}</td>
-                                <td class="px-4 py-3 capitalize">{{ $c->tipo_consulta }}</td>
-                                <td class="px-4 py-3 max-w-xs truncate">{{ $c->motivo_consulta }}</td>
-                                <td class="px-4 py-3 max-w-xs truncate">{{ $c->diagnostico }}</td>
-                                <td class="px-4 py-3 text-gray-500 whitespace-nowrap">{{ $c->fecha->format('d/m/Y H:i') }}</td>
-                                <td class="px-4 py-3 text-center">
-                                    <div class="flex items-center justify-center gap-1.5">
-                                        @can('update', $c)
-                                        <a href="{{ route('consultas.editar', $c->id) }}" wire:navigate
-                                           class="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition"
-                                           title="Editar consulta">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                            </svg>
-                                        </a>
-                                        @endcan
+                            @php
+                                $ini = mb_strtoupper(mb_substr((string) $c->paciente?->nombres, 0, 1) . mb_substr((string) $c->paciente?->apellidos, 0, 1));
+                            @endphp
+                            <tr class="hover:bg-gray-50/70 transition">
+                                <td class="px-5 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <span class="flex items-center justify-center w-9 h-9 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold shrink-0">{{ $ini ?: '—' }}</span>
+                                        <span class="min-w-0">
+                                            <span class="block font-medium text-gray-900 truncate max-w-[200px]">{{ $c->paciente?->nombre_completo ?? '—' }}</span>
+                                            <span class="block text-xs text-gray-500 font-mono">{{ $c->paciente?->cedula ?? '—' }}</span>
+                                        </span>
                                     </div>
+                                </td>
+                                <td class="px-5 py-3 hidden md:table-cell">
+                                    <span class="block text-gray-700">{{ $c->medico?->nombre_completo ?? '—' }}</span>
+                                    @if ($c->tipo_consulta)
+                                        <span class="inline-block mt-0.5 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 capitalize">{{ $c->tipo_consulta }}</span>
+                                    @endif
+                                </td>
+                                <td class="px-5 py-3 max-w-xs">
+                                    <span class="block text-gray-900 truncate">{{ $c->motivo_consulta ?: '—' }}</span>
+                                    <span class="block text-xs text-gray-500 truncate">{{ $c->diagnostico ?: 'Sin diagnóstico' }}</span>
+                                </td>
+                                <td class="px-5 py-3 whitespace-nowrap">
+                                    <span class="block text-gray-900">{{ $c->fecha->format('d/m/Y') }}</span>
+                                    <span class="block text-xs text-gray-400">{{ $c->fecha->format('H:i') }}</span>
+                                </td>
+                                <td class="px-5 py-3 text-right">
+                                    @can('update', $c)
+                                        <a href="{{ route('consultas.editar', $c->id) }}" wire:navigate
+                                           class="inline-flex p-2 rounded-lg text-gray-400 hover:text-blue-700 hover:bg-blue-50 transition"
+                                           title="Editar consulta" aria-label="Editar consulta">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
+                                        </a>
+                                    @endcan
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="9" class="px-4 py-8 text-center text-gray-400">No se encontraron expedientes clínicos</td></tr>
+                            <tr>
+                                <td colspan="5" class="px-5 py-14 text-center">
+                                    <p class="text-sm font-medium text-gray-700">{{ $busqueda ? 'No hay expedientes para esta búsqueda' : 'Aún no hay consultas registradas' }}</p>
+                                    <p class="text-xs text-gray-400 mt-1">{{ $busqueda ? 'Pruebe con otro nombre o cédula.' : 'Las consultas aparecen aquí al atender a un paciente.' }}</p>
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
             @if ($consultas->hasPages())
-                <div class="p-4 border-t">{{ $consultas->links() }}</div>
+                <div class="p-4 border-t border-gray-100">{{ $consultas->links() }}</div>
             @endif
         </div>
     </div>
