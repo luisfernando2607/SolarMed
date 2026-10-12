@@ -525,8 +525,10 @@
                                                             <span class="inline-block mt-1 px-2 py-0.5 rounded-full bg-gray-100 text-xs text-gray-500 border border-gray-200">CIE-10: {{ $consulta->codigo_cie10 }}</span>
                                                         @endif
                                                     </div>
+                                                    @can('update', $consulta)
                                                     <a href="{{ route('consultas.editar', $consulta->id) }}" wire:navigate
                                                        class="shrink-0 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition">Editar</a>
+                                                    @endcan
                                                 </div>
                                                 @endforeach
                                             </div>

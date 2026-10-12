@@ -81,6 +81,11 @@ php artisan test
 Cubren permisos por rol, turnos, facturación, formulario de consulta y facturación electrónica SRI
 (XML, firma XAdES-BES y web services simulados). Usan SQLite en memoria; no tocan la base `solarmed`.
 
+## Historia clínica
+
+Una consulta solo la puede corregir el médico que la registró. Cada corrección exige un motivo y guarda la
+versión anterior, visible en el *Historial de correcciones* de la consulta.
+
 ## Usuarios y permisos
 
 No hay registro público: los usuarios los crea un administrador en **Usuarios**. Cada ruta exige un
@@ -107,6 +112,9 @@ Cada médico factura con **su propio RUC** y su propia numeración (`001-001-000
 3. **Facturación > Nueva factura**: elegir el médico emisor (se sugiere el que atendió al paciente).
 4. En la factura: **Generar XML → Firmar → Enviar al SRI → Consultar autorización**.
    Si el SRI devuelve el comprobante, sus mensajes se muestran en la factura y se puede regenerar.
+
+5. **Anular una factura autorizada**: en la factura, *Emitir nota de crédito* con el motivo. La nota de
+   crédito electrónica (codDoc 04) se genera, firma y envía al SRI; al ser autorizada, la factura queda anulada.
 
 > El certificado `.p12` de cada médico debe corresponder a su RUC; de lo contrario el SRI rechaza el
 > comprobante. Probar siempre primero en ambiente de pruebas.

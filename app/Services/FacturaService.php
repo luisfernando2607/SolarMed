@@ -68,7 +68,8 @@ class FacturaService {
                     $factura->items()->create($linea);
                 }
 
-                return $factura;
+                // Recarga para tener los valores por defecto de la base (estado, estado_sri)
+                return $factura->refresh();
             });
         });
     }

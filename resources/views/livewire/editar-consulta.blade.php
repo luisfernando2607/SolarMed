@@ -15,8 +15,10 @@
         @endphp
         @if ($volver && str_contains($volver, $rutaPacientes))
             <a href="{{ route('pacientes') }}" wire:navigate class="text-sm text-blue-600 hover:text-blue-800">&larr; Volver a Pacientes</a>
-        @else
+        @elseif ($consulta->turno_id)
             <a href="{{ route('turno.atender', $consulta->turno_id) }}" wire:navigate class="text-sm text-blue-600 hover:text-blue-800">&larr; Volver a la atención</a>
+        @else
+            <a href="{{ route('expedientes') }}" wire:navigate class="text-sm text-blue-600 hover:text-blue-800">&larr; Volver a Expedientes</a>
         @endif
         <h1 class="text-2xl font-bold text-gray-900 mt-1">Editar consulta — {{ $paciente?->nombre_completo ?? '--' }}</h1>
         <p class="text-sm text-gray-500">{{ $consulta->especialidad?->nombre ?? '--' }} &middot; {{ $consulta->fecha->format('d/m/Y H:i') }}</p>
@@ -167,6 +169,16 @@
             @endif
         </div>
 
+        {{-- Motivo de la corrección (queda en el historial de la consulta) --}}
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Motivo de la corrección *</label>
+            <input wire:model="motivo_cambio" type="text" maxlength="500"
+                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="Ej.: se agregan resultados de laboratorio, se corrige dosis">
+            <p class="text-xs text-gray-500 mt-1">La versión anterior se conserva en el historial de la consulta.</p>
+            @error('motivo_cambio') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+        </div>
+
         {{-- Botones --}}
         <div class="flex justify-end gap-3">
             @php
@@ -178,7 +190,7 @@
                     Cancelar
                 </a>
             @else
-                <a href="{{ route('turno.atender', $consulta->turno_id) }}" wire:navigate
+                <a href="{{ $consulta->turno_id ? route('turno.atender', $consulta->turno_id) : route('expedientes') }}" wire:navigate
                    class="px-5 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition">
                     Cancelar
                 </a>
@@ -189,5 +201,29 @@
             </button>
         </div>
     </form>
+
+    @if ($versiones->isNotEmpty())
+        <div class="bg-white rounded-xl shadow-sm border p-6 mt-6">
+            <h3 class="font-semibold text-gray-700 mb-3">Historial de correcciones ({{ $versiones->count() }})</h3>
+            <div class="space-y-3">
+                @foreach ($versiones as $v)
+                    <details class="border rounded-lg p-3 text-sm">
+                        <summary class="cursor-pointer">
+                            <span class="font-medium text-gray-800">{{ $v->created_at->format('d/m/Y H:i') }}</span>
+                            &middot; {{ $v->user?->name ?? '--' }}
+                            &middot; <span class="text-gray-600">{{ $v->motivo }}</span>
+                        </summary>
+                        <dl class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            @foreach (['motivo_consulta' => 'Motivo', 'diagnostico' => 'Diagnóstico', 'codigo_cie10' => 'CIE-10', 'tratamiento' => 'Tratamiento', 'indicaciones' => 'Indicaciones', 'anamnesis' => 'Anamnesis'] as $campo => $etiqueta)
+                                @if (!empty($v->datos_anteriores[$campo]))
+                                    <div><dt class="text-gray-400">{{ $etiqueta }} (antes)</dt><dd class="text-gray-800 whitespace-pre-line">{{ $v->datos_anteriores[$campo] }}</dd></div>
+                                @endif
+                            @endforeach
+                        </dl>
+                    </details>
+                @endforeach
+            </div>
+        </div>
+    @endif
 </div>
 </div>
