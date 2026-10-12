@@ -23,6 +23,29 @@ use Barryvdh\DomPDF\Facade\Pdf;
 // Landing público — formulario de turno para pacientes
 Route::view('/', 'welcome')->name('turno.form');
 
+// Portada pública de la clínica: especialidades, médicos, horario, contacto y verificación de certificados
+Route::get('home', function () {
+    $ajustes = app(App\Services\AjustesService::class);
+    $nombresDias = [1 => 'lunes', 2 => 'martes', 3 => 'miércoles', 4 => 'jueves', 5 => 'viernes', 6 => 'sábado', 0 => 'domingo'];
+    $dias = collect($nombresDias)->only($ajustes->get('agenda.dias_laborables'))->values();
+    $consecutivos = $dias->count() > 2 && $dias->count() === count($ajustes->get('agenda.dias_laborables'))
+        && array_values(array_intersect(array_keys($nombresDias), $ajustes->get('agenda.dias_laborables'))) === range(1, $dias->count());
+
+    return view('home', [
+        'especialidades' => App\Models\Especialidad::where('activo', true)
+            ->with(['medicos' => fn ($q) => $q->where('activo', true)->orderBy('apellidos')])
+            ->orderBy('nombre')->get(),
+        'diasTexto' => ucfirst($consecutivos ? "{$dias->first()} a {$dias->last()}" : $dias->implode(', ')),
+        'horario' => $ajustes->get('agenda.hora_inicio') . ' – ' . $ajustes->get('agenda.hora_fin'),
+    ]);
+})->name('home');
+
+// Formulario de la portada: lleva a la página de verificación del código ingresado
+Route::get('verificar', function (Illuminate\Http\Request $request) {
+    $codigo = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', (string) $request->query('codigo')));
+    return $codigo ? redirect()->route('certificados.verificar', $codigo) : redirect()->route('home');
+})->middleware('throttle:30,1')->name('certificados.buscar');
+
 // Dashboard protegido
 Route::get('dashboard', function () {
     if (request()->user()->can('configuracion.editar')) {
