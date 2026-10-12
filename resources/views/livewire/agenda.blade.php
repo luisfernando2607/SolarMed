@@ -193,6 +193,8 @@
         eventResize: (info) => $wire.mover(Number(info.event.id), info.event.startStr, info.event.endStr).then(ok => { if (!ok) info.revert(); }),
     });
     calendario.render();
+    // Ajusta el calendario cuando cambia el ancho disponible (p. ej. al contraer la barra lateral)
+    new ResizeObserver(() => calendario.updateSize()).observe(document.getElementById('calendario-citas'));
     $wire.on('agenda-actualizada', () => calendario.refetchEvents());
 </script>
 @endscript
