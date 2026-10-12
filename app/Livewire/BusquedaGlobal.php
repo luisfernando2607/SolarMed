@@ -30,6 +30,7 @@ class BusquedaGlobal extends Component
         ['Tarifario', 'tarifario', 'configuracion.editar', 'precios servicios'],
         ['SRI', 'sri.config', 'configuracion.editar', 'firma electronica ruc certificado'],
         ['Configuración', 'configuracion', 'configuracion.editar', 'ajustes marca logo clinica'],
+        ['Roles y permisos', 'roles', 'configuracion.editar', 'accesos perfiles'],
         ['Auditoría', 'auditoria', 'configuracion.editar', 'registro accesos'],
         ['Mi perfil', 'profile', null, 'contraseña clave dos factores 2fa'],
     ];
