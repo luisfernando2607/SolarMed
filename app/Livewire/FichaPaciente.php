@@ -64,6 +64,7 @@ class FichaPaciente extends Component
 
         return view('livewire.ficha-paciente', [
             'clinico' => $clinico,
+            'ultimaAtencion' => $p->ultimaAtencion(),
             'turnoActivo' => $p->turnos()->whereIn('estado', ['esperando', 'en_atencion'])->whereDate('fecha', today())->latest()->first(),
             'proximaCita' => Cita::with('medico')->where('paciente_id', $p->id)->where('fecha_hora', '>=', now())
                 ->whereNotIn('estado', ['cancelada', 'completada'])->orderBy('fecha_hora')->first(),

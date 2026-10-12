@@ -5,6 +5,8 @@ namespace App\Livewire;
 use App\Models\Cita;
 use App\Models\Embarazo;
 use App\Models\Factura;
+use App\Models\IncidenteSeguridad;
+use App\Models\SolicitudInformacion;
 use App\Models\Medico;
 use App\Models\Turno;
 use App\Services\PrenatalService;
@@ -105,9 +107,27 @@ class PanelPendientes extends Component
         return ['activos' => $activos->count(), 'atencion' => $atencion];
     }
 
+    /** Plazos legales: copias de HC (48 h), derechos LOPDP (15 días) y notificación de incidentes (5 días) */
+    private function cumplimiento(): ?array
+    {
+        if (!Auth::user()->can('auditoria.ver')) {
+            return null;
+        }
+
+        $pendientes = SolicitudInformacion::pendientes();
+        $datos = [
+            'solicitudes' => (clone $pendientes)->count(),
+            'vencidas' => (clone $pendientes)->where('fecha_limite', '<', now())->count(),
+            'incidentes' => IncidenteSeguridad::where('requiere_notificacion', true)->whereNull('notificado_autoridad_at')->count(),
+        ];
+
+        return array_sum($datos) ? $datos : null;
+    }
+
     public function render()
     {
         return view('livewire.panel-pendientes', [
+            'cumplimiento' => $this->cumplimiento(),
             'hoy' => $this->hoy(),
             'sri' => $this->sri(),
             'facturacion' => $this->facturacionPorMedico(),

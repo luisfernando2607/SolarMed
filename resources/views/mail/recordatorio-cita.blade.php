@@ -1,7 +1,7 @@
 <x-mail::message>
 # Recordatorio de cita
 
-Estimado(a) **{{ $cita->paciente?->nombre_completo }}**:
+Estimado(a) **{{ $cita->paciente?->identidad_reservada ? 'paciente' : $cita->paciente?->nombre_completo }}**:
 
 Le recordamos su cita de **{{ mb_strtolower($cita->tipo) }}**:
 

@@ -66,7 +66,7 @@
                     </div>
                     <div class="w-1 self-stretch rounded-full" style="background: {{ $c->especialidad?->color_agenda ?? $marca->color() }}"></div>
                     <div class="min-w-0 flex-1">
-                        <p class="text-sm font-medium text-gray-900 truncate">{{ $c->paciente?->nombre_completo }}</p>
+                        <p class="text-sm font-medium text-gray-900 truncate">{{ $c->paciente?->nombre_visible }}</p>
                         <p class="text-xs text-gray-500 truncate">{{ $c->tipo }}@unless ($medico) · {{ $c->medico?->nombre_completo }}@endunless</p>
                     </div>
                     @if (in_array($c->estado, ['pendiente', 'confirmada'], true) && $c->fecha_hora->isFuture() && ($wa = app(\App\Services\WhatsappService::class)->enlaceRecordatorio($c)))
@@ -95,7 +95,7 @@
                 <div class="flex items-center gap-3 py-2.5 border-t first:border-t-0">
                     <span class="flex items-center justify-center w-12 h-9 rounded-lg text-sm font-bold text-white shrink-0" style="background: {{ $t->especialidad?->color_agenda ?? $marca->color() }}">{{ $t->prefijo }}{{ $t->numero_turno }}</span>
                     <div class="min-w-0 flex-1">
-                        <p class="text-sm font-medium text-gray-900 truncate">{{ $t->paciente?->nombre_completo ?? $t->nombre_temporal }}</p>
+                        <p class="text-sm font-medium text-gray-900 truncate">{{ $t->paciente?->nombre_visible ?? $t->nombre_temporal }}</p>
                         <p class="text-xs text-gray-500 truncate">{{ $t->motivo }}</p>
                     </div>
                     <span class="text-xs text-gray-400 shrink-0" title="Hora de llegada">{{ $t->hora_registro ? \Carbon\Carbon::parse($t->hora_registro)->diffForHumans(null, true) : '' }}</span>

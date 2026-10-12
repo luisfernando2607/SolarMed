@@ -269,6 +269,13 @@
                                                     <textarea wire:model="enfermedades_familiares" rows="2" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm py-2"></textarea>
                                                 </div>
                                             </div>
+                                            <label class="flex items-start gap-3 mt-4 p-3 rounded-xl border border-gray-200 bg-gray-50/70 cursor-pointer">
+                                                <input type="checkbox" wire:model="identidad_reservada" class="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                                <span class="text-sm">
+                                                    <span class="block font-medium text-gray-800">Identidad reservada</span>
+                                                    <span class="block text-xs text-gray-500 mt-0.5">Para pacientes con VIH, tuberculosis activa, cáncer u otras enfermedades raras o catastróficas (AM 5216-A, Art. 13). En documentos, sala de espera, agenda y recordatorios se muestra la cédula en lugar del nombre.</span>
+                                                </span>
+                                            </label>
                                         </div>
                                     </div>
 

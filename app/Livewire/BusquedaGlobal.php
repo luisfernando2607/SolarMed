@@ -32,6 +32,8 @@ class BusquedaGlobal extends Component
         ['Configuración', 'configuracion', 'configuracion.editar', 'ajustes marca logo clinica'],
         ['Roles y permisos', 'roles', 'configuracion.editar', 'accesos perfiles'],
         ['Registro de accesos', 'auditoria', 'auditoria.ver', 'auditoria trazabilidad bitacora'],
+        ['Solicitudes de información', 'auditoria.solicitudes', 'auditoria.ver', 'copia historia clinica lopdp derechos acceso rectificacion'],
+        ['Incidentes de seguridad', 'auditoria.incidentes', 'auditoria.ver', 'vulneracion filtracion datos lopdp'],
         ['Mi perfil', 'profile', null, 'contraseña clave dos factores 2fa'],
     ];
 

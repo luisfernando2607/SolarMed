@@ -19,6 +19,7 @@
     </style>
 </head>
 <body>
+    @include('pdf.partials.confidencial')
     <div class="header">
         <img src="{{ $marca->logoRuta() }}" alt="{{ $marca->nombre() }}" style="height: 50px; margin-bottom: 6px;">
         <h1>INFORME DE ECOGRAFÍA</h1>
@@ -28,7 +29,7 @@
     <div class="section">
         <h2>Datos del paciente</h2>
         <table>
-            <tr><td class="label">Paciente:</td><td class="value">{{ $eco->paciente->nombre_completo }}</td></tr>
+            <tr><td class="label">Paciente:</td><td class="value">{{ $eco->paciente->nombre_visible }}</td></tr>
             <tr><td class="label">Cédula:</td><td class="value">{{ $eco->paciente->cedula }}</td></tr>
             <tr><td class="label">Edad:</td><td class="value">{{ $eco->paciente->edad }} años</td></tr>
             <tr><td class="label">Médico:</td><td class="value">{{ $eco->medico?->nombre_completo ?? '--' }}</td></tr>

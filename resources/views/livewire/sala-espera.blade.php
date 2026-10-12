@@ -8,7 +8,7 @@
                 'cancelado' => ['Cancelado', 'bg-red-50 text-red-700', 'bg-red-500'],
             ];
             $iniciales = function ($turno) {
-                $nombre = trim((string) ($turno->paciente?->nombre_completo ?? $turno->nombre_temporal));
+                $nombre = trim((string) ($turno->paciente?->nombre_visible ?? $turno->nombre_temporal));
                 $partes = preg_split('/\s+/', $nombre) ?: [];
                 return mb_strtoupper(mb_substr($partes[0] ?? '', 0, 1) . mb_substr($partes[1] ?? '', 0, 1)) ?: '?';
             };
@@ -91,7 +91,7 @@
                                     <div class="flex items-center gap-3 mt-2">
                                         <span class="flex items-center justify-center min-w-[3rem] h-10 px-2 rounded-xl bg-white border border-amber-200 font-bold text-gray-900 tabular-nums">{{ $t->codigo }}</span>
                                         <div class="min-w-0">
-                                            <p class="font-medium text-gray-900 truncate">{{ $t->paciente?->nombre_completo ?? $t->nombre_temporal }}</p>
+                                            <p class="font-medium text-gray-900 truncate">{{ $t->paciente?->nombre_visible ?? $t->nombre_temporal }}</p>
                                             <p class="text-xs text-gray-500 truncate">
                                                 <span class="font-mono">{{ $t->cedula }}</span> · {{ $t->motivo }} · {{ $t->hora_registro->format('H:i') }}
                                                 @if ($tel = $t->paciente?->telefono ?? $t->telefono) · {{ $tel }} @endif
@@ -127,7 +127,7 @@
                                         <li wire:key="espera-{{ $turno->id }}" class="flex items-center gap-3 px-3 py-2 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50/70 transition">
                                             <span class="text-sm font-semibold text-gray-900 tabular-nums min-w-[2.75rem]">{{ $turno->codigo }}</span>
                                             <button wire:click="verDetalle({{ $turno->id }})" class="flex-1 min-w-0 text-left group">
-                                                <span class="block text-sm font-medium text-gray-900 group-hover:text-blue-700 truncate">{{ $turno->paciente?->nombre_completo ?? $turno->nombre_temporal }}</span>
+                                                <span class="block text-sm font-medium text-gray-900 group-hover:text-blue-700 truncate">{{ $turno->paciente?->nombre_visible ?? $turno->nombre_temporal }}</span>
                                                 <span class="block text-xs text-gray-500 truncate"><span class="font-mono">{{ $turno->cedula }}</span> · {{ $turno->motivo }}</span>
                                             </button>
                                             <span class="text-xs text-gray-400 whitespace-nowrap hidden sm:inline" title="Tiempo de espera">{{ $turno->hora_registro->diffForHumans(null, true, true, 1) }}</span>
@@ -138,7 +138,7 @@
                                                         x-on:click="Swal.fire({
                                                             icon: 'warning',
                                                             title: '¿Cancelar turno?',
-                                                            text: {{ \Illuminate\Support\Js::from(($turno->codigo . ' · ' . ($turno->paciente?->nombre_completo ?? $turno->nombre_temporal))) }},
+                                                            text: {{ \Illuminate\Support\Js::from(($turno->codigo . ' · ' . ($turno->paciente?->nombre_visible ?? $turno->nombre_temporal))) }},
                                                             showCancelButton: true,
                                                             confirmButtonColor: '#dc2626',
                                                             cancelButtonColor: '#6b7280',
@@ -201,7 +201,7 @@
                                                     <div class="flex items-center gap-3">
                                                         <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold shrink-0">{{ $iniciales($turno) }}</span>
                                                         <span class="min-w-0">
-                                                            <span class="block font-medium text-gray-900 truncate max-w-[200px]">{{ $turno->paciente?->nombre_completo ?? $turno->nombre_temporal }}</span>
+                                                            <span class="block font-medium text-gray-900 truncate max-w-[200px]">{{ $turno->paciente?->nombre_visible ?? $turno->nombre_temporal }}</span>
                                                             <span class="block text-xs text-gray-500 font-mono">{{ $turno->cedula }}</span>
                                                         </span>
                                                     </div>
@@ -248,7 +248,7 @@
                     <div>
                         <h3 class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-3">Turno</h3>
                         <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-                            <div><dt class="text-xs text-gray-500">Paciente</dt><dd class="font-medium text-gray-900">{{ $detalle->paciente?->nombre_completo ?? $detalle->nombre_temporal }}</dd></div>
+                            <div><dt class="text-xs text-gray-500">Paciente</dt><dd class="font-medium text-gray-900">{{ $detalle->paciente?->nombre_visible ?? $detalle->nombre_temporal }}</dd></div>
                             <div><dt class="text-xs text-gray-500">Cédula</dt><dd class="font-medium text-gray-900 font-mono">{{ $detalle->cedula }}</dd></div>
                             <div><dt class="text-xs text-gray-500">Teléfono</dt><dd class="font-medium text-gray-900">{{ $detalle->paciente?->telefono ?? $detalle->telefono ?: '—' }}</dd></div>
                             <div><dt class="text-xs text-gray-500">Motivo</dt><dd class="font-medium text-gray-900">{{ $detalle->motivo }}</dd></div>
