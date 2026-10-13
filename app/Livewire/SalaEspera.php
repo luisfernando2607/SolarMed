@@ -79,13 +79,13 @@ class SalaEspera extends Component
                 'en_atencion' => Turno::where('especialidad_id', $esp->id)
                     ->where('fecha', $fechaCarbon)
                     ->where('estado', 'en_atencion')
-                    ->with('paciente')
+                    ->with('paciente', 'preparacion')
                     ->first(),
                 'esperando' => Turno::where('especialidad_id', $esp->id)
                     ->where('fecha', $fechaCarbon)
                     ->where('estado', 'esperando')
                     ->orderBy('numero_turno')
-                    ->with('paciente')
+                    ->with('paciente', 'preparacion')
                     ->get(),
             ];
 

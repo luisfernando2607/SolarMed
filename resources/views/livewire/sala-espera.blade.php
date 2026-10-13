@@ -131,6 +131,7 @@
                                                 <span class="block text-xs text-gray-500 truncate"><span class="font-mono">{{ $turno->cedula }}</span> · {{ $turno->motivo }}</span>
                                             </button>
                                             <span class="text-xs text-gray-400 whitespace-nowrap hidden sm:inline" title="Tiempo de espera">{{ $turno->hora_registro->diffForHumans(null, true, true, 1) }}</span>
+                                            @include('livewire.partials.boton-preparacion', ['turno' => $turno])
                                             @can('turnos.gestionar')
                                                 <div class="flex items-center gap-1 shrink-0">
                                                     <button wire:click="llamar({{ $turno->id }})" class="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition">Llamar</button>

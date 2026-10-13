@@ -28,6 +28,8 @@ class RolesSeeder extends Seeder {
             'usuarios.ver', 'usuarios.gestionar',
             // Auditoría (también se crean en la migración add_permisos_auditoria)
             'auditoria.ver', 'auditoria.gestionar',
+            // Preparación de enfermería (también en la migración create_preparaciones)
+            'preparacion.registrar',
         ];
 
         foreach ($permisos as $p) {
@@ -41,7 +43,7 @@ class RolesSeeder extends Seeder {
         $medico->syncPermissions([
             'turnos.ver', 'pacientes.ver', 'pacientes.crear', 'pacientes.editar', 'pacientes.eliminar',
             'expediente.ver', 'expediente.crear', 'ecografias.ver', 'ecografias.crear',
-            'facturas.ver', 'facturas.crear',
+            'facturas.ver', 'facturas.crear', 'preparacion.registrar',
         ]);
 
         $secretaria = Role::firstOrCreate(['name' => 'secretaria']);
@@ -51,7 +53,7 @@ class RolesSeeder extends Seeder {
         ]);
 
         $enfermeria = Role::firstOrCreate(['name' => 'enfermeria']);
-        $enfermeria->syncPermissions(['turnos.ver', 'pacientes.ver']);
+        $enfermeria->syncPermissions(['turnos.ver', 'pacientes.ver', 'preparacion.registrar']);
 
         $auditor = Role::firstOrCreate(['name' => 'auditor']);
         $auditor->syncPermissions(['auditoria.ver', 'auditoria.gestionar', 'pacientes.ver', 'expediente.ver', 'ecografias.ver']);

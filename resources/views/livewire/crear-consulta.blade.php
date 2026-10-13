@@ -10,6 +10,8 @@
         <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-6">{{ session('error') }}</div>
     @endif
 
+    @include('livewire.partials.resumen-preparacion', ['preparacion' => $turno->preparacion])
+
     <form wire:submit="guardar" class="space-y-6">
         {{-- Tipo de consulta --}}
         <div class="bg-white rounded-xl shadow-sm border p-6">

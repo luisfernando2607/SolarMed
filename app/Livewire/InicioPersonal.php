@@ -50,6 +50,10 @@ class InicioPersonal extends Component
             $kpis[] = ['titulo' => 'Turnos de hoy', 'valor' => (clone $turnosHoy)->count(), 'detalle' => (clone $turnosHoy)->where('estado', 'completado')->count() . ' completados', 'ruta' => 'sala-espera'];
             $kpis[] = ['titulo' => 'En sala de espera', 'valor' => $esperando->count(), 'detalle' => (clone $turnosHoy)->where('estado', 'en_atencion')->count() . ' en atención', 'ruta' => 'sala-espera'];
             $kpis[] = ['titulo' => 'Citas de hoy', 'valor' => $citasHoy->whereIn('estado', ['pendiente', 'confirmada'])->count(), 'detalle' => $citasHoy->where('estado', 'pendiente')->count() . ' sin confirmar', 'ruta' => 'agenda'];
+            if ($user->can('preparacion.registrar')) {
+                $sinSignos = Turno::whereDate('fecha', today())->where('estado', 'esperando')->whereNotNull('paciente_id')->doesntHave('preparacion')->count();
+                $kpis[] = ['titulo' => 'Por tomar signos', 'valor' => $sinSignos, 'detalle' => 'Pacientes en espera sin preparación', 'ruta' => 'sala-espera'];
+            }
             if ($user->can('facturas.ver')) {
                 $facturasHoy = Factura::whereDate('fecha', today())->where('estado', '!=', 'anulada');
                 $kpis[] = ['titulo' => 'Cobrado hoy', 'valor' => '$' . number_format((float) (clone $facturasHoy)->sum('total'), 2), 'detalle' => (clone $facturasHoy)->count() . ' facturas', 'ruta' => 'facturas'];

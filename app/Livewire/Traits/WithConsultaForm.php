@@ -120,6 +120,28 @@ trait WithConsultaForm
         $this->examen_fisico_notas = $ef['notas'] ?? null;
     }
 
+    /** Trae los signos que tomó enfermería en la preparación del turno, sin pisar lo que el médico ya escribió */
+    protected function llenarDesdePreparacion(?\App\Models\Preparacion $p): void
+    {
+        if (!$p) {
+            return;
+        }
+        $valores = [
+            'examen_fisico_pa' => $p->presion(),
+            'examen_fisico_fc' => $p->frecuencia_cardiaca,
+            'examen_fisico_fr' => $p->frecuencia_respiratoria,
+            'examen_fisico_temp' => $p->temperatura,
+            'examen_fisico_peso' => $p->peso,
+            'examen_fisico_talla' => $p->talla,
+            'examen_fisico_imc' => $p->imc(),
+        ];
+        foreach ($valores as $campo => $valor) {
+            if (($this->{$campo} === null || $this->{$campo} === '') && $valor !== null) {
+                $this->{$campo} = $valor;
+            }
+        }
+    }
+
     /** Campos clínicos listos para crear o actualizar un ExpedienteConsulta. */
     protected function datosConsulta(): array
     {

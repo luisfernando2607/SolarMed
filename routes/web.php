@@ -86,6 +86,9 @@ Route::get('turnos/crear', \App\Livewire\CrearTurnoRecepcion::class)
 Route::get('atender/{turno}', AtenderTurno::class)
     ->middleware(['auth', 'can:expediente.ver'])
     ->name('turno.atender');
+Route::get('turnos/{turno}/preparacion', \App\Livewire\PreparacionTurno::class)
+    ->middleware(['auth', 'can:preparacion.registrar'])
+    ->name('turnos.preparacion');
 
 // Pacientes
 Route::get('pacientes', ListaPacientes::class)
