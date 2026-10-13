@@ -171,7 +171,7 @@ class ConfiguracionTest extends TestCase
     {
         $this->assertSame('Siguiente &raquo;', __('pagination.next'));
         $this->assertSame('Mostrando', __('Showing'));
-        $this->assertSame('El correo electrónico es obligatorio.',
+        $this->assertSame('El campo correo electrónico es obligatorio.',
             \Illuminate\Support\Facades\Validator::make([], ['email' => 'required'])->errors()->first('email'));
     }
 }
