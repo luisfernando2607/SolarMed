@@ -68,6 +68,7 @@
                 @can('expediente.crear')
                     <a href="{{ route('pedidos.crear', $p) }}" wire:navigate class="{{ $boton }}">Pedido de exámenes</a>
                     <a href="{{ route('certificados.crear', $p) }}" wire:navigate class="{{ $boton }}">Certificado</a>
+                    <a href="{{ route('consentimientos.crear', $p) }}" wire:navigate class="{{ $boton }}" title="Consentimiento informado (formulario 024)">Consentimiento</a>
                 @endcan
                 @if ($clinico)
                     <a href="{{ route('pacientes.pdf', $p) }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-sm transition">
@@ -251,10 +252,13 @@
                                     <p class="text-xs text-gray-400">{{ $d['medico'] }}</p>
                                 @endif
                             </div>
+                            @isset($d['ver'])
+                                <a href="{{ $d['ver'] }}" wire:navigate class="shrink-0 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition">Abrir</a>
+                            @endisset
                             <a href="{{ $d['pdf'] }}" class="shrink-0 px-3 py-1.5 text-xs font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition">PDF</a>
                         </div>
                     @empty
-                        <p class="px-5 py-12 text-center text-sm text-gray-400">Sin recetas, certificados, pedidos ni ecografías.</p>
+                        <p class="px-5 py-12 text-center text-sm text-gray-400">Sin recetas, certificados, pedidos, ecografías ni consentimientos.</p>
                     @endforelse
                 </div>
             @endif

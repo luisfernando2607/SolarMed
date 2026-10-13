@@ -21,6 +21,7 @@ class BusquedaGlobal extends Component
         ['Registrar turno', 'turnos.crear', 'turnos.ver', 'nuevo turno'],
         ['Sala de espera', 'sala-espera', 'turnos.ver', 'turnos cola'],
         ['Pacientes', 'pacientes', 'pacientes.ver', 'lista'],
+        ['Plantillas de consentimiento', 'consentimientos.plantillas', 'expediente.crear', 'consentimiento informado formulario 024 procedimiento'],
         ['Expedientes', 'expedientes', 'expediente.ver', 'consultas historia clinica'],
         ['Facturas', 'facturas', 'facturas.ver', 'facturacion sri'],
         ['Nueva factura', 'facturas.crear', 'facturas.crear', 'cobrar facturar'],
