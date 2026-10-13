@@ -6,6 +6,8 @@ export const test = base.extend({
         const errores = [];
         page.on('pageerror', (e) => errores.push(`JS: ${e.message}`));
         page.on('response', (r) => { if (r.status() >= 500) errores.push(`HTTP ${r.status()} ${r.url()}`); });
+        // Algo bloqueado por la política de seguridad de contenido también es un error
+        page.on('console', (m) => { if (/Content Security Policy|Refused to (load|execute|apply|connect|frame)/i.test(m.text())) errores.push(`CSP: ${m.text()}`); });
         await use(page);
         expect(errores, 'errores de JavaScript o del servidor').toEqual([]);
     },
