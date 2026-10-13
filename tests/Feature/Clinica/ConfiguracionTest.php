@@ -52,7 +52,7 @@ class ConfiguracionTest extends TestCase
             ->set('especialidad_id', (string) $esp->id)
             ->assertSet('motivosDisponibles', ['Control de niño sano' => 'Control de niño sano', 'Vacunación' => 'Vacunación', 'Fiebre' => 'Fiebre']);
 
-        $form->set(['nombres' => 'Luis', 'apellidos' => 'Mora', 'cedula' => '0911111111', 'sexo' => 'masculino', 'telefono' => '0999999999'])
+        $form->set(['nombres' => 'Luis', 'apellidos' => 'Mora', 'cedula' => '0911111111', 'sexo' => 'masculino', 'telefono' => '0999999999', 'acepta_privacidad' => true])
             ->set('motivo', 'Motivo inventado')
             ->call('registrar')
             ->assertHasErrors(['motivo' => 'in'])

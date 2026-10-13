@@ -129,7 +129,7 @@
 
     <footer class="bg-white border-t">
         <div class="max-w-6xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-500">
-            <span>&copy; {{ date('Y') }} {{ $marca->nombre() }}</span>
+            <span>&copy; {{ date('Y') }} {{ $marca->nombre() }} · <a href="{{ route('privacidad') }}" class="hover:text-gray-800 underline">Aviso de privacidad</a></span>
             <span>{{ $marca->contacto() }}</span>
         </div>
     </footer>

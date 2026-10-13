@@ -398,6 +398,15 @@
                     </div>
                 </div>
 
+                {{-- Consentimiento para tratar los datos (LOPDP) --}}
+                <div x-show="paso == 3" class="px-5 pt-2">
+                    <label class="flex items-start gap-3 text-sm text-gray-700">
+                        <input type="checkbox" wire:model="acepta_privacidad" class="mt-0.5 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 shrink-0">
+                        <span>He leído el <a href="{{ route('privacidad') }}" target="_blank" class="font-medium text-blue-700 underline">aviso de privacidad</a> y autorizo el tratamiento de mis datos, incluidos los de salud, para gestionar mi atención.</span>
+                    </label>
+                    @error('acepta_privacidad') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+
                 {{-- ===== Botones de navegación ===== --}}
                 <div class="px-5 pb-6 pt-2 mt-auto flex gap-3">
                     <button

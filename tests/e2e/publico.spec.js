@@ -8,6 +8,10 @@ test('portada pública y agenda en línea', async ({ page }) => {
     await page.goto('/agendar');
     await expect(page.locator('body')).toContainText(/especialidad/i);
     await sinDesbordeLateral(page);
+
+    await page.goto('/privacidad');
+    await expect(page.getByRole('heading', { name: 'Aviso de privacidad' })).toBeVisible();
+    await sinDesbordeLateral(page);
 });
 
 test('login en español y enlaces inválidos', async ({ page }) => {

@@ -20,7 +20,7 @@
             <div class="w-full sm:max-w-md mt-2 px-6 py-6 bg-white shadow-md rounded-lg">
                 {{ $slot }}
             </div>
-            <p class="mt-6 text-xs text-gray-400">&copy; {{ date('Y') }} {{ $marca->nombre() }}@if ($marca->subtitulo()) &mdash; {{ $marca->subtitulo() }}@endif</p>
+            <p class="mt-6 text-xs text-gray-400">&copy; {{ date('Y') }} {{ $marca->nombre() }}@if ($marca->subtitulo()) &mdash; {{ $marca->subtitulo() }}@endif · <a href="{{ route('privacidad') }}" class="underline hover:text-gray-600">Aviso de privacidad</a></p>
         </div>
     </body>
 </html>
