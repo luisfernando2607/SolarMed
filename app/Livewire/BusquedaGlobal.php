@@ -25,6 +25,7 @@ class BusquedaGlobal extends Component
         ['Facturas', 'facturas', 'facturas.ver', 'facturacion sri'],
         ['Nueva factura', 'facturas.crear', 'facturas.crear', 'cobrar facturar'],
         ['Reporte de ventas', 'reportes.ventas', 'reportes.ver', 'reportes ingresos'],
+        ['Producción y morbilidad', 'reportes.morbilidad', 'reportes.ver|auditoria.ver', 'reportes cie10 diagnosticos estadistica atenciones msp'],
         ['Usuarios', 'usuarios', 'usuarios.ver', 'personal cuentas'],
         ['Especialidades', 'especialidades', 'configuracion.editar', 'motivos'],
         ['Tarifario', 'tarifario', 'configuracion.editar', 'precios servicios'],
@@ -80,7 +81,7 @@ class BusquedaGlobal extends Component
 
             $buscado = $this->normalizar($q);
             foreach (self::PANTALLAS as [$texto, $ruta, $permiso, $claves]) {
-                if ((!$permiso || $user->can($permiso)) && str_contains($this->normalizar("{$texto} {$claves}"), $buscado)) {
+                if ((!$permiso || $user->canAny(explode('|', $permiso))) && str_contains($this->normalizar("{$texto} {$claves}"), $buscado)) {
                     $pantallas[] = [$texto, route($ruta)];
                 }
             }
