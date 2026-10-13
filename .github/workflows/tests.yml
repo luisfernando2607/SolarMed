@@ -38,3 +38,45 @@ jobs:
 
       - name: Ejecutar pruebas
         run: php artisan test
+
+  navegador:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_sqlite, gd, bcmath, openssl, dom, mbstring, intl
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Dependencias
+        run: |
+          composer install --no-interaction --prefer-dist --no-progress
+          npm ci
+          npm run build
+
+      - name: Preparar entorno
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Navegador Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Pruebas de navegador (escritorio y celular)
+        run: npm run e2e
+
+      - name: Guardar trazas si fallan
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trazas-playwright
+          path: test-results/
+          retention-days: 7

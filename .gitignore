@@ -31,3 +31,8 @@ auth.json
 
 # Logos subidos desde Configuración
 /public/marca
+
+# Pruebas de navegador
+/database/e2e.sqlite
+/test-results
+/playwright-report
