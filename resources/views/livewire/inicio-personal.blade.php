@@ -39,11 +39,11 @@
 
     <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
         @foreach ($kpis as $k)
-            <a href="{{ route($k['ruta']) }}" wire:navigate class="tarjeta p-5 hover:shadow-sm transition">
+            <{{ $k['ruta'] ? 'a' : 'div' }} @if ($k['ruta']) href="{{ route($k['ruta']) }}" wire:navigate @endif class="tarjeta p-5 {{ $k['ruta'] ? 'hover:shadow-sm transition' : '' }}">
                 <p class="text-sm font-medium text-gray-500">{{ $k['titulo'] }}</p>
                 <p class="mt-2 text-3xl font-semibold tracking-tight text-gray-900">{{ $k['valor'] }}</p>
                 <p class="mt-2 text-xs text-gray-400">{{ $k['detalle'] }}</p>
-            </a>
+            </{{ $k['ruta'] ? 'a' : 'div' }}>
         @endforeach
     </div>
 

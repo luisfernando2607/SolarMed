@@ -151,6 +151,22 @@
         </section>
 
         <section class="bg-white rounded-xl shadow-sm border p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-1">Encuesta de satisfacción</h2>
+            <p class="text-sm text-gray-500 mb-4">Cada consulta genera una encuesta corta para el paciente (Estadística → Satisfacción). Se responde en un dispositivo de la clínica o con el enlace por WhatsApp.</p>
+            <div class="flex flex-wrap items-end gap-6">
+                <label class="flex items-center gap-2 text-sm text-gray-800">
+                    <input type="checkbox" wire:model="encuestaActiva" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    Generar encuesta en cada consulta
+                </label>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">El enlace vence a los (días)</label>
+                    <input wire:model="encuestaDias" type="number" min="1" max="60" class="w-28 rounded-lg border-gray-300 shadow-sm text-sm">
+                    @error('encuestaDias') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm border p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-1">Catálogo de exámenes</h2>
             <p class="text-xs text-gray-500 mb-4">Lista que aparece al emitir un pedido de exámenes (uno por línea). Los pedidos ya emitidos no cambian.</p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

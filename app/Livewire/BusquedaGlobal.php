@@ -27,6 +27,7 @@ class BusquedaGlobal extends Component
         ['Facturas', 'facturas', 'facturas.ver', 'facturacion sri'],
         ['Nueva factura', 'facturas.crear', 'facturas.crear', 'cobrar facturar'],
         ['Reporte de ventas', 'reportes.ventas', 'reportes.ver', 'reportes ingresos'],
+        ['Satisfacción de los pacientes', 'reportes.satisfaccion', 'reportes.ver|auditoria.ver', 'encuesta opinion calidad nps'],
         ['Producción y morbilidad', 'reportes.morbilidad', 'reportes.ver|auditoria.ver', 'reportes cie10 diagnosticos estadistica atenciones msp'],
         ['Usuarios', 'usuarios', 'usuarios.ver', 'personal cuentas'],
         ['Especialidades', 'especialidades', 'configuracion.editar', 'motivos'],

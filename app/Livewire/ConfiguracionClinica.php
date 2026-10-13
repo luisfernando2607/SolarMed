@@ -35,6 +35,10 @@ class ConfiguracionClinica extends Component
     public array $dias = [];
     public string $plantillaWhatsapp = '';
 
+    // Encuesta de satisfacción
+    public bool $encuestaActiva = true;
+    public $encuestaDias;
+
     // Alertas prenatales
     public $pa_sistolica, $pa_diastolica, $pa_severa_sistolica, $pa_severa_diastolica;
     public $fcf_min, $fcf_max, $au_tolerancia_cm, $movimientos_desde_semana, $dias_sin_control, $aviso_fpp_dias;
@@ -65,6 +69,8 @@ class ConfiguracionClinica extends Component
         $this->hora_fin = $a->get('agenda.hora_fin');
         $this->dias = array_map('strval', $a->get('agenda.dias_laborables'));
         $this->plantillaWhatsapp = (string) $a->get('recordatorios.whatsapp_plantilla');
+        $this->encuestaActiva = (bool) $a->get('encuestas.activas');
+        $this->encuestaDias = $a->get('encuestas.dias_validez');
         foreach (self::PRENATAL as $campo) {
             $this->{$campo} = $a->get("prenatal.{$campo}");
         }
@@ -98,6 +104,8 @@ class ConfiguracionClinica extends Component
             'dias' => 'required|array|min:1',
             'dias.*' => 'in:0,1,2,3,4,5,6',
             'plantillaWhatsapp' => 'required|string|max:700',
+            'encuestaActiva' => 'boolean',
+            'encuestaDias' => 'required|integer|between:1,60',
             'pa_sistolica' => 'required|integer|between:100,200',
             'pa_diastolica' => 'required|integer|between:60,130',
             'pa_severa_sistolica' => 'required|integer|between:120,250|gt:pa_sistolica',
@@ -172,6 +180,8 @@ class ConfiguracionClinica extends Component
             'agenda.hora_fin' => $this->hora_fin,
             'agenda.dias_laborables' => array_values(array_map('intval', $this->dias)),
             'recordatorios.whatsapp_plantilla' => trim($this->plantillaWhatsapp),
+            'encuestas.activas' => $this->encuestaActiva,
+            'encuestas.dias_validez' => (int) $this->encuestaDias,
             'tareas.hora_recordatorios' => $this->hora_recordatorios,
             'tareas.hora_respaldo' => $this->hora_respaldo,
         ];

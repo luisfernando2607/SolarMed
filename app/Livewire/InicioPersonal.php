@@ -44,6 +44,11 @@ class InicioPersonal extends Component
             $kpis[] = ['titulo' => 'En sala de espera', 'valor' => $esperando->count(), 'detalle' => $medico->especialidad?->nombre, 'ruta' => 'sala-espera'];
             $kpis[] = ['titulo' => 'Mis consultas del mes', 'valor' => ExpedienteConsulta::where('medico_id', $medico->id)->whereBetween('fecha', [now()->startOfMonth(), now()->endOfMonth()])->count(),
                 'detalle' => ExpedienteConsulta::where('medico_id', $medico->id)->whereDate('fecha', today())->count() . ' hoy', 'ruta' => 'expedientes'];
+            $mias = \App\Models\Encuesta::respondidas()->where('medico_id', $medico->id)->where('respondida_at', '>=', now()->subDays(90))->get();
+            if ($mias->isNotEmpty()) {
+                $kpis[] = ['titulo' => 'Satisfacción de mis pacientes', 'valor' => round($mias->map->promedio()->filter()->avg(), 1) . ' / 5',
+                    'detalle' => $mias->count() . ' ' . ($mias->count() === 1 ? 'respuesta' : 'respuestas') . ' en 90 días', 'ruta' => null];
+            }
             $kpis[] = ['titulo' => 'Embarazos en control', 'valor' => Embarazo::where('estado', 'activo')->where('medico_id', $medico->id)->count(), 'detalle' => 'Activos a mi cargo', 'ruta' => 'pacientes'];
         } else {
             $turnosHoy = Turno::whereDate('fecha', today());
