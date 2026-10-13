@@ -40,6 +40,22 @@
         </div>
     @endif
 
+    @if ($inventario)
+        <a href="{{ route('inventario') }}" wire:navigate
+           class="bg-white border rounded-xl p-4 flex flex-wrap items-center gap-x-6 gap-y-2 hover:bg-gray-50 transition {{ $inventario['vencidos'] ? 'border-red-300' : '' }}">
+            <h3 class="font-semibold text-gray-800 text-sm">Inventario</h3>
+            @if ($inventario['stock_bajo'])
+                <span class="text-sm text-amber-800">{{ $inventario['stock_bajo'] }} {{ $inventario['stock_bajo'] === 1 ? 'producto' : 'productos' }} con stock bajo</span>
+            @endif
+            @if ($inventario['por_vencer'])
+                <span class="text-sm text-amber-800">{{ $inventario['por_vencer'] }} {{ $inventario['por_vencer'] === 1 ? 'lote por vencer' : 'lotes por vencer' }}</span>
+            @endif
+            @if ($inventario['vencidos'])
+                <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">{{ $inventario['vencidos'] }} {{ $inventario['vencidos'] === 1 ? 'lote vencido' : 'lotes vencidos' }} con existencias</span>
+            @endif
+        </a>
+    @endif
+
     @if ($cumplimiento)
         <div class="bg-white border rounded-xl p-4 flex flex-wrap items-center gap-x-6 gap-y-2 {{ $cumplimiento['vencidas'] ? 'border-red-300' : '' }}">
             <h3 class="font-semibold text-gray-800 text-sm">Plazos legales</h3>

@@ -26,6 +26,8 @@ class RolesPermisos extends Component
         'configuracion' => 'Configuración',
         'usuarios' => 'Usuarios',
         'auditoria' => 'Auditoría',
+        'inventario' => 'Inventario',
+        'preparacion' => 'Preparación de enfermería',
     ];
 
     const DESCRIPCIONES = [
@@ -48,6 +50,9 @@ class RolesPermisos extends Component
         'usuarios.ver' => 'Ver usuarios',
         'usuarios.gestionar' => 'Crear y editar usuarios',
         'auditoria.ver' => 'Ver el registro de accesos y los indicadores de auditoría',
+        'inventario.ver' => 'Ver existencias, lotes y kardex',
+        'inventario.gestionar' => 'Registrar entradas, salidas, ajustes y bajas',
+        'preparacion.registrar' => 'Tomar signos vitales antes de la consulta',
         'auditoria.gestionar' => 'Evaluar historias clínicas y registrar planes de acción',
     ];
 

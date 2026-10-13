@@ -136,9 +136,21 @@ class PanelPendientes extends Component
         return array_sum($datos) ? $datos : null;
     }
 
+    /** Existencias por debajo del mínimo, lotes por vencer y vencidos con stock */
+    private function inventario(): ?array
+    {
+        if (!Auth::user()->can('inventario.ver')) {
+            return null;
+        }
+        $a = app(\App\Services\InventarioService::class)->alertas();
+
+        return array_sum($a) ? $a : null;
+    }
+
     public function render()
     {
         return view('livewire.panel-pendientes', [
+            'inventario' => $this->inventario(),
             'cumplimiento' => $this->cumplimiento(),
             'enLinea' => $this->enLinea(),
             'hoy' => $this->hoy(),

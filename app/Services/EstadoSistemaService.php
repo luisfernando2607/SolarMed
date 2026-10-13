@@ -34,8 +34,26 @@ class EstadoSistemaService
             'auditoria' => $this->auditoria(),
             'sri' => $this->sri(),
             'certificados' => $this->certificados(),
+            'inventario' => $this->inventario(),
             'disco' => $this->disco(),
             'configuracion' => $this->configuracion(),
+        ];
+    }
+
+    private function inventario(): array
+    {
+        $a = app(InventarioService::class)->alertas();
+        $partes = array_filter([
+            $a['vencidos'] ? "{$a['vencidos']} " . ($a['vencidos'] === 1 ? 'lote vencido' : 'lotes vencidos') . ' con existencias (dar de baja)' : null,
+            $a['por_vencer'] ? "{$a['por_vencer']} " . ($a['por_vencer'] === 1 ? 'lote vence' : 'lotes vencen') . ' en 60 días o menos' : null,
+            $a['stock_bajo'] ? "{$a['stock_bajo']} " . ($a['stock_bajo'] === 1 ? 'producto' : 'productos') . ' con stock bajo' : null,
+        ]);
+
+        return [
+            'titulo' => 'Inventario',
+            'estado' => $a['vencidos'] ? 'error' : ($partes ? 'aviso' : 'ok'),
+            'detalle' => $partes ? ucfirst(implode('; ', $partes)) . '.' : 'Sin productos vencidos, por vencer ni con stock bajo.',
+            'accion' => route('inventario'),
         ];
     }
 

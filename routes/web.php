@@ -462,4 +462,20 @@ Route::get('reportes/satisfaccion', \App\Livewire\ReporteSatisfaccion::class)
     ->middleware('auth')
     ->name('reportes.satisfaccion');
 
+// Inventario de insumos y medicamentos
+Route::get('inventario', \App\Livewire\ListaInventario::class)
+    ->middleware(['auth', 'can:inventario.ver'])
+    ->name('inventario');
+Route::get('inventario/{producto}', \App\Livewire\DetalleProducto::class)
+    ->whereNumber('producto')
+    ->middleware(['auth', 'can:inventario.ver'])
+    ->name('inventario.producto');
+Route::get('inventario/exportar/stock', [\App\Http\Controllers\InventarioExportController::class, 'stock'])
+    ->middleware(['auth', 'can:inventario.ver'])
+    ->name('inventario.exportar');
+Route::get('inventario/{producto}/kardex', [\App\Http\Controllers\InventarioExportController::class, 'kardex'])
+    ->whereNumber('producto')
+    ->middleware(['auth', 'can:inventario.ver'])
+    ->name('inventario.kardex');
+
 require __DIR__.'/auth.php';
