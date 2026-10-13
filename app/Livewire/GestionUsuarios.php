@@ -40,6 +40,10 @@ class GestionUsuarios extends Component
     public $p12_file;
     public $p12_password;
 
+    // Datos del prescriptor exigidos en la receta (ACESS-2023-0030 Art. 5 d y e)
+    public $colegiatura;
+    public $telefono_medico;
+
     // Datos tributarios del médico (emisor de sus facturas electrónicas)
     public $ruc;
     public $razon_social;
@@ -62,6 +66,8 @@ class GestionUsuarios extends Component
         if ($this->rol === 'medico') {
             $rules += [
                 'ruc' => ['nullable', 'regex:/^\d{13}$/'],
+                'colegiatura' => 'nullable|string|max:40',
+                'telefono_medico' => 'nullable|string|max:40',
                 'razon_social' => 'required_with:ruc|nullable|string|max:300',
                 'nombre_comercial' => 'nullable|string|max:300',
                 'direccion_matriz' => 'required_with:ruc|nullable|string|max:300',
@@ -107,7 +113,7 @@ class GestionUsuarios extends Component
     {
         $this->reset(['name', 'email', 'cedula', 'password', 'password_confirmation', 'rol', 'p12_file', 'p12_password', 'editMode', 'editId',
             'ruc', 'razon_social', 'nombre_comercial', 'direccion_matriz', 'obligado_contabilidad',
-            'regimen_rimpe', 'sri_establecimiento', 'sri_pto_emi']);
+            'regimen_rimpe', 'sri_establecimiento', 'sri_pto_emi', 'colegiatura', 'telefono_medico']);
     }
 
     public function crear(): void
@@ -132,6 +138,8 @@ class GestionUsuarios extends Component
         $this->rol = $user->roles->first()?->name;
 
         $medico = $user->medico;
+        $this->colegiatura = $medico?->colegiatura;
+        $this->telefono_medico = $medico?->telefono;
         $this->ruc = $medico?->ruc;
         $this->razon_social = $medico?->razon_social;
         $this->nombre_comercial = $medico?->nombre_comercial;
@@ -211,6 +219,8 @@ class GestionUsuarios extends Component
         );
 
         $medico->update([
+            'colegiatura' => trim((string) $this->colegiatura) ?: null,
+            'telefono' => trim((string) $this->telefono_medico) ?: null,
             'ruc' => $this->ruc ?: null,
             'razon_social' => $this->razon_social ?: null,
             'nombre_comercial' => $this->nombre_comercial ?: null,

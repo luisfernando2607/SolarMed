@@ -11,6 +11,6 @@
         <div style="font-size: 9px; color: #555;">{{ $medico->especialidad->nombre }}</div>
     @endif
     @if ($medico?->colegiatura)
-        <div style="font-size: 9px; color: #555;">Reg. profesional: {{ $medico->colegiatura }}</div>
+        <div style="font-size: 9px; color: #555;">Registro ACESS: {{ $medico->colegiatura }}</div>
     @endif
 </div>

@@ -225,6 +225,26 @@
                         @if ($rol === 'medico')
                             <div class="border-t border-gray-100 pt-4 space-y-4">
                                 <div>
+                                    <h4 class="text-sm font-semibold text-gray-700">Datos del prescriptor</h4>
+                                    <p class="text-xs text-gray-400">Obligatorios en la receta médica (Resolución ACESS-2023-0030, Art. 5).</p>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Registro profesional ACESS</label>
+                                        <input wire:model="colegiatura" type="text" maxlength="40" placeholder="Número de registro"
+                                            class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        @error('colegiatura') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium text-gray-600 mb-1">Teléfono de contacto permanente</label>
+                                        <input wire:model="telefono_medico" type="text" maxlength="40" placeholder="0991234567"
+                                            class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        @error('telefono_medico') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="border-t border-gray-100 pt-4 space-y-4">
+                                <div>
                                     <h4 class="text-sm font-semibold text-gray-700">Datos tributarios (facturación electrónica)</h4>
                                     <p class="text-xs text-gray-400">Las facturas de este médico se emiten con su RUC. Si lo deja vacío se usan los datos de SRI &gt; Configuración.</p>
                                 </div>

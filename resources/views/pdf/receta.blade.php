@@ -1,3 +1,7 @@
+{{-- Recetas desde la Resolución ACESS-2023-0030 (con número secuencial y medicamentos por DCI); las anteriores, en su formato original --}}
+@if ($receta->estructurada())
+@include('pdf.receta-acess')
+@else
 <!DOCTYPE html>
 <html>
 <head>
@@ -50,7 +54,7 @@
 
     <table class="paciente">
         <tr>
-            <td class="label">Paciente:</td><td>{{ $receta->paciente->nombre_visible }}</td>
+            <td class="label">Paciente:</td><td>{{ $receta->paciente->nombre_completo }}</td>
             <td class="label">Cédula:</td><td>{{ $receta->paciente->cedula }}</td>
         </tr>
         <tr>
@@ -90,3 +94,4 @@
     <div class="footer">Documento generado el {{ now()->format('d/m/Y H:i') }} · {{ $marca->nombre() }}@if ($marca->direccion()) · {{ $marca->direccion() }}@endif</div>
 </body>
 </html>
+@endif

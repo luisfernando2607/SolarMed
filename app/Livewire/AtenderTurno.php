@@ -35,7 +35,7 @@ class AtenderTurno extends Component
                 ->take(5)
                 ->get();
             $this->recetasRecientes = \App\Models\Receta::where('paciente_id', $this->paciente->id)
-                ->with('medico')
+                ->with('medico', 'items')
                 ->latest('fecha')->latest('id')
                 ->take(5)
                 ->get();

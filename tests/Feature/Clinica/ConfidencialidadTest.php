@@ -52,9 +52,9 @@ class ConfidencialidadTest extends TestCase
         $receta = Receta::create(['paciente_id' => $this->reservado->id, 'medico_id' => $this->medico->id, 'fecha' => today(), 'medicamentos' => [['medicamento' => 'Isoniazida']]]);
         $html = view('pdf.receta', ['receta' => $receta->load('paciente', 'medico.especialidad', 'consulta')])->render();
 
+        // La receta se dispensa en farmacia: lleva los nombres completos (ACESS-2023-0030 Art. 5 b.i) y la leyenda CONFIDENCIAL
         $this->assertStringContainsString('CONFIDENCIAL', $html);
-        $this->assertStringContainsString('C.I. 0102030405', $html);
-        $this->assertStringNotContainsString('Quintero', $html);
+        $this->assertStringContainsString('Rosa Quintero', $html);
 
         $historial = view('pdf.historial-paciente', ['paciente' => $this->reservado->load('consultas')])->render();
         $this->assertStringContainsString('CONFIDENCIAL', $historial);

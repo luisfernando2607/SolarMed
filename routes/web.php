@@ -124,11 +124,12 @@ Route::get('recetas/crear/{turno}', CrearReceta::class)
     ->name('recetas.crear');
 
 Route::get('recetas/pdf/{receta}', function (App\Models\Receta $receta) {
-    $receta->load('paciente', 'medico.especialidad', 'consulta');
-    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'receta', $receta->id, $receta->paciente_id, 'PDF de receta');
+    $receta->load('paciente', 'medico.especialidad', 'consulta', 'items');
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'receta', $receta->id, $receta->paciente_id, "PDF de receta N.º {$receta->numeroFormateado()}");
+    // Formato ACESS: A4 horizontal con receta e indicaciones desprendibles; las recetas anteriores siguen en A5
     return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.receta', ['receta' => $receta])
-        ->setPaper('a5', 'portrait')
-        ->stream("receta_{$receta->id}.pdf");
+        ->setPaper($receta->estructurada() ? 'a4' : 'a5', $receta->estructurada() ? 'landscape' : 'portrait')
+        ->stream("receta_{$receta->numeroFormateado()}.pdf");
 })->middleware(['auth', 'can:expediente.ver'])->name('recetas.pdf');
 
 // Archivos del paciente (laboratorios, imágenes, referencias)
