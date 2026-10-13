@@ -36,6 +36,18 @@ class PanelPendientes extends Component
         ];
     }
 
+    /** Reservas hechas por pacientes en la página pública que esperan confirmación */
+    private function enLinea(): ?array
+    {
+        if (!Auth::user()->can('turnos.gestionar')) {
+            return null;
+        }
+        $citas = Cita::enLineaPorConfirmar();
+        $total = (clone $citas)->count();
+
+        return $total ? ['total' => $total, 'proxima' => (clone $citas)->orderBy('fecha_hora')->value('fecha_hora')] : null;
+    }
+
     private function sri(): ?array
     {
         if (!Auth::user()->can('facturas.ver')) {
@@ -128,6 +140,7 @@ class PanelPendientes extends Component
     {
         return view('livewire.panel-pendientes', [
             'cumplimiento' => $this->cumplimiento(),
+            'enLinea' => $this->enLinea(),
             'hoy' => $this->hoy(),
             'sri' => $this->sri(),
             'facturacion' => $this->facturacionPorMedico(),

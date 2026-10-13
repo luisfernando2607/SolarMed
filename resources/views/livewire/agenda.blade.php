@@ -129,6 +129,11 @@
                             @default bg-amber-100 text-amber-700
                         @endswitch">{{ ucfirst($cita->estado) }}</span>
                 </div>
+                @if ($cita->origen === 'web')
+                    <p class="mb-3 inline-flex items-center gap-1.5 rounded-lg bg-sky-50 px-2.5 py-1 text-xs font-medium text-sky-800">
+                        Reservada en línea por el paciente · código <span class="font-mono">{{ $cita->codigo_reserva }}</span>
+                    </p>
+                @endif
                 <dl class="text-sm space-y-1.5">
                     <div><dt class="inline text-gray-500">Paciente:</dt> <dd class="inline font-medium">{{ $cita->paciente?->nombre_completo }}</dd> <span class="text-gray-500">· {{ $cita->paciente?->cedula }}</span></div>
                     @if ($cita->paciente?->telefono)<div><dt class="inline text-gray-500">Teléfono:</dt> <dd class="inline">{{ $cita->paciente->telefono }}</dd></div>@endif

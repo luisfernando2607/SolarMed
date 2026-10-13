@@ -9,8 +9,14 @@ class Cita extends Model
 {
     protected $fillable = [
         'paciente_id', 'medico_id', 'especialidad_id', 'tipo', 'fecha_hora',
-        'duracion_min', 'estado', 'color', 'notas', 'recordatorio_enviado_at',
+        'duracion_min', 'estado', 'origen', 'codigo_reserva', 'color', 'notas', 'recordatorio_enviado_at',
     ];
+
+    /** Citas reservadas por el paciente en la página pública que el personal aún no confirma */
+    public function scopeEnLineaPorConfirmar($q)
+    {
+        return $q->where('origen', 'web')->where('estado', 'pendiente')->where('fecha_hora', '>=', now()->startOfDay());
+    }
 
     protected $casts = [
         'fecha_hora' => 'datetime',

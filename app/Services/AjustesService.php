@@ -47,6 +47,10 @@ class AjustesService
         'agenda.hora_inicio' => '07:00',
         'agenda.hora_fin' => '20:00',
         'agenda.dias_laborables' => [1, 2, 3, 4, 5, 6], // 0 = domingo … 6 = sábado
+        // Agenda en línea (página pública /agendar)
+        'agenda.reserva_online' => true,
+        'agenda.reserva_dias' => 30,
+        'agenda.reserva_anticipacion_horas' => 2,
         // Recordatorio por WhatsApp: {paciente} {fecha} {hora} {medico} {clinica}
         'recordatorios.whatsapp_plantilla' => 'Hola {paciente}, le recordamos su cita en {clinica} el {fecha} a las {hora} con {medico}. Si no puede asistir, por favor avísenos respondiendo este mensaje.',
         // Alertas prenatales (apoyo a la decisión clínica)

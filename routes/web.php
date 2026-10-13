@@ -37,8 +37,12 @@ Route::get('home', function () {
             ->orderBy('nombre')->get(),
         'diasTexto' => ucfirst($consecutivos ? "{$dias->first()} a {$dias->last()}" : $dias->implode(', ')),
         'horario' => $ajustes->get('agenda.hora_inicio') . ' – ' . $ajustes->get('agenda.hora_fin'),
+        'reservaOnline' => (bool) $ajustes->get('agenda.reserva_online'),
     ]);
 })->name('home');
+
+// Agenda en línea: el paciente reserva su cita (la clínica la confirma)
+Route::view('agendar', 'agendar')->middleware('throttle:60,1')->name('agendar');
 
 // Formulario de la portada: lleva a la página de verificación del código ingresado
 Route::get('verificar', function (Illuminate\Http\Request $request) {

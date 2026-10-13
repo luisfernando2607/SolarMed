@@ -147,6 +147,25 @@
                     <p class="text-xs text-gray-400 mt-1">Se reemplazan: {{ implode(' ', \App\Services\WhatsappService::PLACEHOLDERS) }}. El botón WhatsApp aparece en la cita de la agenda y en la agenda de hoy.</p>
                     @error('plantillaWhatsapp') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
+                <div class="md:col-span-2 rounded-lg border border-gray-200 p-4">
+                    <label class="flex items-center gap-2 text-sm font-medium text-gray-800">
+                        <input type="checkbox" wire:model="reserva_online" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        Agenda en línea: los pacientes pueden reservar citas en <a href="{{ route('agendar') }}" target="_blank" class="text-blue-700 hover:underline">{{ route('agendar') }}</a>
+                    </label>
+                    <p class="text-xs text-gray-500 mt-1">Las reservas llegan como citas pendientes, marcadas "En línea", para que el personal las confirme.</p>
+                    <div class="grid grid-cols-2 gap-4 mt-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Días hacia adelante que se pueden reservar</label>
+                            <input wire:model="reserva_dias" type="number" min="1" max="180" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                            @error('reserva_dias') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Anticipación mínima (horas)</label>
+                            <input wire:model="reserva_anticipacion_horas" type="number" min="0" max="168" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                            @error('reserva_anticipacion_horas') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
