@@ -63,7 +63,7 @@ class Agenda extends Component
             ->get()
             ->map(fn (Cita $c) => [
                 'id' => $c->id,
-                'title' => ($c->paciente?->nombre_visible ?? 'Paciente') . ' · ' . $c->tipo,
+                'title' => ($c->origen === 'web' && $c->estado === 'pendiente' ? 'En línea · ' : '') . ($c->paciente?->nombre_visible ?? 'Paciente') . ' · ' . $c->tipo,
                 'start' => $c->fecha_hora->toIso8601String(),
                 'end' => $c->fecha_hora->copy()->addMinutes($c->duracion_min)->toIso8601String(),
                 'backgroundColor' => $c->estado === 'cancelada' ? '#9CA3AF' : ($c->color ?: $c->especialidad?->color_agenda ?: '#3B82F6'),

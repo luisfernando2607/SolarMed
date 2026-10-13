@@ -32,7 +32,11 @@
                 <a href="#especialidades" class="hidden md:inline px-3 py-2 text-gray-600 hover:text-gray-900">Especialidades</a>
                 <a href="#horario" class="hidden md:inline px-3 py-2 text-gray-600 hover:text-gray-900">Horario y contacto</a>
                 <a href="{{ route('login') }}" class="px-3 py-2 text-gray-600 hover:text-gray-900">Ingresar</a>
-                <a href="{{ route('turno.form') }}" class="px-4 py-2 rounded-lg text-white font-medium" style="background: var(--marca)">Tomar turno</a>
+                @if ($reservaOnline)
+                    <a href="{{ route('agendar') }}" class="px-4 py-2 rounded-lg text-white font-medium" style="background: var(--marca)">Agendar cita</a>
+                @else
+                    <a href="{{ route('turno.form') }}" class="px-4 py-2 rounded-lg text-white font-medium" style="background: var(--marca)">Tomar turno</a>
+                @endif
             </nav>
         </div>
     </header>
@@ -45,9 +49,14 @@
                 @if ($marca->subtitulo())
                     <p class="mt-3 text-lg md:text-xl text-white/85">{{ $marca->subtitulo() }}</p>
                 @endif
-                <p class="mt-5 text-white/80 max-w-md">Registre su turno desde su celular antes de llegar y espere su llamado en la sala de espera.</p>
+                <p class="mt-5 text-white/80 max-w-md">{{ $reservaOnline ? 'Agende su cita en línea eligiendo médico, día y hora, o registre su turno de hoy desde el celular antes de llegar.' : 'Registre su turno desde su celular antes de llegar y espere su llamado en la sala de espera.' }}</p>
                 <div class="mt-8 flex flex-wrap gap-3">
-                    <a href="{{ route('turno.form') }}" class="px-6 py-3 rounded-xl bg-white font-semibold shadow-lg" style="color: var(--marca-oscuro)">Tomar turno ahora</a>
+                    @if ($reservaOnline)
+                        <a href="{{ route('agendar') }}" class="px-6 py-3 rounded-xl bg-white font-semibold shadow-lg" style="color: var(--marca-oscuro)">Agendar cita</a>
+                        <a href="{{ route('turno.form') }}" class="px-6 py-3 rounded-xl border border-white/50 font-semibold hover:bg-white/10">Turno para hoy</a>
+                    @else
+                        <a href="{{ route('turno.form') }}" class="px-6 py-3 rounded-xl bg-white font-semibold shadow-lg" style="color: var(--marca-oscuro)">Tomar turno ahora</a>
+                    @endif
                     @if ($marca->telefono())
                         <a href="tel:{{ preg_replace('/[^0-9+]/', '', $marca->telefono()) }}" class="px-6 py-3 rounded-xl border border-white/50 font-semibold hover:bg-white/10">Llamar {{ $marca->telefono() }}</a>
                     @endif
@@ -94,7 +103,7 @@
                 <h2 class="text-lg font-semibold text-gray-900">Horario de atención</h2>
                 <p class="mt-3 text-gray-700">{{ $diasTexto }}</p>
                 <p class="text-2xl font-bold mt-1" style="color: var(--marca)">{{ $horario }}</p>
-                <a href="{{ route('turno.form') }}" class="inline-block mt-4 text-sm font-medium" style="color: var(--marca)">Registrar turno →</a>
+                <a href="{{ route($reservaOnline ? 'agendar' : 'turno.form') }}" class="inline-block mt-4 text-sm font-medium" style="color: var(--marca)">{{ $reservaOnline ? 'Agendar cita →' : 'Registrar turno →' }}</a>
             </div>
             <div class="bg-white rounded-2xl border p-6">
                 <h2 class="text-lg font-semibold text-gray-900">Contacto</h2>

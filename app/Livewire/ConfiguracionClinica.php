@@ -34,6 +34,10 @@ class ConfiguracionClinica extends Component
     public $hora_fin;
     public array $dias = [];
     public string $plantillaWhatsapp = '';
+    // Agenda en línea
+    public bool $reserva_online = true;
+    public $reserva_dias;
+    public $reserva_anticipacion_horas;
 
     // Encuesta de satisfacción
     public bool $encuestaActiva = true;
@@ -71,6 +75,9 @@ class ConfiguracionClinica extends Component
         $this->plantillaWhatsapp = (string) $a->get('recordatorios.whatsapp_plantilla');
         $this->encuestaActiva = (bool) $a->get('encuestas.activas');
         $this->encuestaDias = $a->get('encuestas.dias_validez');
+        $this->reserva_online = (bool) $a->get('agenda.reserva_online');
+        $this->reserva_dias = $a->get('agenda.reserva_dias');
+        $this->reserva_anticipacion_horas = $a->get('agenda.reserva_anticipacion_horas');
         foreach (self::PRENATAL as $campo) {
             $this->{$campo} = $a->get("prenatal.{$campo}");
         }
@@ -106,6 +113,9 @@ class ConfiguracionClinica extends Component
             'plantillaWhatsapp' => 'required|string|max:700',
             'encuestaActiva' => 'boolean',
             'encuestaDias' => 'required|integer|between:1,60',
+            'reserva_online' => 'boolean',
+            'reserva_dias' => 'required|integer|between:1,180',
+            'reserva_anticipacion_horas' => 'required|integer|between:0,168',
             'pa_sistolica' => 'required|integer|between:100,200',
             'pa_diastolica' => 'required|integer|between:60,130',
             'pa_severa_sistolica' => 'required|integer|between:120,250|gt:pa_sistolica',
@@ -182,6 +192,9 @@ class ConfiguracionClinica extends Component
             'recordatorios.whatsapp_plantilla' => trim($this->plantillaWhatsapp),
             'encuestas.activas' => $this->encuestaActiva,
             'encuestas.dias_validez' => (int) $this->encuestaDias,
+            'agenda.reserva_online' => (bool) $this->reserva_online,
+            'agenda.reserva_dias' => (int) $this->reserva_dias,
+            'agenda.reserva_anticipacion_horas' => (int) $this->reserva_anticipacion_horas,
             'tareas.hora_recordatorios' => $this->hora_recordatorios,
             'tareas.hora_respaldo' => $this->hora_respaldo,
         ];
