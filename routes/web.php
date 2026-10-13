@@ -251,6 +251,10 @@ Route::get('notas-credito/xml/{notaCredito}', function (App\Models\NotaCredito $
 Route::get('reportes/ventas', \App\Livewire\ReporteVentas::class)
     ->middleware(['auth', 'can:reportes.ver'])
     ->name('reportes.ventas');
+// Producción y morbilidad: reportes.ver o auditoria.ver (se valida en el componente)
+Route::get('reportes/morbilidad', \App\Livewire\ReporteMorbilidad::class)
+    ->middleware('auth')
+    ->name('reportes.morbilidad');
 
 // Auditoría de accesos a datos clínicos (solo admin)
 Route::get('auditoria', \App\Livewire\Auditoria::class)
