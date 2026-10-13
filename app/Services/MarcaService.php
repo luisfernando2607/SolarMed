@@ -21,6 +21,17 @@ class MarcaService
         return (string) $this->ajuste('marca.subtitulo');
     }
 
+    /** Bloque A de los formularios MSP: institución, unicódigo, tipología y ubicación del establecimiento */
+    public function establecimiento(): array
+    {
+        $datos = ['nombre' => $this->nombre()];
+        foreach (['institucion', 'unicodigo', 'tipologia', 'provincia', 'canton', 'parroquia', 'distrito'] as $campo) {
+            $datos[$campo] = (string) $this->ajuste("establecimiento.{$campo}");
+        }
+
+        return $datos;
+    }
+
     public function direccion(): string
     {
         return (string) $this->ajuste('marca.direccion');

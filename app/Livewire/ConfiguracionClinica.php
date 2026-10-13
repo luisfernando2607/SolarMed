@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Services\AjustesService;
 use App\Services\AuditoriaService;
 use Illuminate\Support\Facades\File;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -15,6 +16,11 @@ class ConfiguracionClinica extends Component
     // Clínica (marca)
     public $marca_nombre, $marca_subtitulo, $marca_direccion, $marca_telefono, $marca_email, $marca_color;
     public $logo;
+
+    // Establecimiento de salud (formularios MSP)
+    public $est_institucion, $est_unicodigo, $est_tipologia, $est_provincia, $est_canton, $est_parroquia, $est_distrito;
+    public const ESTABLECIMIENTO = ['institucion', 'unicodigo', 'tipologia', 'provincia', 'canton', 'parroquia', 'distrito'];
+    public const INSTITUCIONES = ['Ministerio de Salud Pública (MSP)', 'IESS', 'ISSFA', 'ISSPOL', 'Red Privada Complementaria'];
 
     // Catálogo de exámenes
     public string $examenesLaboratorio = '';
@@ -46,6 +52,9 @@ class ConfiguracionClinica extends Component
         $a = app(AjustesService::class);
         foreach (['nombre', 'subtitulo', 'direccion', 'telefono', 'email', 'color'] as $campo) {
             $this->{"marca_{$campo}"} = $a->get("marca.{$campo}");
+        }
+        foreach (self::ESTABLECIMIENTO as $campo) {
+            $this->{"est_{$campo}"} = $a->get("establecimiento.{$campo}");
         }
         $this->examenesLaboratorio = implode("\n", $a->get('examenes.laboratorio'));
         $this->examenesImagen = implode("\n", $a->get('examenes.imagen'));
@@ -105,6 +114,13 @@ class ConfiguracionClinica extends Component
             'marca_telefono' => 'nullable|string|max:40',
             'marca_email' => 'nullable|email|max:120',
             'marca_color' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'est_institucion' => ['required', Rule::in(self::INSTITUCIONES)],
+            'est_unicodigo' => ['nullable', 'regex:/^\d{1,10}$/'],
+            'est_tipologia' => 'nullable|string|max:120',
+            'est_provincia' => 'nullable|string|max:60',
+            'est_canton' => 'nullable|string|max:60',
+            'est_parroquia' => 'nullable|string|max:60',
+            'est_distrito' => 'nullable|string|max:20',
             'logo' => 'nullable|image|mimes:png,jpg,jpeg|max:1024|dimensions:min_width=64,min_height=64,max_width=3000,max_height=3000',
             'hora_recordatorios' => ['required', 'date_format:H:i'],
             'hora_respaldo' => ['required', 'date_format:H:i'],
@@ -115,6 +131,7 @@ class ConfiguracionClinica extends Component
             'pa_severa_sistolica.gt' => 'Debe ser mayor que el umbral de hipertensión.',
             'pa_severa_diastolica.gt' => 'Debe ser mayor que el umbral de hipertensión.',
             'fcf_max.gt' => 'Debe ser mayor que el mínimo.',
+            'est_unicodigo.regex' => 'El unicódigo es numérico (lo asigna el MSP / ACESS).',
             'logo.image' => 'El logo debe ser una imagen PNG o JPG.',
             'logo.max' => 'El logo no debe superar 1 MB.',
             'logo.dimensions' => 'El logo debe medir entre 64 y 3000 píxeles por lado.',
@@ -143,6 +160,11 @@ class ConfiguracionClinica extends Component
             'marca.telefono' => trim((string) $this->marca_telefono),
             'marca.email' => trim((string) $this->marca_email),
             'marca.color' => $this->marca_color,
+        ];
+        foreach (self::ESTABLECIMIENTO as $campo) {
+            $valores["establecimiento.{$campo}"] = trim((string) $this->{"est_{$campo}"});
+        }
+        $valores += [
             'agenda.tipos' => $tipos,
             'agenda.duraciones' => $duraciones,
             'agenda.duracion_defecto' => (int) $this->duracion_defecto,

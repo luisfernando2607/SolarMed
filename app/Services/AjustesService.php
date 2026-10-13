@@ -21,6 +21,14 @@ class AjustesService
         'marca.color' => '#0F6E56',
         'marca.logo' => null,      // ruta relativa a public/ (null = logo incluido)
         'marca.logo_bn' => null,   // versión en blanco y negro para tickets
+        // Establecimiento de salud: bloque A de los formularios de la Historia Clínica Única (AM 00115-2021)
+        'establecimiento.institucion' => 'Red Privada Complementaria',
+        'establecimiento.unicodigo' => '',
+        'establecimiento.tipologia' => '',
+        'establecimiento.provincia' => '',
+        'establecimiento.canton' => '',
+        'establecimiento.parroquia' => '',
+        'establecimiento.distrito' => '',
         // Catálogo para el pedido de exámenes
         'examenes.laboratorio' => [
             'Biometría hemática', 'Glucosa en ayunas', 'Hemoglobina glicosilada (HbA1c)', 'Urea', 'Creatinina', 'Ácido úrico',
