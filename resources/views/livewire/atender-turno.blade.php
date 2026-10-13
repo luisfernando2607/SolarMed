@@ -45,6 +45,8 @@
             </div>
         @endif
 
+        @include('livewire.partials.resumen-preparacion', ['preparacion' => $turno->preparacion])
+
         @if (session('receta_creada'))
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 px-5 py-4 mb-6">
                 <span class="text-sm font-medium text-emerald-800">Receta guardada.</span>

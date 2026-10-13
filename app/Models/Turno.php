@@ -19,6 +19,7 @@ class Turno extends Model {
     public function especialidad(): BelongsTo { return $this->belongsTo(Especialidad::class); }
     public function medico(): BelongsTo       { return $this->belongsTo(Medico::class); }
     public function paciente(): BelongsTo     { return $this->belongsTo(Paciente::class); }
+    public function preparacion(): \Illuminate\Database\Eloquent\Relations\HasOne { return $this->hasOne(Preparacion::class); }
 
     /** Ej: G3, O12 */
     public function getCodigoAttribute(): string {

@@ -24,7 +24,7 @@ class AtenderTurno extends Component
 
     public function mount(Turno $turno): void
     {
-        $this->turno = $turno->loadMissing(['especialidad', 'paciente']);
+        $this->turno = $turno->loadMissing(['especialidad', 'paciente', 'preparacion.user']);
 
         if ($this->turno->paciente_id) {
             $this->paciente = $this->turno->paciente;
@@ -49,6 +49,7 @@ class AtenderTurno extends Component
             $this->resetForm();
         } else {
             $this->sugerirTipoAtencion($this->turno->paciente_id, $this->turno->especialidad_id);
+            $this->llenarDesdePreparacion($this->turno->preparacion);
         }
     }
 
