@@ -135,12 +135,22 @@ class CorreoRecetaTest extends TestCase
         $consulta = ExpedienteConsulta::create([
             'paciente_id' => $this->paciente->id, 'medico_id' => $this->medico->id, 'especialidad_id' => $this->medico->especialidad_id,
             'turno_id' => $turno->id, 'tipo_consulta' => 'ginecologica', 'fecha' => now(), 'motivo_consulta' => 'Control', 'diagnostico' => 'Vaginosis',
+            'codigo_cie10' => 'N76.0',
         ]);
+        \App\Models\Cie10Code::create(['codigo' => 'N76.0', 'descripcion' => 'Vaginitis aguda', 'categoria' => 'N76', 'capitulo' => 'XIV']);
 
         Livewire::actingAs($this->medicoUser)->test(CrearReceta::class, ['turno' => $turno])
-            ->set('medicamentos.0.medicamento', 'Metronidazol')
-            ->set('medicamentos.0.presentacion', 'Tabletas 500 mg')
-            ->set('medicamentos.0.dosis', '1 tableta')
+            ->assertSet('diagnostico', 'Vaginosis')
+            ->assertSet('codigo_cie10', 'N76.0')
+            ->assertSet('alergias', 'Penicilina')
+            ->set('ciudad', 'Guayaquil')
+            ->set('items.0.dci', 'Metronidazol')
+            ->set('items.0.concentracion', '500 mg')
+            ->set('items.0.forma_farmaceutica', 'Tableta')
+            ->set('items.0.cantidad', 14)
+            ->set('items.0.dosis', '1 tableta')
+            ->set('items.0.frecuencia', 'Cada 12 horas')
+            ->set('items.0.duracion', '7 días')
             ->call('guardar')
             ->assertHasNoErrors();
 

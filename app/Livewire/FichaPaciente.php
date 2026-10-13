@@ -38,8 +38,9 @@ class FichaPaciente extends Component
         $id = $this->paciente->id;
 
         return collect()
-            ->concat(Receta::with('medico')->where('paciente_id', $id)->get()->map(fn ($r) => [
-                'tipo' => 'Receta', 'fecha' => $r->fecha, 'detalle' => str($r->medicamentos)->squish()->limit(90)->toString(),
+            ->concat(Receta::with('medico', 'items')->where('paciente_id', $id)->get()->map(fn ($r) => [
+                'tipo' => 'Receta', 'fecha' => $r->fecha,
+                'detalle' => ($r->estructurada() ? "N.º {$r->numeroFormateado()} · " : '') . str($r->resumen())->limit(90)->toString(),
                 'medico' => $r->medico?->nombre_completo, 'pdf' => route('recetas.pdf', $r), 'tono' => 'bg-emerald-50 text-emerald-700',
             ]))
             ->concat(CertificadoMedico::with('medico')->where('paciente_id', $id)->get()->map(fn ($c) => [

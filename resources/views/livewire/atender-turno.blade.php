@@ -361,7 +361,7 @@
                                 <li class="py-2.5 flex items-center justify-between gap-3 text-sm">
                                     <div class="min-w-0">
                                         <p class="text-gray-900"><span class="font-medium">{{ $receta->fecha->format('d/m/Y') }}</span> <span class="text-gray-500">· {{ $receta->medico?->nombre_completo }}</span></p>
-                                        <p class="text-xs text-gray-500 truncate">{{ collect($receta->medicamentos)->pluck('medicamento')->filter()->implode(', ') }}</p>
+                                        <p class="text-xs text-gray-500 truncate">{{ $receta->resumen() }}</p>
                                     </div>
                                     <a href="{{ route('recetas.pdf', $receta->id) }}" target="_blank"
                                        class="shrink-0 px-2.5 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition">PDF</a>
