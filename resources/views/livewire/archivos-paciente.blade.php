@@ -7,7 +7,7 @@
     </div>
 
     @can('expediente.crear')
-        <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
+        <div class="bg-white rounded-xl shadow-xs border p-6 mb-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Subir archivo</h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                 <div class="md:col-span-2">
@@ -19,7 +19,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Categoría *</label>
-                    <select wire:model="categoria" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    <select wire:model="categoria" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                         @foreach ($categorias as $clave => $nombre)
                             <option value="{{ $clave }}">{{ $nombre }}</option>
                         @endforeach
@@ -28,7 +28,7 @@
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Descripción</label>
                     <input wire:model="descripcion" type="text" maxlength="255" placeholder="Ej.: Biometría 12/10"
-                        class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                 </div>
             </div>
             <div class="flex justify-end mt-4">
@@ -47,7 +47,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @forelse ($archivos as $a)
-            <div class="bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col">
+            <div class="bg-white rounded-xl shadow-xs border overflow-hidden flex flex-col">
                 <a href="{{ route('pacientes.archivo', $a->id) }}" target="_blank" class="block h-36 bg-gray-50 flex items-center justify-center overflow-hidden">
                     @if ($a->esImagen())
                         <img src="{{ route('pacientes.archivo', $a->id) }}" alt="{{ $a->nombre_original }}" class="object-cover w-full h-full" loading="lazy">

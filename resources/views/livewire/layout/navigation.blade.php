@@ -116,7 +116,7 @@ new class extends Component
     </style>
 
     {{-- Barra superior en celular --}}
-    <div class="lg:hidden sticky top-0 z-30 flex items-center gap-3 h-14 px-4 bg-white/95 backdrop-blur border-b">
+    <div class="lg:hidden sticky top-0 z-30 flex items-center gap-3 h-14 px-4 bg-white/95 backdrop-blur-sm border-b">
         <button type="button" @click="menuAbierto = true" class="p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100" aria-label="Abrir menú">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
@@ -155,7 +155,7 @@ new class extends Component
 
         {{-- Botón contraer (borde derecho) --}}
         <button type="button" @click="colapsado = !colapsado"
-                class="hidden lg:flex absolute -right-3 top-[60px] w-6 h-6 items-center justify-center rounded-full bg-white border border-gray-200 text-gray-400 shadow-sm hover:text-gray-700 hover:border-gray-300 transition"
+                class="hidden lg:flex absolute -right-3 top-[60px] w-6 h-6 items-center justify-center rounded-full bg-white border border-gray-200 text-gray-400 shadow-xs hover:text-gray-700 hover:border-gray-300 transition"
                 :title="colapsado ? 'Expandir menú' : 'Contraer menú'" :aria-label="colapsado ? 'Expandir menú' : 'Contraer menú'">
             <svg class="w-3.5 h-3.5 transition-transform" :class="colapsado && 'rotate-180'" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
         </button>
@@ -167,7 +167,7 @@ new class extends Component
                     :class="colapsado && 'lg:justify-center lg:px-0'" aria-label="Buscar">
                 <svg class="w-[18px] h-[18px] shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
                 <span class="flex-1 text-left" :class="colapsado && 'lg:hidden'">Buscar…</span>
-                <kbd class="hidden lg:inline text-[10px] border border-gray-200 rounded px-1 bg-white" :class="colapsado && 'lg:!hidden'">Ctrl K</kbd>
+                <kbd class="hidden lg:inline text-[10px] border border-gray-200 rounded-sm px-1 bg-white" :class="colapsado && 'lg:hidden!'">Ctrl K</kbd>
                 <span class="sb-tip hidden" :class="colapsado && 'lg:block'">Buscar (Ctrl K)</span>
             </button>
         </div>

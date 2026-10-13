@@ -5,7 +5,7 @@
             $nombre = $paciente?->nombre_completo ?? $turno->nombre_temporal;
             $partes = preg_split('/\s+/', trim((string) $nombre)) ?: [];
             $ini = mb_strtoupper(mb_substr($partes[0] ?? '', 0, 1) . mb_substr($partes[1] ?? '', 0, 1)) ?: '?';
-            $campo = 'w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm';
+            $campo = 'w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm';
             $etiqueta = 'block text-xs font-medium text-gray-600 mb-1';
             $chip = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition';
         @endphp
@@ -27,7 +27,7 @@
                 </div>
             </div>
             @can('turnos.gestionar')
-                <button wire:click="marcarCompletado" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-xl hover:bg-emerald-700 shadow-sm transition">
+                <button wire:click="marcarCompletado" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-xl hover:bg-emerald-700 shadow-xs transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
                     Finalizar atención
                 </button>
@@ -72,7 +72,7 @@
                             @if ($showForm)
                                 <button wire:click="toggleForm" type="button" class="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition">Cancelar</button>
                             @else
-                                <button wire:click="toggleForm" type="button" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-sm transition">
+                                <button wire:click="toggleForm" type="button" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-xs transition">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                                     Nueva consulta
                                 </button>
@@ -185,7 +185,7 @@
                                                     <div class="mt-1.5 flex items-center gap-2">
                                                         <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 font-mono">{{ $cie10Selected['codigo'] }}</span>
                                                         <span class="text-xs text-gray-500 truncate">{{ $cie10Selected['descripcion'] }}</span>
-                                                        <button type="button" wire:click="clearCie10" class="p-0.5 rounded text-gray-400 hover:text-red-600" aria-label="Quitar código CIE-10">
+                                                        <button type="button" wire:click="clearCie10" class="p-0.5 rounded-sm text-gray-400 hover:text-red-600" aria-label="Quitar código CIE-10">
                                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                                                         </button>
                                                     </div>
@@ -208,7 +208,7 @@
                                 <div>
                                     <h3 class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-3">Derivación</h3>
                                     <label class="inline-flex items-center gap-2 mb-3 cursor-pointer">
-                                        <input type="checkbox" wire:model.live="requiere_derivacion" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                        <input type="checkbox" wire:model.live="requiere_derivacion" class="rounded-sm border-gray-300 text-blue-600 focus:ring-blue-500">
                                         <span class="text-sm text-gray-700">Requiere derivación a otra especialidad</span>
                                     </label>
                                     @if ($requiere_derivacion)
@@ -226,7 +226,7 @@
                                         Cancelar
                                     </button>
                                     <button type="submit" wire:loading.attr="disabled"
-                                        class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition shadow-sm text-sm disabled:opacity-60">
+                                        class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition shadow-xs text-sm disabled:opacity-60">
                                         Guardar consulta
                                     </button>
                                 </div>

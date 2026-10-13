@@ -88,13 +88,14 @@ class DocumentosMedicosTest extends TestCase
             ->assertSet('codigo_cie10', 'N39.0')
             ->set('tipo', 'reposo')
             ->set('dias_reposo', 3)
-            ->set('reposo_desde', '2026-10-12')
-            ->assertSee('14/10/2026')
+            // Fechas relativas a hoy: el reposo no puede empezar antes de la atención
+            ->set('reposo_desde', today()->toDateString())
+            ->assertSee(today()->addDays(2)->format('d/m/Y'))
             ->call('emitir')
             ->assertHasNoErrors();
 
         $cert = CertificadoMedico::sole();
-        $this->assertSame('2026-10-14', $cert->reposo_hasta->format('Y-m-d'));
+        $this->assertSame(today()->addDays(2)->toDateString(), $cert->reposo_hasta->format('Y-m-d'));
         $this->assertSame($this->consulta->id, $cert->consulta_id);
         $this->assertMatchesRegularExpression('/^[A-HJ-NP-Z2-9]{10}$/', $cert->codigo_verificacion);
 

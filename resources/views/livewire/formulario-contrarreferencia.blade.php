@@ -1,16 +1,18 @@
 @php
     $r = $referencia;
     $entrante = $r->direccion === 'entrante';
-    $campo = 'w-full rounded-xl border-gray-200 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500';
+    $campo = 'w-full rounded-xl border-gray-200 shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500';
     $etiqueta = 'block text-xs font-medium text-gray-600 mb-1';
     $error = fn ($c) => $errors->has($c) ? '<p class="text-red-600 text-xs mt-1">' . e($errors->first($c)) . '</p>' : '';
 @endphp
 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
 
-    <a href="{{ route('referencias', ['paciente' => $r->paciente_id]) }}" wire:navigate class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
-        Referencias
-    </a>
+    <div>
+        <a href="{{ route('referencias', ['paciente' => $r->paciente_id]) }}" wire:navigate class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            Referencias
+        </a>
+    </div>
 
     <div>
         <h1 class="text-2xl font-bold text-gray-900">{{ $entrante ? 'Emitir contrarreferencia' : 'Registrar contrarreferencia recibida' }}</h1>
@@ -135,7 +137,7 @@
 
         <div class="flex justify-end gap-2">
             <a href="{{ route('referencias', ['paciente' => $r->paciente_id]) }}" wire:navigate class="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">Cancelar</a>
-            <button type="submit" wire:loading.attr="disabled" class="px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-sm">Guardar {{ $contra_tipo === 'referencia_inversa' ? 'referencia inversa' : 'contrarreferencia' }}</button>
+            <button type="submit" wire:loading.attr="disabled" class="px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-xs">Guardar {{ $contra_tipo === 'referencia_inversa' ? 'referencia inversa' : 'contrarreferencia' }}</button>
         </div>
     </form>
 </div>

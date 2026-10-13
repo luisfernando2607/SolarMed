@@ -7,7 +7,7 @@
                 <p class="text-sm text-gray-500 mt-1">{{ number_format($usuarios->total()) }} {{ $usuarios->total() === 1 ? 'cuenta con acceso' : 'cuentas con acceso' }} al sistema</p>
             </div>
             @can('usuarios.gestionar')
-                <button wire:click="crear" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-sm transition">
+                <button wire:click="crear" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-xs transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                     Nuevo usuario
                 </button>
@@ -18,7 +18,7 @@
             <div class="relative sm:max-w-md">
                 <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
                 <input wire:model.live.debounce.300ms="busqueda" type="search"
-                    class="w-full pl-10 rounded-xl border-gray-200 bg-white shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500"
+                    class="w-full pl-10 rounded-xl border-gray-200 bg-white shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500"
                     placeholder="Buscar por nombre o email…">
             </div>
         </div>
@@ -77,12 +77,12 @@
                                     {{-- Requisitos AM 5216-A: clave personal y acuerdo de confidencialidad --}}
                                     <span class="mt-1 flex flex-wrap gap-1">
                                         @if ($u->debe_cambiar_password)
-                                            <span class="px-1.5 py-0.5 rounded text-[11px] bg-amber-50 text-amber-700" title="Aún usa la clave asignada; deberá cambiarla al entrar">Clave temporal</span>
+                                            <span class="px-1.5 py-0.5 rounded-sm text-[11px] bg-amber-50 text-amber-700" title="Aún usa la clave asignada; deberá cambiarla al entrar">Clave temporal</span>
                                         @endif
                                         @if ($u->confidencialidad_aceptada_at)
-                                            <span class="px-1.5 py-0.5 rounded text-[11px] bg-gray-100 text-gray-500" title="Aceptó el acuerdo de confidencialidad el {{ $u->confidencialidad_aceptada_at->format('d/m/Y H:i') }}">Confidencialidad ✓</span>
+                                            <span class="px-1.5 py-0.5 rounded-sm text-[11px] bg-gray-100 text-gray-500" title="Aceptó el acuerdo de confidencialidad el {{ $u->confidencialidad_aceptada_at->format('d/m/Y H:i') }}">Confidencialidad ✓</span>
                                         @else
-                                            <span class="px-1.5 py-0.5 rounded text-[11px] bg-amber-50 text-amber-700">Sin acuerdo de confidencialidad</span>
+                                            <span class="px-1.5 py-0.5 rounded-sm text-[11px] bg-amber-50 text-amber-700">Sin acuerdo de confidencialidad</span>
                                         @endif
                                     </span>
                                 </td>
@@ -142,7 +142,7 @@
 
         {{-- Modal crear / editar --}}
         @if ($editMode || $editId === 0)
-            <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 flex items-start justify-center p-4 pt-12 overflow-y-auto"
+            <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-xs z-50 flex items-start justify-center p-4 pt-12 overflow-y-auto"
                  wire:click.self="resetForm">
                 <div class="bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 max-w-lg w-full p-6">
                     <div class="flex justify-between items-start mb-6">
@@ -154,7 +154,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Nombre *</label>
                             <input wire:model="name" type="text"
-                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                class="w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm"
                                 placeholder="Nombre completo">
                             @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -162,7 +162,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Email *</label>
                             <input wire:model="email" type="email"
-                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                class="w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm"
                                 placeholder="correo@ejemplo.com">
                             @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -170,7 +170,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Cédula / RUC</label>
                             <input wire:model="cedula" type="text" maxlength="13"
-                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                class="w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm"
                                 placeholder="Cédula o RUC">
                             @error('cedula') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -178,7 +178,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Contraseña {{ $editMode ? '(dejar vacío para mantener)' : '*' }}</label>
                             <input wire:model="password" type="password"
-                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                class="w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm"
                                 placeholder="{{ $editMode ? 'Nueva contraseña' : 'Contraseña' }}">
                             @error('password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -186,14 +186,14 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Confirmar contraseña {{ $editMode ? '(dejar vacío para mantener)' : '*' }}</label>
                             <input wire:model="password_confirmation" type="password"
-                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                class="w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm"
                                 placeholder="Repetir contraseña">
                         </div>
 
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Rol *</label>
                             <select wire:model.live="rol"
-                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                class="w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                                 <option value="">Seleccione un rol...</option>
                                 @foreach ($roles as $r)
                                     <option value="{{ $r->name }}">{{ ucfirst($r->name) }}</option>
@@ -232,13 +232,13 @@
                                     <div>
                                         <label class="block text-xs font-medium text-gray-600 mb-1">Registro profesional ACESS</label>
                                         <input wire:model="colegiatura" type="text" maxlength="40" placeholder="Número de registro"
-                                            class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                            class="w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                                         @error('colegiatura') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium text-gray-600 mb-1">Teléfono de contacto permanente</label>
                                         <input wire:model="telefono_medico" type="text" maxlength="40" placeholder="0991234567"
-                                            class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                            class="w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                                         @error('telefono_medico') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                     </div>
                                 </div>
@@ -251,38 +251,38 @@
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">RUC</label>
                                     <input wire:model="ruc" type="text" maxlength="13" placeholder="0912345678001"
-                                        class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        class="w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                                     @error('ruc') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">Razón social</label>
                                     <input wire:model="razon_social" type="text" placeholder="Como consta en el RUC"
-                                        class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        class="w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                                     @error('razon_social') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">Nombre comercial (opcional)</label>
                                     <input wire:model="nombre_comercial" type="text" 
-                                        class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        class="w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                                     @error('nombre_comercial') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">Dirección matriz</label>
                                     <input wire:model="direccion_matriz" type="text" 
-                                        class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        class="w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                                     @error('direccion_matriz') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                 </div>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-xs font-medium text-gray-600 mb-1">Obligado a llevar contabilidad</label>
-                                        <select wire:model="obligado_contabilidad" class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        <select wire:model="obligado_contabilidad" class="w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                                             <option value="NO">NO</option>
                                             <option value="SI">SI</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium text-gray-600 mb-1">Régimen RIMPE</label>
-                                        <select wire:model="regimen_rimpe" class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        <select wire:model="regimen_rimpe" class="w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                                             <option value="">No aplica</option>
                                             @foreach (\App\Models\Medico::REGIMENES_RIMPE as $regimen)
                                                 <option value="{{ $regimen }}">{{ $regimen }}</option>
@@ -295,13 +295,13 @@
                                     <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">Establecimiento</label>
                                     <input wire:model="sri_establecimiento" type="text" maxlength="3"
-                                        class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        class="w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                                     @error('sri_establecimiento') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                 </div>
                                     <div>
                                     <label class="block text-xs font-medium text-gray-600 mb-1">Punto de emisión</label>
                                     <input wire:model="sri_pto_emi" type="text" maxlength="3"
-                                        class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                        class="w-full rounded-xl border-gray-200 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                                     @error('sri_pto_emi') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                                 </div>
                                 </div>
@@ -314,7 +314,7 @@
                                 Cancelar
                             </button>
                             <button type="submit"
-                                class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition shadow-sm text-sm">
+                                class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition shadow-xs text-sm">
                                 {{ $editMode ? 'Guardar cambios' : 'Crear usuario' }}
                             </button>
                         </div>

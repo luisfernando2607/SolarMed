@@ -17,7 +17,7 @@
             </div>
         </div>
     @else
-        <form wire:submit="emitir" class="bg-white rounded-xl shadow-sm border p-6 space-y-5">
+        <form wire:submit="emitir" class="bg-white rounded-xl shadow-xs border p-6 space-y-5">
             <div class="flex gap-3">
                 @foreach (['atencion' => 'Certificado de atención', 'reposo' => 'Certificado de reposo'] as $valor => $texto)
                     <label class="flex-1 cursor-pointer border rounded-lg p-3 text-sm {{ $tipo === $valor ? 'border-blue-500 bg-blue-50 text-blue-800 font-medium' : 'text-gray-700' }}">
@@ -30,12 +30,12 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Fecha de atención *</label>
-                    <input wire:model="fecha_atencion" type="date" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    <input wire:model="fecha_atencion" type="date" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                     @error('fecha_atencion') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Hora de atención</label>
-                    <input wire:model="hora_atencion" type="time" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    <input wire:model="hora_atencion" type="time" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                 </div>
             </div>
 
@@ -43,12 +43,12 @@
                 <div class="grid grid-cols-3 gap-4 bg-amber-50 border border-amber-200 rounded-lg p-4">
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Días de reposo *</label>
-                        <input wire:model.live="dias_reposo" type="number" min="1" max="90" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <input wire:model.live="dias_reposo" type="number" min="1" max="90" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                         @error('dias_reposo') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Desde *</label>
-                        <input wire:model.live="reposo_desde" type="date" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <input wire:model.live="reposo_desde" type="date" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                         @error('reposo_desde') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
@@ -61,21 +61,21 @@
             <div class="grid grid-cols-4 gap-4">
                 <div class="col-span-3">
                     <label class="block text-xs font-medium text-gray-600 mb-1">Diagnóstico {{ $tipo === 'reposo' ? '*' : '' }}</label>
-                    <input wire:model="diagnostico" type="text" maxlength="500" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    <input wire:model="diagnostico" type="text" maxlength="500" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                     @error('diagnostico') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">CIE-10</label>
-                    <input wire:model="codigo_cie10" type="text" maxlength="10" class="w-full rounded-lg border-gray-300 shadow-sm text-sm uppercase">
+                    <input wire:model="codigo_cie10" type="text" maxlength="10" class="w-full rounded-lg border-gray-300 shadow-xs text-sm uppercase">
                 </div>
             </div>
             <label class="flex items-center gap-2 text-sm text-gray-700">
-                <input wire:model="mostrar_diagnostico" type="checkbox" class="rounded border-gray-300">
+                <input wire:model="mostrar_diagnostico" type="checkbox" class="rounded-sm border-gray-300">
                 Imprimir el diagnóstico en el certificado <span class="text-xs text-gray-400">(desmarque si la paciente no autoriza revelarlo)</span>
             </label>
             <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Observaciones / recomendaciones</label>
-                <textarea wire:model="observaciones" rows="3" maxlength="1000" class="w-full rounded-lg border-gray-300 shadow-sm text-sm"></textarea>
+                <textarea wire:model="observaciones" rows="3" maxlength="1000" class="w-full rounded-lg border-gray-300 shadow-xs text-sm"></textarea>
             </div>
             <div class="flex justify-end">
                 <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">Emitir certificado</button>
@@ -84,7 +84,7 @@
     @endif
 
     @if ($anteriores->isNotEmpty())
-        <div class="bg-white rounded-xl shadow-sm border p-6 mt-6">
+        <div class="bg-white rounded-xl shadow-xs border p-6 mt-6">
             <h2 class="font-semibold text-gray-800 mb-3">Certificados emitidos</h2>
             <div class="divide-y text-sm">
                 @foreach ($anteriores as $c)

@@ -32,7 +32,7 @@
 
             {{-- Cabecera --}}
             <div class="text-white text-center px-5 pt-8 pb-8 rounded-b-3xl shadow-lg shadow-black/10" style="background: linear-gradient(135deg, {{ $marca->color() }} 0%, color-mix(in srgb, {{ $marca->color() }} 70%, white) 100%);">
-                <div class="w-12 h-12 mx-auto mb-3 bg-white/15 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                <div class="w-12 h-12 mx-auto mb-3 bg-white/15 rounded-2xl flex items-center justify-center backdrop-blur-xs">
                     <x-application-logo class="w-7 h-7 opacity-90" />
                 </div>
                 <h1 class="text-lg font-bold tracking-tight">{{ $marca->nombre() }}</h1>
@@ -42,13 +42,13 @@
             </div>
 
             {{-- Barra de progreso --}}
-            <div class="bg-white mx-4 -mt-5 rounded-2xl shadow-sm border border-gray-100 px-5 py-4 flex items-center gap-2">
+            <div class="bg-white mx-4 -mt-5 rounded-2xl shadow-xs border border-gray-100 px-5 py-4 flex items-center gap-2">
                 <template x-for="n in 3" :key="n">
                     <div class="flex items-center gap-2 flex-1 last:flex-none">
                         <button
                             type="button"
-                            class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-all duration-300"
-                            :class="paso >= n ? 'shadow-sm' : ''"
+                            class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-all duration-300"
+                            :class="paso >= n ? 'shadow-xs' : ''"
                             :style="paso > n  ? 'background:var(--marca-claro); color:var(--marca-oscuro);' :
                                     paso == n ? 'background:var(--marca-medio); color:white;' :
                                     'background:#F1EFE8; color:#9CA3AF;'"
@@ -80,7 +80,7 @@
                 {{-- ================================================ --}}
                 <div x-show="paso == 1" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="flex-1 overflow-y-auto">
                     <div class="flex items-center gap-3 px-5 pt-5 pb-1">
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                              style="background:var(--marca-suave); color:var(--marca);">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -172,7 +172,7 @@
                             </div>
                         </div>
 
-                        <hr class="border-gray-100 my-1">
+                        <hr class="border-gray-100">
 
                         {{-- Contacto y dirección --}}
                         <div>
@@ -236,7 +236,7 @@
                 {{-- ================================================ --}}
                 <div x-show="paso == 2" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="flex-1 overflow-y-auto">
                     <div class="flex items-center gap-3 px-5 pt-5 pb-1">
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                              style="background:var(--marca-suave); color:var(--marca);">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -334,7 +334,7 @@
                 {{-- ================================================ --}}
                 <div x-show="paso == 3" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-cloak class="flex-1">
                     <div class="flex items-center gap-3 px-5 pt-5 pb-1">
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
                              style="background:var(--marca-suave); color:var(--marca);">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -387,7 +387,7 @@
 
                         <div class="rounded-xl p-3.5 text-xs text-gray-500 flex gap-2.5 items-start"
                              style="background: #F1EFE8;">
-                            <svg class="w-4 h-4 flex-shrink-0 mt-0.5" style="color:var(--marca-medio);"
+                            <svg class="w-4 h-4 shrink-0 mt-0.5" style="color:var(--marca-medio);"
                                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"/>
@@ -413,7 +413,7 @@
                         x-show="paso < 3"
                         @click="$wire.validarPaso(paso).then(ok => { if(ok) paso++ })"
                         class="py-4 rounded-2xl font-semibold text-white text-base shadow-lg shadow-black/10 active:scale-[0.98] transition-all"
-                        :class="paso > 1 ? 'flex-[2]' : 'w-full'"
+                        :class="paso > 1 ? 'flex-2' : 'w-full'"
                         style="background: var(--marca-medio);">
                         Continuar →
                     </button>
@@ -422,7 +422,7 @@
                         type="submit"
                         x-show="paso == 3"
                         wire:loading.attr="disabled"
-                        class="flex-[2] py-4 rounded-2xl font-semibold text-white text-base flex items-center justify-center gap-2 shadow-lg shadow-black/10 active:scale-[0.98] transition-all"
+                        class="flex-2 py-4 rounded-2xl font-semibold text-white text-base flex items-center justify-center gap-2 shadow-lg shadow-black/10 active:scale-[0.98] transition-all"
                         style="background: var(--marca-medio);">
                         <span wire:loading.remove>
                             <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

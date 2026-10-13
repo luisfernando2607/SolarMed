@@ -39,7 +39,7 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 Registrar turno
             </a>
-            <a href="{{ route('facturas.crear') }}" wire:navigate class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white shadow-sm hover:opacity-90 transition" style="background: {{ $marca->color() }}">
+            <a href="{{ route('facturas.crear') }}" wire:navigate class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white shadow-xs hover:opacity-90 transition" style="background: {{ $marca->color() }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 Nueva factura
             </a>
@@ -208,7 +208,7 @@
                 @php $rampa = ['#f3f2ee', '#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95']; @endphp
                 <div class="flex items-center gap-2 text-xs text-gray-500">
                     Menos
-                    <div class="flex gap-0.5">@foreach ($rampa as $c)<span class="w-5 h-3 rounded-sm" style="background: {{ $c }}"></span>@endforeach</div>
+                    <div class="flex gap-0.5">@foreach ($rampa as $c)<span class="w-5 h-3 rounded-xs" style="background: {{ $c }}"></span>@endforeach</div>
                     Más
                 </div>
             </div>

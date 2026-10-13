@@ -4,7 +4,7 @@
 </style>
 @php
     $tono = fn (int $p) => \App\Services\CalidadHistoriaService::tono($p);
-    $campo = 'rounded-xl border-gray-200 bg-white shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500';
+    $campo = 'rounded-xl border-gray-200 bg-white shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500';
 @endphp
 <div class="calidad max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
@@ -77,7 +77,7 @@
                     @foreach ($porCriterio as $c)
                         <li class="grid grid-cols-[minmax(0,11rem)_1fr_2.5rem] items-center gap-3 text-sm" title="{{ $c['clave'] }}. {{ $c['titulo'] }}: {{ $c['pct'] }}% de las consultas cumple">
                             <span class="truncate text-gray-600"><span class="font-mono text-xs text-gray-400 mr-1">{{ $c['clave'] }}</span>{{ $c['titulo'] }}</span>
-                            <span class="h-2.5 rounded bg-gray-100 overflow-hidden"><span class="block h-full rounded bg-blue-600" style="width: {{ max($c['pct'], 1) }}%"></span></span>
+                            <span class="h-2.5 rounded-sm bg-gray-100 overflow-hidden"><span class="block h-full rounded-sm bg-blue-600" style="width: {{ max($c['pct'], 1) }}%"></span></span>
                             <span class="text-right tabular-nums text-gray-700">{{ $c['pct'] }}%</span>
                         </li>
                     @endforeach
@@ -91,7 +91,7 @@
                     @foreach ($porMedico as $m)
                         <li class="grid grid-cols-[minmax(0,11rem)_1fr_2.5rem] items-center gap-3 text-sm" title="{{ $m['medico'] }}: {{ $m['pct'] }}% en {{ $m['consultas'] }} consultas">
                             <span class="truncate text-gray-600">{{ $m['medico'] }} <span class="text-xs text-gray-400">· {{ $m['consultas'] }}</span></span>
-                            <span class="h-2.5 rounded bg-gray-100 overflow-hidden"><span class="block h-full rounded bg-blue-600" style="width: {{ max($m['pct'], 1) }}%"></span></span>
+                            <span class="h-2.5 rounded-sm bg-gray-100 overflow-hidden"><span class="block h-full rounded-sm bg-blue-600" style="width: {{ max($m['pct'], 1) }}%"></span></span>
                             <span class="text-right tabular-nums text-gray-700">{{ $m['pct'] }}%</span>
                         </li>
                     @endforeach
@@ -113,7 +113,7 @@
                         <button wire:click="quitarMuestra" class="px-3 py-2 rounded-xl text-sm text-gray-600 hover:bg-gray-100">Ver todas</button>
                     @endif
                     <input type="number" min="1" max="100" wire:model="tamanoMuestra" class="w-20 {{ $campo }}" aria-label="Tamaño de la muestra">
-                    <button wire:click="generarMuestra" class="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-sm transition">Generar muestra</button>
+                    <button wire:click="generarMuestra" class="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-xs transition">Generar muestra</button>
                 </div>
             @endcan
         </div>
@@ -148,7 +148,7 @@
                             <td class="px-5 py-3 hidden lg:table-cell">
                                 <div class="flex flex-wrap gap-1">
                                     @forelse ($faltan as $k)
-                                        <span class="px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 text-xs font-mono" title="{{ \App\Services\CalidadHistoriaService::CRITERIOS[$k][0] }}">{{ $k }}</span>
+                                        <span class="px-1.5 py-0.5 rounded-sm bg-gray-100 text-gray-600 text-xs font-mono" title="{{ \App\Services\CalidadHistoriaService::CRITERIOS[$k][0] }}">{{ $k }}</span>
                                     @empty
                                         <span class="text-xs text-gray-400">Completa</span>
                                     @endforelse

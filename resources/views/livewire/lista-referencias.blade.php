@@ -4,7 +4,7 @@
         'contrarreferida' => 'bg-emerald-50 text-emerald-700',
         'cerrada' => 'bg-gray-100 text-gray-600',
     ];
-    $campo = 'rounded-xl border-gray-200 bg-white shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500';
+    $campo = 'rounded-xl border-gray-200 bg-white shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500';
     $accion = 'px-2.5 py-1.5 rounded-lg text-xs font-medium border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 transition whitespace-nowrap';
 @endphp
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
@@ -16,7 +16,7 @@
         </div>
         @if ($pacienteFiltro)
             @can('expediente.crear')
-                <a href="{{ route('referencias.crear', $pacienteFiltro) }}" wire:navigate class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-sm transition shrink-0">
+                <a href="{{ route('referencias.crear', $pacienteFiltro) }}" wire:navigate class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-xs transition shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                     Nueva referencia
                 </a>
@@ -50,7 +50,7 @@
             <option value="entrante">Recibidas de otros establecimientos</option>
         </select>
         <label class="inline-flex items-center gap-2 text-sm text-gray-700 px-1">
-            <input type="checkbox" wire:model.live="sinRespuesta" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <input type="checkbox" wire:model.live="sinRespuesta" class="rounded-sm border-gray-300 text-blue-600 focus:ring-blue-500">
             Solo sin respuesta &gt; {{ \App\Models\Referencia::DIAS_SIN_RESPUESTA }} días
         </label>
     </div>
@@ -112,7 +112,7 @@
                                             <a href="{{ route('referencias.editar', $r) }}" wire:navigate class="{{ $accion }}">Editar</a>
                                         @endif
                                         @unless ($r->tieneContrarreferencia())
-                                            <a href="{{ route('referencias.contrarreferencia', $r) }}" wire:navigate class="{{ $accion }} !border-blue-200 !text-blue-700 hover:!bg-blue-50">{{ $r->direccion === 'entrante' ? 'Contrarreferir' : 'Registrar respuesta' }}</a>
+                                            <a href="{{ route('referencias.contrarreferencia', $r) }}" wire:navigate class="{{ $accion }} border-blue-200! text-blue-700! hover:bg-blue-50!">{{ $r->direccion === 'entrante' ? 'Contrarreferir' : 'Registrar respuesta' }}</a>
                                         @endunless
                                         @if ($r->estado === 'contrarreferida')
                                             <button wire:click="cerrar({{ $r->id }})" wire:confirm="¿Cerrar esta referencia? Indica que ya se dio seguimiento a la contrarreferencia." class="{{ $accion }}">Cerrar</button>

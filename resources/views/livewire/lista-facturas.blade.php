@@ -6,7 +6,7 @@
                 <h1 class="text-2xl font-bold text-gray-900">Facturación</h1>
                 <p class="text-sm text-gray-500 mt-1">{{ number_format($facturas->total()) }} {{ $facturas->total() === 1 ? 'factura' : 'facturas' }}{{ $filtroEstado ? ' · ' . ($filtroEstado === 'pagada' ? 'pagadas' : 'anuladas') : '' }}</p>
             </div>
-            <a href="{{ route('facturas.crear') }}" wire:navigate class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-sm transition">
+            <a href="{{ route('facturas.crear') }}" wire:navigate class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-xs transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 Nueva factura
             </a>
@@ -16,7 +16,7 @@
             <div class="relative flex-1 sm:max-w-md">
                 <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
                 <input wire:model.live.debounce.300ms="busqueda" type="search"
-                    class="w-full pl-10 rounded-xl border-gray-200 bg-white shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500"
+                    class="w-full pl-10 rounded-xl border-gray-200 bg-white shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500"
                     placeholder="Buscar por número, paciente o cédula…">
             </div>
             <div class="inline-flex rounded-xl border border-gray-200 bg-white p-1 text-sm self-start">

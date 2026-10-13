@@ -1,5 +1,5 @@
 @php
-    $campo = 'rounded-xl border-gray-200 bg-white shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500';
+    $campo = 'rounded-xl border-gray-200 bg-white shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500';
     $etiqueta = 'block text-xs font-medium text-gray-600 mb-1';
     $tonosTipo = ['medicamento' => 'bg-sky-50 text-sky-700', 'insumo' => 'bg-gray-100 text-gray-600', 'material' => 'bg-violet-50 text-violet-700'];
 @endphp
@@ -11,12 +11,12 @@
             <p class="text-sm text-gray-500 mt-1">Existencias por lote, vencimientos y kardex. Las salidas usan primero el lote que vence antes.</p>
         </div>
         <div class="flex flex-wrap gap-2">
-            <a href="{{ route('inventario.exportar') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition">
+            <a href="{{ route('inventario.exportar') }}" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-xs transition">
                 <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
                 Exportar stock
             </a>
             @can('inventario.gestionar')
-                <button wire:click="nuevoProducto" class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-sm transition">
+                <button wire:click="nuevoProducto" class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-xs transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                     Nuevo producto
                 </button>
@@ -76,7 +76,7 @@
                             <td class="px-5 py-3">
                                 <a href="{{ route('inventario.producto', $p) }}" wire:navigate class="font-medium text-gray-900 hover:text-blue-700">{{ $p->descripcion() }}</a>
                                 <span class="block text-xs text-gray-500">
-                                    <span class="px-1.5 py-0.5 rounded {{ $tonosTipo[$p->tipo] ?? '' }}">{{ \App\Models\Producto::TIPOS[$p->tipo] }}</span>
+                                    <span class="px-1.5 py-0.5 rounded-sm {{ $tonosTipo[$p->tipo] ?? '' }}">{{ \App\Models\Producto::TIPOS[$p->tipo] }}</span>
                                     {{ $p->presentacion }}
                                 </span>
                             </td>
@@ -121,7 +121,7 @@
 
     {{-- Nuevo producto --}}
     @if ($mostrarFormulario)
-        <div class="fixed inset-0 z-50 flex items-start justify-center bg-gray-900/40 backdrop-blur-sm p-4 pt-12 overflow-y-auto" wire:click.self="$set('mostrarFormulario', false)">
+        <div class="fixed inset-0 z-50 flex items-start justify-center bg-gray-900/40 backdrop-blur-xs p-4 pt-12 overflow-y-auto" wire:click.self="$set('mostrarFormulario', false)">
             <form wire:submit="guardarProducto" class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl p-6 space-y-4">
                 <h2 class="text-lg font-semibold text-gray-900">Nuevo producto</h2>
                 @include('livewire.partials.form-producto')

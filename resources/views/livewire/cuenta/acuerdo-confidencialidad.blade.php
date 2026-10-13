@@ -18,7 +18,7 @@
 
     <form wire:submit="aceptar" class="mt-4 space-y-4">
         <label class="flex items-start gap-3 text-sm text-gray-800">
-            <input type="checkbox" wire:model="acepto" class="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <input type="checkbox" wire:model="acepto" class="mt-0.5 rounded-sm border-gray-300 text-blue-600 focus:ring-blue-500">
             <span>He leído y acepto el acuerdo de confidencialidad.</span>
         </label>
         <x-input-error :messages="$errors->get('acepto')" />

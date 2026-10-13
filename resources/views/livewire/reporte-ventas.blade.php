@@ -8,15 +8,15 @@
     </div>
 
     <div class="flex flex-wrap items-center gap-3 mb-6">
-        <input wire:model.live="mes" type="month" class="rounded-lg border-gray-300 shadow-sm text-sm">
-        <select wire:model.live="ruc" class="rounded-lg border-gray-300 shadow-sm text-sm">
+        <input wire:model.live="mes" type="month" class="rounded-lg border-gray-300 shadow-xs text-sm">
+        <select wire:model.live="ruc" class="rounded-lg border-gray-300 shadow-xs text-sm">
             <option value="">Todos los RUC</option>
             @foreach ($rucs as $r => $nombre)
                 <option value="{{ $r }}">{{ $r }} — {{ $nombre }}</option>
             @endforeach
         </select>
         <label class="flex items-center gap-2 text-sm text-gray-700">
-            <input wire:model.live="soloAutorizadas" type="checkbox" class="rounded border-gray-300"> Solo autorizadas por el SRI
+            <input wire:model.live="soloAutorizadas" type="checkbox" class="rounded-sm border-gray-300"> Solo autorizadas por el SRI
         </label>
     </div>
 
@@ -50,7 +50,7 @@
         </div>
     @endif
 
-    <div class="bg-white rounded-xl shadow-sm border overflow-hidden mb-6">
+    <div class="bg-white rounded-xl shadow-xs border overflow-hidden mb-6">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
@@ -86,7 +86,7 @@
     </div>
 
     @if ($notas->isNotEmpty())
-        <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div class="bg-white rounded-xl shadow-xs border overflow-hidden">
             <div class="px-4 py-3 border-b font-semibold text-gray-700">Notas de crédito</div>
             <table class="w-full text-sm">
                 <tbody class="divide-y">

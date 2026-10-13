@@ -14,7 +14,7 @@
 
     <form wire:submit="guardar" class="space-y-6">
         {{-- Tipo de consulta --}}
-        <div class="bg-white rounded-xl shadow-sm border p-6">
+        <div class="bg-white rounded-xl shadow-xs border p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Tipo de consulta</h2>
             <div class="flex gap-4">
                 <label class="flex items-center gap-2 cursor-pointer">
@@ -34,50 +34,50 @@
         </div>
 
         {{-- Motivo y anamnesis --}}
-        <div class="bg-white rounded-xl shadow-sm border p-6">
+        <div class="bg-white rounded-xl shadow-xs border p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Motivo y antecedentes</h2>
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Motivo de consulta *</label>
-                    <textarea wire:model="motivo_consulta" rows="2" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                    <textarea wire:model="motivo_consulta" rows="2" class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500"></textarea>
                     @error('motivo_consulta') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     @include('livewire.partials.consulta-tipo-atencion')
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Enfermedad o problema actual</label>
-                    <textarea wire:model="anamnesis" rows="3" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                    <textarea wire:model="anamnesis" rows="3" class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500"></textarea>
                     @include('livewire.partials.consulta-revision-sistemas')
                 </div>
             </div>
         </div>
 
         {{-- Examen físico --}}
-        <div class="bg-white rounded-xl shadow-sm border p-6">
+        <div class="bg-white rounded-xl shadow-xs border p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Examen físico</h2>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">PA (mmHg)</label>
-                    <input wire:model="examen_fisico_pa" type="text" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                    <input wire:model="examen_fisico_pa" type="text" class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">FC (lpm)</label>
-                    <input wire:model="examen_fisico_fc" type="text" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                    <input wire:model="examen_fisico_fc" type="text" class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">FR (rpm)</label>
-                    <input wire:model="examen_fisico_fr" type="text" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                    <input wire:model="examen_fisico_fr" type="text" class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Temp (°C)</label>
-                    <input wire:model="examen_fisico_temp" type="text" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                    <input wire:model="examen_fisico_temp" type="text" class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Peso (kg)</label>
-                    <input wire:model="examen_fisico_peso" type="number" step="0.1" wire:change="calcularImc" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                    <input wire:model="examen_fisico_peso" type="number" step="0.1" wire:change="calcularImc" class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Talla (m)</label>
-                    <input wire:model="examen_fisico_talla" type="number" step="0.01" wire:change="calcularImc" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                    <input wire:model="examen_fisico_talla" type="number" step="0.01" wire:change="calcularImc" class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">IMC</label>
@@ -86,25 +86,25 @@
             </div>
             <div class="mt-4">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Notas del examen físico</label>
-                <textarea wire:model="examen_fisico_notas" rows="2" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                <textarea wire:model="examen_fisico_notas" rows="2" class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500"></textarea>
             </div>
         </div>
 
         {{-- Diagnóstico y tratamiento --}}
-        <div class="bg-white rounded-xl shadow-sm border p-6">
+        <div class="bg-white rounded-xl shadow-xs border p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Diagnóstico y tratamiento</h2>
             <div class="space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                     <div class="sm:col-span-3">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Diagnóstico *</label>
-                        <textarea wire:model="diagnostico" rows="2" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                        <textarea wire:model="diagnostico" rows="2" class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500"></textarea>
                         @error('diagnostico') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         @include('livewire.partials.consulta-tipo-diagnostico')
                     </div>
                     <div class="relative" x-data="{ open: false }">
                         <label class="block text-sm font-medium text-gray-700 mb-1">CIE-10</label>
                         <input wire:model.live.debounce.200ms="cie10Search" type="text"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                            class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm"
                             placeholder="Buscar código o descripción..." autocomplete="off"
                             x-on:focus="open = true" x-on:click.away="open = false">
                         @if ($cie10Results)
@@ -121,7 +121,7 @@
                         @endif
                         @if ($cie10Selected)
                         <div class="mt-1 flex items-center gap-2">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">{{ $cie10Selected['codigo'] }}</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium bg-blue-100 text-blue-800">{{ $cie10Selected['codigo'] }}</span>
                             <span class="text-xs text-gray-500 truncate">{{ $cie10Selected['descripcion'] }}</span>
                             <button type="button" wire:click="clearCie10" class="text-xs text-red-500 hover:text-red-700">&times;</button>
                         </div>
@@ -131,26 +131,26 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Tratamiento</label>
-                    <textarea wire:model="tratamiento" rows="3" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                    <textarea wire:model="tratamiento" rows="3" class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500"></textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Indicaciones</label>
-                    <textarea wire:model="indicaciones" rows="2" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                    <textarea wire:model="indicaciones" rows="2" class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500"></textarea>
                 </div>
             </div>
         </div>
 
         {{-- Derivación --}}
-        <div class="bg-white rounded-xl shadow-sm border p-6">
+        <div class="bg-white rounded-xl shadow-xs border p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Derivación</h2>
             <label class="flex items-center gap-2 mb-3">
-                <input type="checkbox" wire:model="requiere_derivacion" class="rounded border-gray-300 text-blue-600">
+                <input type="checkbox" wire:model="requiere_derivacion" class="rounded-sm border-gray-300 text-blue-600">
                 <span class="text-sm">Requiere derivación a otra especialidad</span>
             </label>
             @if ($requiere_derivacion)
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Especialidad de derivación</label>
-                    <input wire:model="derivacion_especialidad" type="text" class="w-full max-w-md rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <input wire:model="derivacion_especialidad" type="text" class="w-full max-w-md rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500">
                     @error('derivacion_especialidad') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
             @endif
@@ -163,7 +163,7 @@
                 Cancelar
             </a>
             <button type="submit"
-                class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition shadow-sm">
+                class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition shadow-xs">
                 Guardar consulta
             </button>
         </div>

@@ -22,7 +22,7 @@
 <body class="font-sans antialiased bg-gray-50 text-gray-800">
 
     {{-- Barra superior --}}
-    <header class="bg-white/90 backdrop-blur border-b sticky top-0 z-20">
+    <header class="bg-white/90 backdrop-blur-sm border-b sticky top-0 z-20">
         <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
             <a href="{{ route('home') }}" class="flex items-center gap-2 min-w-0">
                 <img src="{{ $marca->logoUrl() }}" alt="" class="h-9 w-auto max-w-[120px] object-contain">
@@ -77,7 +77,7 @@
             <p class="text-gray-500 mt-1">Atención con profesionales de cada área.</p>
             <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 @foreach ($especialidades as $e)
-                    <article class="bg-white rounded-2xl border shadow-sm p-6 border-t-4" style="border-top-color: {{ $e->color_agenda ?: $marca->color() }}">
+                    <article class="bg-white rounded-2xl border shadow-xs p-6 border-t-4" style="border-top-color: {{ $e->color_agenda ?: $marca->color() }}">
                         <h3 class="text-lg font-semibold text-gray-900">{{ $e->nombre }}</h3>
                         @if ($e->medicos->isNotEmpty())
                             <p class="text-sm text-gray-500 mt-1">{{ $e->medicos->map(fn ($m) => $m->nombre_completo)->implode(' · ') }}</p>

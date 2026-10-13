@@ -9,7 +9,7 @@
         'login' => 'bg-gray-100 text-gray-600', 'logout' => 'bg-gray-100 text-gray-600',
         'cambiar_password' => 'bg-sky-50 text-sky-700', 'aceptar_confidencialidad' => 'bg-sky-50 text-sky-700',
     ];
-    $campo = 'rounded-xl border-gray-200 bg-white shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500';
+    $campo = 'rounded-xl border-gray-200 bg-white shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500';
 @endphp
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
 
@@ -18,7 +18,7 @@
             <h1 class="text-2xl font-bold text-gray-900">Registro de accesos</h1>
             <p class="text-sm text-gray-500 mt-1">Quién vio, descargó o modificó datos clínicos, y cada ingreso al sistema. Los registros no se pueden editar ni borrar (AM 5216-A, Art. 8).</p>
         </div>
-        <a href="{{ $urlExportar }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm transition shrink-0">
+        <a href="{{ $urlExportar }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-xs transition shrink-0">
             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
             Exportar CSV
         </a>

@@ -13,7 +13,7 @@
     </div>
 
     @if (!$embarazo)
-        <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
+        <div class="bg-white rounded-xl shadow-xs border p-6 mb-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-1">Sin embarazo activo</h2>
             @can('expediente.crear')
                 <p class="text-sm text-gray-500 mb-4">Registre la fecha de última menstruación para iniciar el seguimiento.</p>
@@ -21,7 +21,7 @@
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">FUM *</label>
                         <input wire:model="fum" type="date" max="{{ now()->format('Y-m-d') }}"
-                            class="rounded-lg border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500 text-sm">
+                            class="rounded-lg border-gray-300 shadow-xs focus:border-pink-500 focus:ring-pink-500 text-sm">
                     </div>
                     <button wire:click="iniciarEmbarazo"
                         class="px-5 py-2.5 bg-pink-600 text-white text-sm font-medium rounded-lg hover:bg-pink-700 transition">Iniciar control prenatal</button>
@@ -54,7 +54,7 @@
         </div>
 
         {{-- Controles --}}
-        <div class="bg-white rounded-xl shadow-sm border mb-6 overflow-hidden">
+        <div class="bg-white rounded-xl shadow-xs border mb-6 overflow-hidden">
             <div class="px-6 py-4 border-b"><h2 class="text-lg font-semibold text-gray-900">Controles</h2></div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
@@ -102,37 +102,37 @@
 
         @can('expediente.crear')
             {{-- Nuevo control --}}
-            <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
+            <div class="bg-white rounded-xl shadow-xs border p-6 mb-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Registrar control</h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Fecha *</label>
-                        <input wire:model="fecha" type="date" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <input wire:model="fecha" type="date" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                         @error('fecha') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Peso materno (kg)</label>
-                        <input wire:model="peso_materno" type="number" step="0.1" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <input wire:model="peso_materno" type="number" step="0.1" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                         @error('peso_materno') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Presión arterial</label>
-                        <input wire:model="presion_arterial" type="text" placeholder="120/80" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <input wire:model="presion_arterial" type="text" placeholder="120/80" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                         @error('presion_arterial') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Altura uterina (cm)</label>
-                        <input wire:model="altura_uterina" type="number" step="0.5" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <input wire:model="altura_uterina" type="number" step="0.5" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                         @error('altura_uterina') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">FCF (lpm)</label>
-                        <input wire:model="fcf" type="number" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <input wire:model="fcf" type="number" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                         @error('fcf') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Presentación</label>
-                        <select wire:model="presentacion" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <select wire:model="presentacion" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                             <option value="">—</option>
                             @foreach (\App\Livewire\ControlPrenatalPaciente::PRESENTACIONES as $p)
                                 <option value="{{ $p }}">{{ $p }}</option>
@@ -141,7 +141,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Movimientos fetales</label>
-                        <select wire:model="movimientos_fetales" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <select wire:model="movimientos_fetales" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                             <option value="">—</option>
                             <option value="1">Presentes</option>
                             <option value="0">Ausentes</option>
@@ -149,7 +149,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Edemas</label>
-                        <select wire:model="edemas" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <select wire:model="edemas" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                             <option value="">—</option>
                             @foreach (\App\Livewire\ControlPrenatalPaciente::EDEMAS as $e)
                                 <option value="{{ $e }}">{{ $e }}</option>
@@ -158,7 +158,7 @@
                     </div>
                     <div class="col-span-2 md:col-span-4">
                         <label class="block text-xs font-medium text-gray-600 mb-1">Observaciones</label>
-                        <textarea wire:model="observaciones" rows="2" class="w-full rounded-lg border-gray-300 shadow-sm text-sm"></textarea>
+                        <textarea wire:model="observaciones" rows="2" class="w-full rounded-lg border-gray-300 shadow-xs text-sm"></textarea>
                     </div>
                 </div>
                 <div class="flex justify-end mt-4">
@@ -169,7 +169,7 @@
         @endcan
 
         {{-- Checklist de exámenes --}}
-        <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
+        <div class="bg-white rounded-xl shadow-xs border p-6 mb-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Exámenes por trimestre</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 @foreach ($checklistConfig as $t => $examenes)
@@ -183,7 +183,7 @@
                                 <label class="flex items-start gap-2 text-sm {{ $hecho ? 'text-gray-500' : ($t < $trimestre ? 'text-red-700' : 'text-gray-800') }}">
                                     <input type="checkbox" @checked($hecho) wire:click="toggleExamen('{{ $clave }}')"
                                         @cannot('expediente.crear') disabled @endcannot
-                                        class="mt-0.5 rounded border-gray-300 text-pink-600 focus:ring-pink-500">
+                                        class="mt-0.5 rounded-sm border-gray-300 text-pink-600 focus:ring-pink-500">
                                     <span>{{ $nombre }}
                                         @if ($hecho)<span class="text-xs text-gray-400">({{ \Carbon\Carbon::parse($hecho)->format('d/m/Y') }})</span>
                                         @elseif ($t < $trimestre)<span class="text-xs">— pendiente</span>@endif
@@ -198,12 +198,12 @@
 
         @can('expediente.crear')
             {{-- Cierre --}}
-            <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
+            <div class="bg-white rounded-xl shadow-xs border p-6 mb-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Finalizar embarazo</h2>
                 <div class="flex flex-col sm:flex-row gap-3 sm:items-end">
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Desenlace *</label>
-                        <select wire:model="desenlace" class="rounded-lg border-gray-300 shadow-sm text-sm">
+                        <select wire:model="desenlace" class="rounded-lg border-gray-300 shadow-xs text-sm">
                             <option value="">Seleccione...</option>
                             @foreach (\App\Models\Embarazo::DESENLACES as $clave => $nombre)
                                 <option value="{{ $clave }}">{{ $nombre }}</option>
@@ -212,7 +212,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Fecha *</label>
-                        <input wire:model="fecha_fin" type="date" class="rounded-lg border-gray-300 shadow-sm text-sm">
+                        <input wire:model="fecha_fin" type="date" class="rounded-lg border-gray-300 shadow-xs text-sm">
                     </div>
                     <button wire:click="cerrarEmbarazo" wire:confirm="¿Finalizar el seguimiento de este embarazo?"
                         class="px-5 py-2.5 border border-gray-400 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">Finalizar</button>
@@ -224,7 +224,7 @@
     @endif
 
     @if ($anteriores->isNotEmpty())
-        <div class="bg-white rounded-xl shadow-sm border p-6">
+        <div class="bg-white rounded-xl shadow-xs border p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-3">Embarazos anteriores</h2>
             <div class="divide-y text-sm">
                 @foreach ($anteriores as $e)

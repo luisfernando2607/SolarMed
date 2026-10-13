@@ -14,7 +14,7 @@
     @livewireStyles
 </head>
 <body class="font-sans antialiased bg-gray-50 text-gray-800">
-    <header class="bg-white/90 backdrop-blur border-b sticky top-0 z-20">
+    <header class="bg-white/90 backdrop-blur-sm border-b sticky top-0 z-20">
         <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
             <a href="{{ route('home') }}" class="flex items-center gap-2 min-w-0">
                 <img src="{{ $marca->logoUrl() }}" alt="" class="h-9 w-auto max-w-[110px] object-contain">

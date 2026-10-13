@@ -1,5 +1,5 @@
 @php
-    $campo = 'w-full rounded-xl border-gray-200 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500';
+    $campo = 'w-full rounded-xl border-gray-200 shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500';
     $etiqueta = 'block text-xs font-medium text-gray-600 mb-1';
     $textos = [
         ['en_que_consiste', '¿En qué consiste? *', 3], ['como_se_realiza', '¿Cómo se realiza?', 3],
@@ -15,7 +15,7 @@
             <p class="text-sm text-gray-500 mt-1">Textos por procedimiento que se cargan al crear un consentimiento informado (formulario 024). Cada profesional los redacta y los revisa para cada paciente.</p>
         </div>
         @unless ($editando)
-            <button wire:click="nueva" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-sm shrink-0">
+            <button wire:click="nueva" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-xs shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 Nueva plantilla
             </button>

@@ -8,7 +8,7 @@
         <p class="text-sm text-gray-500">Qué puede hacer cada rol. Los cambios se aplican al instante y quedan en la auditoría. El rol Administrador siempre tiene todos los permisos.</p>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm border overflow-x-auto">
+    <div class="bg-white rounded-xl shadow-xs border overflow-x-auto">
         <table class="min-w-full text-sm">
             <thead>
                 <tr class="border-b bg-gray-50/60">
@@ -33,7 +33,7 @@
                             <td class="px-5 py-2.5">
                                 <span class="text-gray-800">{{ \App\Livewire\RolesPermisos::DESCRIPCIONES[$permiso] ?? $permiso }}</span>
                                 @if (in_array($permiso, \App\Livewire\RolesPermisos::SENSIBLES))
-                                    <span class="ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-700 ring-1 ring-amber-200">Sensible</span>
+                                    <span class="ml-1.5 px-1.5 py-0.5 rounded-sm text-[10px] font-medium bg-amber-50 text-amber-700 ring-1 ring-amber-200">Sensible</span>
                                 @endif
                                 <span class="block text-[11px] text-gray-400 font-mono">{{ $permiso }}</span>
                             </td>
@@ -49,7 +49,7 @@
                                                 wire:click="alternar({{ $rol->id }}, {{ \Illuminate\Support\Js::from($permiso) }})"
                                             @endif
                                         @endif
-                                        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 {{ $protegido ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer' }}">
+                                        class="h-4 w-4 rounded-sm border-gray-300 text-blue-600 focus:ring-blue-500 {{ $protegido ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer' }}">
                                 </td>
                             @endforeach
                         </tr>

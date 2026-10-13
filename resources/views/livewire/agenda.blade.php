@@ -3,7 +3,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <h1 class="text-2xl font-bold text-gray-900">Agenda de citas</h1>
         <div class="flex items-center gap-3">
-            <select wire:model.live="filtroMedico" class="rounded-lg border-gray-300 shadow-sm text-sm">
+            <select wire:model.live="filtroMedico" class="rounded-lg border-gray-300 shadow-xs text-sm">
                 <option value="">Todos los médicos</option>
                 @foreach ($medicos as $m)
                     <option value="{{ $m->id }}">{{ $m->nombre_completo }} — {{ $m->especialidad?->nombre }}</option>
@@ -15,7 +15,7 @@
         <p class="text-xs text-gray-500 mb-3">Haga clic en un horario libre para agendar. Arrastre una cita para reprogramarla.</p>
     @endcan
 
-    <div class="bg-white rounded-xl shadow-sm border p-4">
+    <div class="bg-white rounded-xl shadow-xs border p-4">
         <div wire:ignore id="calendario-citas"></div>
     </div>
 
@@ -35,7 +35,7 @@
                         </div>
                     @elseif (!$pacienteNuevo)
                         <input wire:model.live.debounce.300ms="busquedaPaciente" type="text" placeholder="Buscar por cédula o nombre..."
-                            class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                            class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                         @if ($pacientes->isNotEmpty())
                             <div class="border rounded-lg mt-1 divide-y max-h-48 overflow-y-auto">
                                 @foreach ($pacientes as $p)
@@ -72,7 +72,7 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="col-span-2">
                         <label class="block text-xs font-medium text-gray-600 mb-1">Médico *</label>
-                        <select wire:model="medico_id" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <select wire:model="medico_id" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                             <option value="">Seleccione...</option>
                             @foreach ($medicos as $m)
                                 <option value="{{ $m->id }}">{{ $m->nombre_completo }} — {{ $m->especialidad?->nombre }}</option>
@@ -82,12 +82,12 @@
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Fecha y hora *</label>
-                        <input wire:model="fecha_hora" type="datetime-local" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <input wire:model="fecha_hora" type="datetime-local" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                         @error('fecha_hora') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Duración (min) *</label>
-                        <select wire:model="duracion_min" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <select wire:model="duracion_min" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                             @foreach ($duraciones as $d)
                                 <option value="{{ $d }}">{{ $d }}</option>
                             @endforeach
@@ -95,7 +95,7 @@
                     </div>
                     <div class="col-span-2">
                         <label class="block text-xs font-medium text-gray-600 mb-1">Tipo *</label>
-                        <select wire:model="tipo" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <select wire:model="tipo" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                             @foreach ($tipos as $t)
                                 <option value="{{ $t }}">{{ $t }}</option>
                             @endforeach
@@ -103,7 +103,7 @@
                     </div>
                     <div class="col-span-2">
                         <label class="block text-xs font-medium text-gray-600 mb-1">Notas</label>
-                        <input wire:model="notas" type="text" maxlength="500" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <input wire:model="notas" type="text" maxlength="500" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                     </div>
                 </div>
 

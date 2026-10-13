@@ -4,7 +4,7 @@
             <a href="{{ route('facturas') }}" wire:navigate class="text-sm text-blue-600 hover:text-blue-800">&larr; Volver a facturación</a>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div class="bg-white rounded-xl shadow-xs border overflow-hidden">
             {{-- Header --}}
             <div class="p-6 border-b bg-gray-50">
                 <div class="flex justify-between items-start">
@@ -182,7 +182,7 @@
                     @can('facturas.crear')
                         <div class="flex flex-col sm:flex-row gap-2">
                             <input wire:model="correo_envio" type="email" maxlength="150"
-                                class="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                class="flex-1 rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm"
                                 placeholder="correo@paciente.com">
                             <button wire:click="enviarCorreo('factura')"
                                 class="px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 transition">
@@ -212,7 +212,7 @@
                                 <p class="text-xs text-gray-500 mb-3">Una factura autorizada por el SRI solo se anula emitiendo una nota de crédito electrónica por el valor total.</p>
                                 <div class="flex flex-col sm:flex-row gap-2">
                                     <input wire:model="motivo_nota_credito" type="text" maxlength="300"
-                                        class="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                        class="flex-1 rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm"
                                         placeholder="Motivo (ej.: error en el cobro, servicio no prestado)">
                                     <button wire:click="emitirNotaCredito" wire:loading.attr="disabled" wire:target="emitirNotaCredito"
                                         wire:confirm="Se emitirá una nota de crédito por ${{ number_format($factura->total, 2) }} y se enviará al SRI. ¿Continuar?"

@@ -17,12 +17,12 @@
         <form wire:submit="emitir" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 @foreach (['laboratorio' => ['Laboratorio', $catalogoLaboratorio], 'imagen' => ['Imagen y otros procedimientos', $catalogoImagen]] as $campo => [$titulo, $lista])
-                    <div class="bg-white rounded-xl shadow-sm border p-5">
+                    <div class="bg-white rounded-xl shadow-xs border p-5">
                         <h2 class="font-semibold text-gray-800 mb-3">{{ $titulo }} <span class="text-xs font-normal text-gray-400">({{ count($this->{$campo}) }} seleccionados)</span></h2>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5">
                             @foreach ($lista as $examen)
                                 <label class="flex items-start gap-2 text-sm text-gray-700">
-                                    <input type="checkbox" wire:model.live="{{ $campo }}" value="{{ $examen }}" class="mt-0.5 rounded border-gray-300">
+                                    <input type="checkbox" wire:model.live="{{ $campo }}" value="{{ $examen }}" class="mt-0.5 rounded-sm border-gray-300">
                                     <span>{{ $examen }}</span>
                                 </label>
                             @endforeach
@@ -32,19 +32,19 @@
             </div>
             @error('laboratorio') <p class="text-red-500 text-sm">{{ $message }}</p> @enderror
 
-            <div class="bg-white rounded-xl shadow-sm border p-5 space-y-4">
+            <div class="bg-white rounded-xl shadow-xs border p-5 space-y-4">
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1">Otros exámenes</label>
-                    <textarea wire:model="otros" rows="2" maxlength="1000" placeholder="Exámenes que no están en la lista" class="w-full rounded-lg border-gray-300 shadow-sm text-sm"></textarea>
+                    <textarea wire:model="otros" rows="2" maxlength="1000" placeholder="Exámenes que no están en la lista" class="w-full rounded-lg border-gray-300 shadow-xs text-sm"></textarea>
                 </div>
                 <div class="grid grid-cols-4 gap-4">
                     <div class="col-span-3">
                         <label class="block text-xs font-medium text-gray-600 mb-1">Diagnóstico presuntivo</label>
-                        <input wire:model="diagnostico" type="text" maxlength="500" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <input wire:model="diagnostico" type="text" maxlength="500" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">CIE-10</label>
-                        <input wire:model="codigo_cie10" type="text" maxlength="10" class="w-full rounded-lg border-gray-300 shadow-sm text-sm uppercase">
+                        <input wire:model="codigo_cie10" type="text" maxlength="10" class="w-full rounded-lg border-gray-300 shadow-xs text-sm uppercase">
                     </div>
                 </div>
                 <div>
@@ -54,7 +54,7 @@
                             <button type="button" wire:click="agregarIndicacion({{ $i }})" class="px-2.5 py-1 text-xs rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200">+ {{ $texto }}</button>
                         @endforeach
                     </div>
-                    <textarea wire:model="indicaciones" rows="3" maxlength="1000" class="w-full rounded-lg border-gray-300 shadow-sm text-sm"></textarea>
+                    <textarea wire:model="indicaciones" rows="3" maxlength="1000" class="w-full rounded-lg border-gray-300 shadow-xs text-sm"></textarea>
                 </div>
                 <div class="flex justify-end">
                     <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700">Emitir pedido</button>
@@ -64,7 +64,7 @@
     @endif
 
     @if ($anteriores->isNotEmpty())
-        <div class="bg-white rounded-xl shadow-sm border p-6 mt-6">
+        <div class="bg-white rounded-xl shadow-xs border p-6 mt-6">
             <h2 class="font-semibold text-gray-800 mb-3">Pedidos anteriores</h2>
             <div class="divide-y text-sm">
                 @foreach ($anteriores as $p)
