@@ -34,7 +34,7 @@
             <div class="flex items-center gap-4 min-w-0 flex-1">
                 <span class="flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-100 text-blue-700 text-lg font-semibold shrink-0">{{ $ini }}</span>
                 <div class="min-w-0">
-                    <h1 class="text-xl sm:text-2xl font-bold text-gray-900 truncate">{{ $p->nombre_completo }}</h1>
+                    <h1 class="text-xl sm:text-2xl font-bold text-gray-900 leading-tight break-words lg:truncate">{{ $p->nombre_completo }}</h1>
                     <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-gray-500">
                         <span class="font-mono">{{ $p->cedula }}</span>
                         <span class="px-2 py-0.5 rounded-full text-xs font-medium capitalize {{ $tonoSexo }}">{{ $p->sexo }}</span>
@@ -66,9 +66,27 @@
                     </a>
                 @endcan
                 @can('expediente.crear')
-                    <a href="{{ route('pedidos.crear', $p) }}" wire:navigate class="{{ $boton }}">Pedido de exámenes</a>
-                    <a href="{{ route('certificados.crear', $p) }}" wire:navigate class="{{ $boton }}">Certificado</a>
-                    <a href="{{ route('consentimientos.crear', $p) }}" wire:navigate class="{{ $boton }}" title="Consentimiento informado (formulario 024)">Consentimiento</a>
+                    {{-- Documentos que se generan desde la ficha --}}
+                    <div class="relative" x-data="{ abierto: false }" @click.outside="abierto = false" @keydown.escape="abierto = false">
+                        <button type="button" @click="abierto = !abierto" :aria-expanded="abierto" class="{{ $boton }}">
+                            Nuevo documento
+                            <svg class="w-4 h-4 text-gray-400 transition" :class="abierto && 'rotate-180'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                        </button>
+                        <div x-show="abierto" x-cloak x-transition.origin.top.right
+                             class="absolute right-0 lg:left-0 lg:right-auto z-30 mt-2 w-64 rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg">
+                            @foreach ([
+                                [route('pedidos.crear', $p), 'Pedido de exámenes', 'Laboratorio e imagen'],
+                                [route('certificados.crear', $p), 'Certificado médico', 'Reposo o asistencia, con QR'],
+                                [route('consentimientos.crear', $p), 'Consentimiento informado', 'Formulario MSP 024'],
+                                [route('referencias.crear', $p), 'Referencia o derivación', 'Formulario MSP 053'],
+                            ] as [$url, $texto, $nota])
+                                <a href="{{ $url }}" wire:navigate class="block rounded-lg px-3 py-2 hover:bg-gray-50">
+                                    <span class="block text-sm font-medium text-gray-900">{{ $texto }}</span>
+                                    <span class="block text-xs text-gray-500">{{ $nota }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
                 @endcan
                 @if ($clinico)
                     <a href="{{ route('pacientes.pdf', $p) }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-sm transition">
@@ -232,9 +250,16 @@
                                     </details>
                                 @endif
                             </div>
-                            @can('update', $c)
-                                <a href="{{ route('consultas.editar', $c->id) }}" wire:navigate class="self-start shrink-0 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition">Editar</a>
-                            @endcan
+                            <div class="self-start shrink-0 flex flex-col items-end gap-1.5">
+                                @can('update', $c)
+                                    <a href="{{ route('consultas.editar', $c->id) }}" wire:navigate class="px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition">Editar</a>
+                                @endcan
+                                @if ($c->requiere_derivacion)
+                                    @can('expediente.crear')
+                                        <a href="{{ route('referencias.crear', ['paciente' => $p->id, 'consulta' => $c->id]) }}" wire:navigate class="px-3 py-1.5 text-xs font-medium text-violet-700 bg-violet-50 rounded-lg hover:bg-violet-100 transition whitespace-nowrap">Generar referencia (053)</a>
+                                    @endcan
+                                @endif
+                            </div>
                         </div>
                     @empty
                         <p class="px-5 py-12 text-center text-sm text-gray-400">Todavía no hay consultas registradas.</p>

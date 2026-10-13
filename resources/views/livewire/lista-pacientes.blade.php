@@ -209,6 +209,16 @@
                                                     <label class="block text-xs font-medium text-gray-500 mb-1">Ciudad</label>
                                                     <input wire:model="ciudad" type="text" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm py-2">
                                                 </div>
+                                                {{-- Lugar de residencia actual (formulario 053, bloque A) --}}
+                                                <div class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                                    @foreach (['provincia' => 'Provincia', 'canton' => 'Cantón', 'parroquia' => 'Parroquia'] as $campoRes => $etiquetaRes)
+                                                        <div>
+                                                            <label class="block text-xs font-medium text-gray-500 mb-1">{{ $etiquetaRes }}</label>
+                                                            <input wire:model="{{ $campoRes }}" type="text" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm py-2">
+                                                            @error($campoRes) <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                                                        </div>
+                                                    @endforeach
+                                                </div>
                                                 <div class="sm:col-span-2">
                                                     <label class="block text-xs font-medium text-gray-500 mb-1">Dirección</label>
                                                     <input wire:model="direccion" type="text" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm py-2">

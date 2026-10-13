@@ -23,6 +23,7 @@ class BusquedaGlobal extends Component
         ['Pacientes', 'pacientes', 'pacientes.ver', 'lista'],
         ['Plantillas de consentimiento', 'consentimientos.plantillas', 'expediente.crear', 'consentimiento informado formulario 024 procedimiento'],
         ['Expedientes', 'expedientes', 'expediente.ver', 'consultas historia clinica'],
+        ['Referencias y contrarreferencias', 'referencias', 'expediente.ver', 'derivacion formulario 053 msp interconsulta'],
         ['Facturas', 'facturas', 'facturas.ver', 'facturacion sri'],
         ['Nueva factura', 'facturas.crear', 'facturas.crear', 'cobrar facturar'],
         ['Reporte de ventas', 'reportes.ventas', 'reportes.ver', 'reportes ingresos'],
