@@ -31,6 +31,10 @@
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="TWO_FACTOR_ROLES" value=""/>
+        <env name="APP_LOCALE" value="es"/>
+        <env name="BACKUP_PASSWORD" value=""/>
+        <env name="BACKUP_PATH" value=""/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
     </php>
 </phpunit>

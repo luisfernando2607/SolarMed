@@ -152,4 +152,26 @@ class ConfiguracionTest extends TestCase
 
         $this->assertSame(20, app(AjustesService::class)->get('agenda.duracion_defecto'), 'Nada se guardó');
     }
+
+    public function test_datos_del_establecimiento_msp(): void
+    {
+        Livewire::actingAs($this->admin)->test(\App\Livewire\ConfiguracionClinica::class)
+            ->set('est_unicodigo', 'ABC')->call('guardar')->assertHasErrors('est_unicodigo')
+            ->set('est_unicodigo', '12345')->set('est_institucion', 'Red Privada Complementaria')
+            ->set('est_provincia', 'Guayas')->set('est_canton', 'Guayaquil')
+            ->call('guardar')->assertHasNoErrors();
+
+        $e = app(\App\Services\MarcaService::class)->establecimiento();
+        $this->assertSame('12345', $e['unicodigo']);
+        $this->assertSame('Guayas', $e['provincia']);
+        $this->assertSame('Red Privada Complementaria', $e['institucion']);
+    }
+
+    public function test_mensajes_en_espanol(): void
+    {
+        $this->assertSame('Siguiente &raquo;', __('pagination.next'));
+        $this->assertSame('Mostrando', __('Showing'));
+        $this->assertSame('El correo electrónico es obligatorio.',
+            \Illuminate\Support\Facades\Validator::make([], ['email' => 'required'])->errors()->first('email'));
+    }
 }

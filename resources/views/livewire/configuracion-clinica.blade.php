@@ -67,6 +67,39 @@
         </section>
 
         <section class="bg-white rounded-xl shadow-sm border p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-1">Establecimiento de salud</h2>
+            <p class="text-sm text-gray-500 mb-4">Datos del bloque A de los formularios de la Historia Clínica Única (consentimiento informado, referencia y contrarreferencia). El unicódigo lo asigna el MSP / ACESS al licenciar el establecimiento.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Institución del sistema</label>
+                    <select wire:model="est_institucion" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        @foreach (\App\Livewire\ConfiguracionClinica::INSTITUCIONES as $inst)
+                            <option value="{{ $inst }}">{{ $inst }}</option>
+                        @endforeach
+                    </select>
+                    @error('est_institucion') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Unicódigo</label>
+                    <input wire:model="est_unicodigo" type="text" inputmode="numeric" class="w-full rounded-lg border-gray-300 shadow-sm text-sm font-mono">
+                    @error('est_unicodigo') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Tipología</label>
+                    <input wire:model="est_tipologia" type="text" placeholder="Ej.: Consultorio de especialidad clínico-quirúrgica" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                    @error('est_tipologia') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+                @foreach (['provincia' => 'Provincia', 'canton' => 'Cantón', 'parroquia' => 'Parroquia', 'distrito' => 'Distrito de salud'] as $campo => $etiqueta)
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">{{ $etiqueta }}</label>
+                        <input wire:model="est_{{ $campo }}" type="text" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        @error("est_{$campo}") <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+                @endforeach
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm border p-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Agenda</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="md:row-span-3">
