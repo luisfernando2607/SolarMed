@@ -449,4 +449,13 @@ Route::get('sistema', \App\Livewire\EstadoSistema::class)
     ->middleware(['auth', 'can:configuracion.editar'])
     ->name('sistema');
 
+// Encuesta de satisfacción: pública con enlace de un solo uso; reporte para reportes.ver o auditoria.ver
+Route::get('encuesta/{token}', \App\Livewire\ResponderEncuesta::class)
+    ->where('token', '[A-Za-z0-9]{40}')
+    ->middleware('throttle:60,1')
+    ->name('encuesta.responder');
+Route::get('reportes/satisfaccion', \App\Livewire\ReporteSatisfaccion::class)
+    ->middleware('auth')
+    ->name('reportes.satisfaccion');
+
 require __DIR__.'/auth.php';

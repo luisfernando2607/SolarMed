@@ -30,7 +30,7 @@ class AtenderTurno extends Component
             $this->paciente = $this->turno->paciente;
             app(\App\Services\AuditoriaService::class)->registrar('ver', 'paciente', $this->paciente->id, $this->paciente->id, "Atención del turno {$this->turno->prefijo}{$this->turno->numero_turno}");
             $this->consultasAnteriores = ExpedienteConsulta::where('paciente_id', $this->paciente->id)
-                ->with('medico')
+                ->with(['medico', 'encuesta'])
                 ->orderBy('fecha', 'desc')
                 ->take(5)
                 ->get();
@@ -77,7 +77,7 @@ class AtenderTurno extends Component
         $this->resetForm();
 
         $this->consultasAnteriores = ExpedienteConsulta::where('paciente_id', $this->turno->paciente_id)
-            ->with('medico')
+            ->with(['medico', 'encuesta'])
             ->orderBy('fecha', 'desc')
             ->take(5)
             ->get();

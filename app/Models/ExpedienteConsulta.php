@@ -31,4 +31,17 @@ class ExpedienteConsulta extends Model {
     public function controlPrenatal(): HasOne { return $this->hasOne(ControlPrenatal::class, 'consulta_id'); }
     public function ecografia(): HasOne      { return $this->hasOne(Ecografia::class, 'consulta_id'); }
     public function versiones(): HasMany     { return $this->hasMany(ExpedienteConsultaVersion::class, 'consulta_id')->latest('created_at')->latest('id'); }
+    public function encuesta(): HasOne       { return $this->hasOne(Encuesta::class, 'consulta_id'); }
+
+    protected static function booted(): void
+    {
+        // Cada consulta deja lista su encuesta de satisfacción (si están activas)
+        static::created(function (ExpedienteConsulta $c) {
+            try {
+                app(\App\Services\EncuestaService::class)->crearParaConsulta($c);
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        });
+    }
 }

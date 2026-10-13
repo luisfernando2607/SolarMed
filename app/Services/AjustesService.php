@@ -61,6 +61,9 @@ class AjustesService
         'prenatal.dias_sin_control' => 28,
         'prenatal.aviso_fpp_dias' => 14,
         // Tareas automáticas
+        // Encuesta de satisfacción del usuario externo
+        'encuestas.activas' => true,
+        'encuestas.dias_validez' => 7,
         'tareas.hora_recordatorios' => '17:00',
         'tareas.hora_respaldo' => '02:30',
     ];

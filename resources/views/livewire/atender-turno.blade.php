@@ -278,6 +278,7 @@
                                         @endcan
                                         <a href="{{ route('recetas.crear', $turno->id) }}" wire:navigate class="{{ $chip }} bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-700">+ Receta</a>
                                     </div>
+                                    @include('livewire.partials.encuesta-consulta', ['encuesta' => $consulta->encuesta])
                                 </li>
                             @endforeach
                         </ol>
