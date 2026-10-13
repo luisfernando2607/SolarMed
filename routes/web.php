@@ -177,6 +177,49 @@ Route::get('certificados/pdf/{certificado}', function (App\Models\CertificadoMed
         ->stream("certificado_{$certificado->numero()}.pdf");
 })->middleware(['auth', 'can:expediente.ver'])->name('certificados.pdf');
 
+// Consentimiento informado (SNS-MSP/HCU-form.024)
+Route::get('consentimientos/plantillas', \App\Livewire\PlantillasConsentimiento::class)
+    ->middleware(['auth', 'can:expediente.crear'])
+    ->name('consentimientos.plantillas');
+
+Route::get('consentimientos/crear/{paciente}', \App\Livewire\CrearConsentimiento::class)
+    ->middleware(['auth', 'can:expediente.crear'])
+    ->name('consentimientos.crear');
+
+Route::get('consentimientos/{consentimiento}/editar', \App\Livewire\CrearConsentimiento::class)
+    ->whereNumber('consentimiento')
+    ->middleware(['auth', 'can:expediente.crear'])
+    ->name('consentimientos.editar');
+
+Route::get('consentimientos/{consentimiento}', \App\Livewire\VerConsentimiento::class)
+    ->whereNumber('consentimiento')
+    ->middleware(['auth', 'can:expediente.ver'])
+    ->name('consentimientos.ver');
+
+Route::get('consentimientos/{consentimiento}/pdf', function (App\Models\Consentimiento $consentimiento) {
+    $consentimiento->load('paciente', 'medico.user');
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'consentimiento', $consentimiento->id, $consentimiento->paciente_id, "PDF consentimiento {$consentimiento->numero()}");
+    $disco = Illuminate\Support\Facades\Storage::disk('private');
+    $grafico = $consentimiento->grafico_ruta && $disco->exists($consentimiento->grafico_ruta)
+        ? 'data:' . $disco->mimeType($consentimiento->grafico_ruta) . ';base64,' . base64_encode($disco->get($consentimiento->grafico_ruta))
+        : null;
+    return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.consentimiento', ['c' => $consentimiento, 'grafico' => $grafico])
+        ->setPaper('a4', 'portrait')
+        ->stream("consentimiento_{$consentimiento->numero()}.pdf");
+})->whereNumber('consentimiento')->middleware(['auth', 'can:expediente.ver'])->name('consentimientos.pdf');
+
+Route::get('consentimientos/{consentimiento}/grafico', function (App\Models\Consentimiento $consentimiento) {
+    abort_unless($consentimiento->grafico_ruta && Illuminate\Support\Facades\Storage::disk('private')->exists($consentimiento->grafico_ruta), 404);
+    return Illuminate\Support\Facades\Storage::disk('private')->response($consentimiento->grafico_ruta);
+})->whereNumber('consentimiento')->middleware(['auth', 'can:expediente.ver'])->name('consentimientos.grafico');
+
+Route::get('consentimientos/{consentimiento}/documento', function (App\Models\Consentimiento $consentimiento) {
+    $disco = Illuminate\Support\Facades\Storage::disk('private');
+    abort_unless($consentimiento->documento_firmado_ruta && $disco->exists($consentimiento->documento_firmado_ruta), 404);
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'consentimiento', $consentimiento->id, $consentimiento->paciente_id, "Formulario firmado {$consentimiento->numero()}");
+    return $disco->response($consentimiento->documento_firmado_ruta, "consentimiento_firmado_{$consentimiento->numero()}." . pathinfo($consentimiento->documento_firmado_ruta, PATHINFO_EXTENSION));
+})->whereNumber('consentimiento')->middleware(['auth', 'can:expediente.ver'])->name('consentimientos.documento');
+
 // Verificación pública de certificados (sin diagnóstico; datos personales parcialmente ocultos)
 Route::get('verificar/{codigo}', function (string $codigo) {
     $c = App\Models\CertificadoMedico::with('paciente', 'medico')->where('codigo_verificacion', strtoupper($codigo))->first();

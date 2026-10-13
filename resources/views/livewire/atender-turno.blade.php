@@ -270,6 +270,7 @@
                                         @can('expediente.crear')
                                             <a href="{{ route('pedidos.crear', ['paciente' => $turno->paciente_id, 'consulta' => $consulta->id]) }}" wire:navigate class="{{ $chip }} bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-700">+ Exámenes</a>
                                             <a href="{{ route('certificados.crear', ['paciente' => $turno->paciente_id, 'consulta' => $consulta->id]) }}" wire:navigate class="{{ $chip }} bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-700">+ Certificado</a>
+                                            <a href="{{ route('consentimientos.crear', ['paciente' => $turno->paciente_id, 'consulta' => $consulta->id]) }}" wire:navigate class="{{ $chip }} bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-700">+ Consentimiento</a>
                                         @endcan
                                         <a href="{{ route('recetas.crear', $turno->id) }}" wire:navigate class="{{ $chip }} bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-700">+ Receta</a>
                                     </div>

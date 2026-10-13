@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\CertificadoMedico;
+use App\Models\Consentimiento;
 use App\Models\Cita;
 use App\Models\Ecografia;
 use App\Models\ExpedienteConsulta;
@@ -30,7 +31,7 @@ class FichaPaciente extends Component
         app(AuditoriaService::class)->registrar('ver', 'paciente', $paciente->id, $paciente->id, 'Ficha del paciente');
     }
 
-    /** Recetas, certificados, pedidos y ecografías en una sola línea de tiempo */
+    /** Recetas, certificados, pedidos, ecografías y consentimientos en una sola línea de tiempo */
     private function documentos(): Collection
     {
         $id = $this->paciente->id;
@@ -51,6 +52,12 @@ class FichaPaciente extends Component
             ->concat(Ecografia::with('medico')->where('paciente_id', $id)->get()->map(fn ($e) => [
                 'tipo' => 'Ecografía', 'fecha' => $e->fecha, 'detalle' => str($e->conclusion ?: $e->indicacion)->squish()->limit(90)->toString(),
                 'medico' => $e->medico?->nombre_completo, 'pdf' => route('ecografias.pdf', $e), 'tono' => 'bg-pink-50 text-pink-700',
+            ]))
+            ->concat(Consentimiento::with('medico')->where('paciente_id', $id)->get()->map(fn ($c) => [
+                'tipo' => 'Consentimiento informado', 'fecha' => $c->fecha_informacion,
+                'detalle' => $c->procedimiento . ' · ' . $c->estadoTexto(),
+                'medico' => $c->medico?->nombre_completo, 'pdf' => route('consentimientos.pdf', $c), 'tono' => $c->estadoTono(),
+                'ver' => route('consentimientos.ver', $c),
             ]))
             ->sortByDesc(fn ($d) => $d['fecha']?->getTimestamp() ?? 0)
             ->values();
