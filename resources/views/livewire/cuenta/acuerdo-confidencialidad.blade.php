@@ -1,5 +1,5 @@
 <div>
-    <p class="text-[11px] font-semibold uppercase tracking-wider text-gray-400">Confidencial</p>
+    <p class="text-[11px] font-semibold uppercase tracking-wider text-blue-700">Paso 2 de 2 · se hace una sola vez</p>
     <h1 class="mt-1 text-lg font-semibold text-gray-900">Acuerdo de confidencialidad</h1>
     <p class="mt-1 text-sm text-gray-500">{{ $marca->nombre() }} · {{ auth()->user()->name }}</p>
 
