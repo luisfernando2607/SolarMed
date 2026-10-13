@@ -34,6 +34,9 @@ class ListaPacientes extends Component
     public $telefono_secundario;
     public $direccion;
     public $ciudad;
+    public $provincia;
+    public $canton;
+    public $parroquia;
     public $email;
     public $ocupacion;
     public $referido_por;
@@ -65,6 +68,9 @@ class ListaPacientes extends Component
             'telefono_secundario' => 'nullable|string|max:20',
             'direccion' => 'nullable|string|max:500',
             'ciudad' => 'nullable|string|max:255',
+            'provincia' => 'nullable|string|max:60',
+            'canton' => 'nullable|string|max:60',
+            'parroquia' => 'nullable|string|max:60',
             'email' => 'nullable|email|max:255',
             'ocupacion' => 'nullable|string|max:255',
             'referido_por' => 'nullable|string|max:255',
@@ -140,6 +146,9 @@ class ListaPacientes extends Component
         $this->telefono_secundario = $paciente->telefono_secundario;
         $this->direccion = $paciente->direccion;
         $this->ciudad = $paciente->ciudad;
+        $this->provincia = $paciente->provincia;
+        $this->canton = $paciente->canton;
+        $this->parroquia = $paciente->parroquia;
         $this->email = $paciente->email;
         $this->ocupacion = $paciente->ocupacion;
         $this->referido_por = $paciente->referido_por;
@@ -183,6 +192,9 @@ class ListaPacientes extends Component
             'telefono_secundario' => $this->telefono_secundario,
             'direccion' => $this->direccion,
             'ciudad' => $this->ciudad,
+            'provincia' => $this->provincia,
+            'canton' => $this->canton,
+            'parroquia' => $this->parroquia,
             'email' => $this->email,
             'ocupacion' => $this->ocupacion,
             'referido_por' => $this->referido_por,

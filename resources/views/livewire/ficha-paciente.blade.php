@@ -69,6 +69,7 @@
                     <a href="{{ route('pedidos.crear', $p) }}" wire:navigate class="{{ $boton }}">Pedido de exámenes</a>
                     <a href="{{ route('certificados.crear', $p) }}" wire:navigate class="{{ $boton }}">Certificado</a>
                     <a href="{{ route('consentimientos.crear', $p) }}" wire:navigate class="{{ $boton }}" title="Consentimiento informado (formulario 024)">Consentimiento</a>
+                    <a href="{{ route('referencias.crear', $p) }}" wire:navigate class="{{ $boton }}">Referencia (053)</a>
                 @endcan
                 @if ($clinico)
                     <a href="{{ route('pacientes.pdf', $p) }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-sm transition">
@@ -232,9 +233,16 @@
                                     </details>
                                 @endif
                             </div>
-                            @can('update', $c)
-                                <a href="{{ route('consultas.editar', $c->id) }}" wire:navigate class="self-start shrink-0 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition">Editar</a>
-                            @endcan
+                            <div class="self-start shrink-0 flex flex-col items-end gap-1.5">
+                                @can('update', $c)
+                                    <a href="{{ route('consultas.editar', $c->id) }}" wire:navigate class="px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition">Editar</a>
+                                @endcan
+                                @if ($c->requiere_derivacion)
+                                    @can('expediente.crear')
+                                        <a href="{{ route('referencias.crear', ['paciente' => $p->id, 'consulta' => $c->id]) }}" wire:navigate class="px-3 py-1.5 text-xs font-medium text-violet-700 bg-violet-50 rounded-lg hover:bg-violet-100 transition whitespace-nowrap">Generar referencia (053)</a>
+                                    @endcan
+                                @endif
+                            </div>
                         </div>
                     @empty
                         <p class="px-5 py-12 text-center text-sm text-gray-400">Todavía no hay consultas registradas.</p>

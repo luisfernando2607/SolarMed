@@ -163,6 +163,41 @@ Route::get('pedidos-examenes/pdf/{pedido}', function (App\Models\PedidoExamen $p
         ->stream("pedido_examenes_{$pedido->numero()}.pdf");
 })->middleware(['auth', 'can:expediente.ver'])->name('pedidos.pdf');
 
+// Referencia, derivación, contrarreferencia y referencia inversa (formulario MSP 053)
+Route::get('referencias', \App\Livewire\ListaReferencias::class)
+    ->middleware(['auth', 'can:expediente.ver'])
+    ->name('referencias');
+Route::get('referencias/crear/{paciente}', \App\Livewire\FormularioReferencia::class)
+    ->whereNumber('paciente')
+    ->middleware(['auth', 'can:expediente.crear'])
+    ->name('referencias.crear');
+Route::get('referencias/{referencia}/editar', \App\Livewire\FormularioReferencia::class)
+    ->whereNumber('referencia')
+    ->middleware(['auth', 'can:expediente.crear'])
+    ->name('referencias.editar');
+Route::get('referencias/{referencia}/contrarreferencia', \App\Livewire\FormularioContrarreferencia::class)
+    ->whereNumber('referencia')
+    ->middleware(['auth', 'can:expediente.crear'])
+    ->name('referencias.contrarreferencia');
+
+Route::get('referencias/pdf/{referencia}', function (App\Models\Referencia $referencia) {
+    $referencia->load('paciente', 'medico.especialidad', 'medico.user', 'contraMedico.user');
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'referencia', $referencia->id, $referencia->paciente_id, "PDF formulario 053 {$referencia->numero()}");
+    return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.referencia', [
+        'r' => $referencia,
+        'est' => app(\App\Services\MarcaService::class)->establecimiento(),
+    ])->setPaper('a4', 'portrait')->stream("referencia_{$referencia->numero()}.pdf");
+})->whereNumber('referencia')->middleware(['auth', 'can:expediente.ver'])->name('referencias.pdf');
+
+Route::get('referencias/{referencia}/documento', function (App\Models\Referencia $referencia) {
+    abort_unless($referencia->documento_respuesta_ruta && Illuminate\Support\Facades\Storage::disk('private')->exists($referencia->documento_respuesta_ruta), 404);
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'referencia', $referencia->id, $referencia->paciente_id, "Documento de contrarreferencia {$referencia->numero()}");
+    return Illuminate\Support\Facades\Storage::disk('private')->response(
+        $referencia->documento_respuesta_ruta, $referencia->documento_respuesta_nombre ?: 'contrarreferencia',
+        ['Content-Type' => $referencia->documento_respuesta_mime, 'X-Content-Type-Options' => 'nosniff']
+    );
+})->whereNumber('referencia')->middleware(['auth', 'can:expediente.ver'])->name('referencias.documento');
+
 // Certificados médicos
 Route::get('certificados/crear/{paciente}', \App\Livewire\CrearCertificado::class)
     ->middleware(['auth', 'can:expediente.crear'])

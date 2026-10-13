@@ -7,7 +7,7 @@ use Carbon\Carbon;
 class Paciente extends Model {
     protected $fillable = [
         'nombres','apellidos','cedula','fecha_nacimiento','sexo',
-        'telefono','telefono_secundario','direccion','ciudad','provincia','email','foto_path',
+        'telefono','telefono_secundario','direccion','ciudad','provincia','canton','parroquia','email','foto_path',
         'ocupacion','referido_por',
         'grupo_sanguineo','peso','altura','medicamentos','cirugias','alergias','antecedentes','enfermedades_familiares',
         'fum','gestas','partos','cesareas','abortos','metodo_anticonceptivo',

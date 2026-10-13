@@ -271,6 +271,8 @@
                                             <a href="{{ route('pedidos.crear', ['paciente' => $turno->paciente_id, 'consulta' => $consulta->id]) }}" wire:navigate class="{{ $chip }} bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-700">+ Exámenes</a>
                                             <a href="{{ route('certificados.crear', ['paciente' => $turno->paciente_id, 'consulta' => $consulta->id]) }}" wire:navigate class="{{ $chip }} bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-700">+ Certificado</a>
                                             <a href="{{ route('consentimientos.crear', ['paciente' => $turno->paciente_id, 'consulta' => $consulta->id]) }}" wire:navigate class="{{ $chip }} bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-700">+ Consentimiento</a>
+                                            <a href="{{ route('referencias.crear', ['paciente' => $turno->paciente_id, 'consulta' => $consulta->id]) }}" wire:navigate
+                                               class="{{ $chip }} {{ $consulta->requiere_derivacion ? 'bg-violet-100 text-violet-800 hover:bg-violet-200' : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-700' }}">{{ $consulta->requiere_derivacion ? 'Generar referencia (053)' : '+ Referencia' }}</a>
                                         @endcan
                                         <a href="{{ route('recetas.crear', $turno->id) }}" wire:navigate class="{{ $chip }} bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-700">+ Receta</a>
                                     </div>

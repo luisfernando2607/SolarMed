@@ -11,6 +11,7 @@ use App\Models\Factura;
 use App\Models\Paciente;
 use App\Models\PedidoExamen;
 use App\Models\Receta;
+use App\Models\Referencia;
 use App\Services\AuditoriaService;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Locked;
@@ -31,7 +32,7 @@ class FichaPaciente extends Component
         app(AuditoriaService::class)->registrar('ver', 'paciente', $paciente->id, $paciente->id, 'Ficha del paciente');
     }
 
-    /** Recetas, certificados, pedidos, ecografías y consentimientos en una sola línea de tiempo */
+    /** Recetas, certificados, pedidos, ecografías, consentimientos y referencias en una sola línea de tiempo */
     private function documentos(): Collection
     {
         $id = $this->paciente->id;
@@ -58,6 +59,12 @@ class FichaPaciente extends Component
                 'detalle' => $c->procedimiento . ' · ' . $c->estadoTexto(),
                 'medico' => $c->medico?->nombre_completo, 'pdf' => route('consentimientos.pdf', $c), 'tono' => $c->estadoTono(),
                 'ver' => route('consentimientos.ver', $c),
+            ]))
+            ->concat(Referencia::with('medico')->where('paciente_id', $id)->get()->map(fn ($r) => [
+                'tipo' => Referencia::TIPOS[$r->tipo] . ($r->direccion === 'entrante' ? ' recibida' : ''),
+                'fecha' => $r->fecha,
+                'detalle' => $r->numero() . ' · ' . $r->especialidad . ' · ' . Referencia::ESTADOS[$r->estado],
+                'medico' => $r->medico?->nombre_completo, 'pdf' => route('referencias.pdf', $r), 'tono' => 'bg-violet-50 text-violet-700',
             ]))
             ->sortByDesc(fn ($d) => $d['fecha']?->getTimestamp() ?? 0)
             ->values();
