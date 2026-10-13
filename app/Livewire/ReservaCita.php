@@ -123,8 +123,8 @@ class ReservaCita extends Component
             'motivo.required' => 'Elija el motivo de la cita.',
             'sexo.required' => 'Seleccione el sexo.',
         ], [
-            'nombres' => 'los nombres', 'apellidos' => 'los apellidos', 'telefono' => 'el celular',
-            'email' => 'el correo', 'fecha_nacimiento' => 'la fecha de nacimiento',
+            'nombres' => 'nombres', 'apellidos' => 'apellidos', 'telefono' => 'celular',
+            'email' => 'correo', 'fecha_nacimiento' => 'fecha de nacimiento',
         ]);
 
         $clave = 'reserva-online:' . request()->ip();

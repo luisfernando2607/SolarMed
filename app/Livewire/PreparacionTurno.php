@@ -74,10 +74,10 @@ class PreparacionTurno extends Component
             'presion_diastolica.lt' => 'La diastólica debe ser menor que la sistólica.',
             'talla.between' => 'La talla va en metros (por ejemplo 1.62).',
         ], [
-            'presion_sistolica' => 'la presión sistólica', 'presion_diastolica' => 'la presión diastólica',
-            'frecuencia_cardiaca' => 'la frecuencia cardíaca', 'frecuencia_respiratoria' => 'la frecuencia respiratoria',
-            'temperatura' => 'la temperatura', 'saturacion' => 'la saturación', 'peso' => 'el peso', 'talla' => 'la talla',
-            'perimetro_abdominal' => 'el perímetro abdominal', 'glucosa_capilar' => 'la glucosa capilar', 'hemoglobina_capilar' => 'la hemoglobina capilar',
+            'presion_sistolica' => 'presión sistólica', 'presion_diastolica' => 'presión diastólica',
+            'frecuencia_cardiaca' => 'frecuencia cardíaca', 'frecuencia_respiratoria' => 'frecuencia respiratoria',
+            'temperatura' => 'temperatura', 'saturacion' => 'saturación', 'peso' => 'peso', 'talla' => 'talla',
+            'perimetro_abdominal' => 'perímetro abdominal', 'glucosa_capilar' => 'glucosa capilar', 'hemoglobina_capilar' => 'hemoglobina capilar',
         ]);
 
         if (!array_filter($datos, fn ($v) => $v !== null && $v !== '')) {
