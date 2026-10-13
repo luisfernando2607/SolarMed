@@ -31,7 +31,7 @@
             @endcan
             @if (!$medico)
                 @can('turnos.ver')
-                    <a href="{{ route('turnos.crear') }}" wire:navigate class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white shadow-sm hover:opacity-90 transition" style="background: {{ $marca->color() }}">+ Registrar turno</a>
+                    <a href="{{ route('turnos.crear') }}" wire:navigate class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white shadow-xs hover:opacity-90 transition" style="background: {{ $marca->color() }}">+ Registrar turno</a>
                 @endcan
             @endif
         </div>
@@ -39,7 +39,7 @@
 
     <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
         @foreach ($kpis as $k)
-            <{{ $k['ruta'] ? 'a' : 'div' }} @if ($k['ruta']) href="{{ route($k['ruta']) }}" wire:navigate @endif class="tarjeta p-5 {{ $k['ruta'] ? 'hover:shadow-sm transition' : '' }}">
+            <{{ $k['ruta'] ? 'a' : 'div' }} @if ($k['ruta']) href="{{ route($k['ruta']) }}" wire:navigate @endif class="tarjeta p-5 {{ $k['ruta'] ? 'hover:shadow-xs transition' : '' }}">
                 <p class="text-sm font-medium text-gray-500">{{ $k['titulo'] }}</p>
                 <p class="mt-2 text-3xl font-semibold tracking-tight text-gray-900">{{ $k['valor'] }}</p>
                 <p class="mt-2 text-xs text-gray-400">{{ $k['detalle'] }}</p>

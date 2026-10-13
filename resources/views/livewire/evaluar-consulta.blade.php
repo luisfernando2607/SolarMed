@@ -8,7 +8,7 @@
     $ef = $c->examen_fisico ?? [];
     $dato = fn ($v) => filled($v) ? $v : '—';
     $puede = auth()->user()->can('auditoria.gestionar');
-    $campo = 'w-full rounded-xl border-gray-200 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500';
+    $campo = 'w-full rounded-xl border-gray-200 shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500';
     $contenido = [
         'A' => "{$p?->nombre_completo} · CI {$dato($p?->cedula)} · " . ($p?->sexo ?: 'sexo —') . ' · ' . ($p?->fecha_nacimiento ? $p->fecha_nacimiento->format('d/m/Y') : 'nacimiento —'),
         'B' => $dato($c->motivo_consulta) . ($c->tipo_atencion ? ' (' . \App\Models\ExpedienteConsulta::TIPOS_ATENCION[$c->tipo_atencion] . ')' : ' (sin primera/subsecuente)'),
@@ -26,10 +26,12 @@
 @endphp
 <div class="evaluar max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
 
-    <a href="{{ route('auditoria.calidad') }}" wire:navigate class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
-        Calidad de la historia clínica
-    </a>
+    <div>
+        <a href="{{ route('auditoria.calidad') }}" wire:navigate class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            Calidad de la historia clínica
+        </a>
+    </div>
 
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
         <div>
@@ -52,10 +54,10 @@
                         <p class="text-sm font-medium text-gray-900"><span class="font-mono text-xs text-gray-400 mr-1">{{ $clave }}</span>{{ $titulo }}</p>
                         <p class="text-xs text-gray-400 mt-0.5">{{ $detalle }}{{ $peso < 1 ? ' · peso ' . $peso : '' }}</p>
                     </div>
-                    <p class="text-sm text-gray-700 whitespace-pre-line break-words">{{ $contenido[$clave] }}</p>
+                    <p class="text-sm text-gray-700 whitespace-pre-line wrap-break-word">{{ $contenido[$clave] }}</p>
                     <div class="space-y-2">
                         <label class="inline-flex items-center gap-2 text-sm {{ $puede ? 'cursor-pointer' : '' }}">
-                            <input type="checkbox" wire:model.live="resultado.{{ $clave }}.ok" @disabled(!$puede) class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <input type="checkbox" wire:model.live="resultado.{{ $clave }}.ok" @disabled(!$puede) class="rounded-sm border-gray-300 text-blue-600 focus:ring-blue-500">
                             <span class="{{ ($resultado[$clave]['ok'] ?? false) ? 'text-emerald-700' : 'text-red-700' }}">{{ ($resultado[$clave]['ok'] ?? false) ? 'Cumple' : 'No cumple' }}</span>
                             @if (($resultado[$clave]['ok'] ?? false) !== $automatica['criterios'][$clave]['ok'])
                                 <span class="text-[11px] text-gray-400">(corregido)</span>
@@ -78,7 +80,7 @@
                     <div class="flex gap-2">
                         <button wire:click="guardar" class="px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">Guardar borrador</button>
                         <button x-data x-on:click="Swal.fire({ icon: 'question', title: '¿Cerrar la evaluación?', text: 'Una evaluación cerrada queda como registro de auditoría y ya no se puede modificar.', showCancelButton: true, confirmButtonText: 'Cerrar evaluación', cancelButtonText: 'Volver', confirmButtonColor: @js($marca->color()) }).then(r => { if (r.isConfirmed) $wire.guardar(true) })"
-                                class="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-sm">Cerrar evaluación</button>
+                                class="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-xs">Cerrar evaluación</button>
                     </div>
                 </div>
             </div>
@@ -134,7 +136,7 @@
                             @error('fechaLimite') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </label>
                         <div class="md:col-span-2 flex justify-end">
-                            <button wire:click="agregarPlan({{ $a->id }})" class="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-sm">Agregar plan de acción</button>
+                            <button wire:click="agregarPlan({{ $a->id }})" class="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-xs">Agregar plan de acción</button>
                         </div>
                     </div>
                 @endif

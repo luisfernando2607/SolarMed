@@ -11,7 +11,7 @@
                 <p class="text-sm text-gray-500 mt-1">Vulneraciones de datos personales. La LOPDP exige notificar a la autoridad en máximo {{ \App\Models\IncidenteSeguridad::DIAS_NOTIFICACION }} días desde que se conocen.</p>
             </div>
             @can('auditoria.gestionar')
-                <button wire:click="nuevo" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-sm transition">
+                <button wire:click="nuevo" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-xs transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                     Registrar incidente
                 </button>
@@ -136,7 +136,7 @@
                         <textarea wire:model="medidas" rows="2" class="{{ $campo }}"></textarea>
                     </div>
                     <label class="flex items-start gap-3 p-3 rounded-xl border border-gray-200 bg-gray-50/70">
-                        <input type="checkbox" wire:model.live="requiere_notificacion" class="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <input type="checkbox" wire:model.live="requiere_notificacion" class="mt-0.5 rounded-sm border-gray-300 text-blue-600 focus:ring-blue-500">
                         <span class="text-sm">
                             <span class="block font-medium text-gray-800">Requiere notificación a la autoridad</span>
                             <span class="block text-xs text-gray-500">Desmarque solo si es improbable que el incidente afecte los derechos de los pacientes; deje constancia de la razón en las medidas.</span>

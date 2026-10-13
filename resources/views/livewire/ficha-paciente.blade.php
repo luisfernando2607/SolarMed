@@ -23,10 +23,12 @@
 @endphp
 <div class="ficha max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
 
-    <a href="{{ route('pacientes') }}" wire:navigate class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
-        Pacientes
-    </a>
+    <div>
+        <a href="{{ route('pacientes') }}" wire:navigate class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            Pacientes
+        </a>
+    </div>
 
     {{-- Encabezado --}}
     <div class="tarjeta p-5 sm:p-6">
@@ -34,7 +36,7 @@
             <div class="flex items-center gap-4 min-w-0 flex-1">
                 <span class="flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-100 text-blue-700 text-lg font-semibold shrink-0">{{ $ini }}</span>
                 <div class="min-w-0">
-                    <h1 class="text-xl sm:text-2xl font-bold text-gray-900 leading-tight break-words lg:truncate">{{ $p->nombre_completo }}</h1>
+                    <h1 class="text-xl sm:text-2xl font-bold text-gray-900 leading-tight wrap-break-word lg:truncate">{{ $p->nombre_completo }}</h1>
                     <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-gray-500">
                         <span class="font-mono">{{ $p->cedula }}</span>
                         <span class="px-2 py-0.5 rounded-full text-xs font-medium capitalize {{ $tonoSexo }}">{{ $p->sexo }}</span>
@@ -89,7 +91,7 @@
                     </div>
                 @endcan
                 @if ($clinico)
-                    <a href="{{ route('pacientes.pdf', $p) }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-sm transition">
+                    <a href="{{ route('pacientes.pdf', $p) }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-xs transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
                         Historia clínica
                     </a>

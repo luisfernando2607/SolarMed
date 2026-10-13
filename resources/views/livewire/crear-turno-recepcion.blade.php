@@ -5,7 +5,7 @@
                 <h1 class="text-2xl font-bold text-gray-900">Registrar turno</h1>
                 <p class="text-sm text-gray-500 mt-1">Para pacientes que llegan sin cita previa</p>
             </div>
-            <a href="{{ route('sala-espera') }}" wire:navigate class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 shadow-sm transition">
+            <a href="{{ route('sala-espera') }}" wire:navigate class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 shadow-xs transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
                 Sala de espera
             </a>
@@ -284,7 +284,7 @@
                     Cancelar
                 </a>
                 <button type="submit" wire:loading.attr="disabled"
-                    class="px-6 py-2.5 rounded-xl font-medium text-white text-sm flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 shadow-sm transition disabled:opacity-60">
+                    class="px-6 py-2.5 rounded-xl font-medium text-white text-sm flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 shadow-xs transition disabled:opacity-60">
                     <span wire:loading.remove>
                         <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>

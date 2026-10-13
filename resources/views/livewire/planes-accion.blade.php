@@ -1,6 +1,6 @@
 <div>
 @php
-    $campo = 'w-full rounded-xl border-gray-200 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500';
+    $campo = 'w-full rounded-xl border-gray-200 shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500';
     $tonos = ['pendiente' => 'bg-amber-50 text-amber-700', 'en_proceso' => 'bg-blue-50 text-blue-700', 'cumplido' => 'bg-emerald-50 text-emerald-700'];
 @endphp
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

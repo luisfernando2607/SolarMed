@@ -1,6 +1,70 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+/* Solo estilos base: las clases .form-* del plugin pisarían nuestro .form-input (formulario público y recepción) */
+@plugin '@tailwindcss/forms' {
+    strategy: 'base';
+}
+
+/* Vistas que Tailwind no ve solo (vendor y storage están en .gitignore) */
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+/*
+  "blue" es el color de la clínica (Configuración > Clínica): los tonos llegan como variables CSS
+  "R G B" desde MarcaService::paletaCss. Los modificadores de opacidad (bg-blue-600/10) siguen
+  funcionando porque Tailwind 4 los resuelve con color-mix().
+*/
+@theme {
+    --color-blue-50: rgb(var(--marca-50));
+    --color-blue-100: rgb(var(--marca-100));
+    --color-blue-200: rgb(var(--marca-200));
+    --color-blue-300: rgb(var(--marca-300));
+    --color-blue-400: rgb(var(--marca-400));
+    --color-blue-500: rgb(var(--marca-500));
+    --color-blue-600: rgb(var(--marca-600));
+    --color-blue-700: rgb(var(--marca-700));
+    --color-blue-800: rgb(var(--marca-800));
+    --color-blue-900: rgb(var(--marca-900));
+    --color-blue-950: rgb(var(--marca-950));
+
+    --font-sans: Figtree, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /*
+      Alturas de línea absolutas como en Tailwind 3: en la versión 4 son proporcionales y los elementos
+      con tamaño propio (text-[10px], text-[11px]) heredaban una línea más baja, achicando chips y botones.
+    */
+    --text-xs--line-height: 1rem;
+    --text-sm--line-height: 1.25rem;
+    --text-base--line-height: 1.5rem;
+    --text-lg--line-height: 1.75rem;
+    --text-xl--line-height: 1.75rem;
+    --text-2xl--line-height: 2rem;
+    --text-3xl--line-height: 2.25rem;
+    --text-4xl--line-height: 2.5rem;
+}
+
+/* Tailwind 4 usa currentColor como color de borde por defecto: se conserva el gris de la versión 3 */
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentcolor);
+    }
+
+    /* Tailwind 4 quita todo relleno; la versión 3 dejaba el 1px del navegador en las celdas de tabla */
+    th,
+    td {
+        padding: 1px;
+    }
+
+    /* Tailwind 4 dejó el cursor por defecto en los botones: se conserva la mano de la versión 3 */
+    button:not(:disabled),
+    [role='button']:not(:disabled) {
+        cursor: pointer;
+    }
+}
 
 [x-cloak] { display: none !important; }
 
@@ -16,7 +80,7 @@
         @apply w-full rounded-xl border-2 border-gray-200 bg-white px-4 py-3.5 text-sm text-gray-700 placeholder-gray-400 transition-all duration-200;
     }
     .form-input:focus {
-        @apply border-blue-500 outline-none ring-2 ring-blue-500/20;
+        @apply border-blue-500 outline-hidden ring-2 ring-blue-500/20;
     }
     .form-input[readonly] {
         @apply bg-gray-50 cursor-not-allowed;

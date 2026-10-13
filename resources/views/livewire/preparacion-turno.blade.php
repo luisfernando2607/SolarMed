@@ -1,6 +1,6 @@
 @php
     $p = $turno->paciente;
-    $campo = 'w-full rounded-xl border-gray-200 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500 tabular-nums disabled:bg-gray-50';
+    $campo = 'w-full rounded-xl border-gray-200 shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500 tabular-nums disabled:bg-gray-50';
     $etiqueta = 'block text-xs font-medium text-gray-600 mb-1';
     $rangos = \App\Models\Preparacion::RANGOS;
     // Resalta mientras se escribe un valor fuera del rango habitual
@@ -18,10 +18,12 @@
     ];
 @endphp
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
-    <a href="{{ route('sala-espera') }}" wire:navigate class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
-        Sala de espera
-    </a>
+    <div>
+        <a href="{{ route('sala-espera') }}" wire:navigate class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            Sala de espera
+        </a>
+    </div>
 
     <div>
         <p class="text-sm text-gray-500">Preparación · turno {{ $turno->codigo }} · {{ $turno->especialidad?->nombre }}</p>
@@ -52,7 +54,7 @@
                         <div>
                             <label for="{{ $c }}" class="{{ $etiqueta }}">{{ $texto }} <span class="text-gray-400 font-normal">({{ $unidad }})</span></label>
                             <input id="{{ $c }}" wire:model.live.debounce.500ms="{{ $c }}" type="number" step="{{ $paso }}" inputmode="decimal" @disabled(!$this->editable)
-                                   class="{{ $campo }} {{ $fuera($c) ? '!border-amber-400 bg-amber-50' : '' }}">
+                                   class="{{ $campo }} {{ $fuera($c) ? 'border-amber-400! bg-amber-50' : '' }}">
                             @if ($fuera($c))
                                 <p class="text-[11px] text-amber-700 mt-1">Fuera del rango habitual ({{ $rangos[$c][0] }}–{{ $rangos[$c][1] }})</p>
                             @endif
@@ -80,7 +82,7 @@
         @if ($this->editable)
             <div class="flex justify-end gap-2">
                 <a href="{{ route('sala-espera') }}" wire:navigate class="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">Cancelar</a>
-                <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 shadow-sm">Guardar signos vitales</button>
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 shadow-xs">Guardar signos vitales</button>
             </div>
         @endif
     </form>

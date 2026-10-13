@@ -28,7 +28,7 @@
             </div>
             <div class="flex flex-wrap items-center gap-3">
                 @if ($vista === 'historial')
-                    <input type="date" wire:model.live="fecha" class="rounded-xl border-gray-200 bg-white shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500">
+                    <input type="date" wire:model.live="fecha" class="rounded-xl border-gray-200 bg-white shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500">
                 @endif
                 <div class="inline-flex rounded-xl border border-gray-200 bg-white p-1 text-sm">
                     <button wire:click="$set('vista', 'activos')" class="px-3 py-1.5 rounded-lg transition {{ $vista === 'activos' ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600 hover:text-gray-900' }}">Activos</button>
@@ -37,7 +37,7 @@
                     @endcan
                 </div>
                 @can('turnos.ver')
-                    <a href="{{ route('turnos.crear') }}" wire:navigate class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-sm transition">
+                    <a href="{{ route('turnos.crear') }}" wire:navigate class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-xl hover:bg-blue-700 shadow-xs transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                         Registrar turno
                     </a>
@@ -89,7 +89,7 @@
                                         En atención ahora
                                     </p>
                                     <div class="flex items-center gap-3 mt-2">
-                                        <span class="flex items-center justify-center min-w-[3rem] h-10 px-2 rounded-xl bg-white border border-amber-200 font-bold text-gray-900 tabular-nums">{{ $t->codigo }}</span>
+                                        <span class="flex items-center justify-center min-w-12 h-10 px-2 rounded-xl bg-white border border-amber-200 font-bold text-gray-900 tabular-nums">{{ $t->codigo }}</span>
                                         <div class="min-w-0">
                                             <p class="font-medium text-gray-900 truncate">{{ $t->paciente?->nombre_visible ?? $t->nombre_temporal }}</p>
                                             <p class="text-xs text-gray-500 truncate">
@@ -122,10 +122,10 @@
                         <div class="px-4 pb-4">
                             @if ($cola['esperando']->count() > 0)
                                 <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-2">Próximos</p>
-                                <ul class="space-y-1.5 max-h-[22rem] overflow-y-auto">
+                                <ul class="space-y-1.5 max-h-88 overflow-y-auto">
                                     @foreach ($cola['esperando'] as $turno)
                                         <li wire:key="espera-{{ $turno->id }}" class="flex items-center gap-3 px-3 py-2 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50/70 transition">
-                                            <span class="text-sm font-semibold text-gray-900 tabular-nums min-w-[2.75rem]">{{ $turno->codigo }}</span>
+                                            <span class="text-sm font-semibold text-gray-900 tabular-nums min-w-11">{{ $turno->codigo }}</span>
                                             <button wire:click="verDetalle({{ $turno->id }})" class="flex-1 min-w-0 text-left group">
                                                 <span class="block text-sm font-medium text-gray-900 group-hover:text-blue-700 truncate">{{ $turno->paciente?->nombre_visible ?? $turno->nombre_temporal }}</span>
                                                 <span class="block text-xs text-gray-500 truncate"><span class="font-mono">{{ $turno->cedula }}</span> · {{ $turno->motivo }}</span>
@@ -233,7 +233,7 @@
     {{-- Detalle del turno --}}
     @if ($detalle)
         @php [$estTexto, $estClase, $estPunto] = $estados[$detalle->estado] ?? [ucfirst((string) $detalle->estado), 'bg-gray-100 text-gray-600', 'bg-gray-400']; @endphp
-        <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" wire:click.self="cerrarDetalle">
+        <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4" wire:click.self="cerrarDetalle">
             <div class="bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 max-w-lg w-full max-h-[90vh] overflow-y-auto">
                 <div class="flex items-start justify-between gap-4 px-6 pt-6 pb-4 border-b border-gray-100">
                     <div>
@@ -281,7 +281,7 @@
                     @if ($detalle->estado === 'esperando')
                         @can('turnos.gestionar')
                             <button wire:click="cancelar({{ $detalle->id }})" class="px-4 py-2 rounded-xl border border-red-200 bg-white text-sm font-medium text-red-700 hover:bg-red-50 transition">Cancelar turno</button>
-                            <button wire:click="llamar({{ $detalle->id }})" class="px-4 py-2 rounded-xl bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 shadow-sm transition">Llamar paciente</button>
+                            <button wire:click="llamar({{ $detalle->id }})" class="px-4 py-2 rounded-xl bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 shadow-xs transition">Llamar paciente</button>
                         @endcan
                     @endif
                     @if ($detalle->estado === 'en_atencion')
@@ -290,7 +290,7 @@
                         @endcan
                     @endif
                     @can('expediente.crear')
-                        <a href="{{ route('turno.atender', $detalle->id) }}" wire:navigate class="px-4 py-2 rounded-xl bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 shadow-sm transition">Atender (médico)</a>
+                        <a href="{{ route('turno.atender', $detalle->id) }}" wire:navigate class="px-4 py-2 rounded-xl bg-blue-600 text-sm font-medium text-white hover:bg-blue-700 shadow-xs transition">Atender (médico)</a>
                     @endcan
                 </div>
             </div>

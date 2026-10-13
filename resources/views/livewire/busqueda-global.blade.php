@@ -19,7 +19,7 @@
      "
      x-on:livewire:navigated.window="cerrar()">
 
-    <div x-show="abierto" x-cloak class="fixed inset-0 z-[70] flex items-start justify-center p-4 pt-[12vh]" role="dialog" aria-modal="true" aria-label="Buscar">
+    <div x-show="abierto" x-cloak class="fixed inset-0 z-70 flex items-start justify-center p-4 pt-[12vh]" role="dialog" aria-modal="true" aria-label="Buscar">
         <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]" x-show="abierto" x-transition.opacity @click="cerrar()"></div>
 
         <div class="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl ring-1 ring-gray-200 overflow-hidden"
@@ -37,7 +37,7 @@
             @php $indice = 0; @endphp
             <div class="max-h-[60vh] overflow-y-auto py-2">
                 @if (mb_strlen(trim($q)) < 2)
-                    <p class="px-5 py-8 text-center text-sm text-gray-400">Escriba al menos 2 letras. Use <kbd class="text-xs border border-gray-200 rounded px-1">↑</kbd> <kbd class="text-xs border border-gray-200 rounded px-1">↓</kbd> y <kbd class="text-xs border border-gray-200 rounded px-1">Enter</kbd>.</p>
+                    <p class="px-5 py-8 text-center text-sm text-gray-400">Escriba al menos 2 letras. Use <kbd class="text-xs border border-gray-200 rounded-sm px-1">↑</kbd> <kbd class="text-xs border border-gray-200 rounded-sm px-1">↓</kbd> y <kbd class="text-xs border border-gray-200 rounded-sm px-1">Enter</kbd>.</p>
                 @elseif ($pacientes->isEmpty() && $facturas->isEmpty() && !$pantallas)
                     <p class="px-5 py-8 text-center text-sm text-gray-400">Sin resultados para «{{ $q }}».</p>
                 @else

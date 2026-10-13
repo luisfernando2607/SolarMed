@@ -68,7 +68,7 @@
                 <p class="mt-1 text-[11px] text-gray-400">No escriba datos personales ni de salud.</p>
             </div>
 
-            <button type="submit" class="w-full py-3 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-sm">Enviar opinión</button>
+            <button type="submit" class="w-full py-3 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-xs">Enviar opinión</button>
         </form>
     @endif
 </div>

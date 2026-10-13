@@ -11,11 +11,11 @@
 
         {{-- Step 1: Seleccionar paciente --}}
         @if (!$selectedPaciente)
-            <div class="bg-white rounded-xl shadow-sm border p-6">
+            <div class="bg-white rounded-xl shadow-xs border p-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Seleccionar paciente</h2>
                 <div class="mb-4">
                     <input wire:model.live.debounce.300ms="busqueda" type="text"
-                        class="w-full max-w-md rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        class="w-full max-w-md rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500"
                         placeholder="Buscar por nombre o cédula...">
                 </div>
                 <div class="divide-y divide-gray-100">
@@ -45,7 +45,7 @@
 
         {{-- Step 2: Agregar servicios --}}
         @if ($selectedPaciente)
-            <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
+            <div class="bg-white rounded-xl shadow-xs border p-6 mb-6">
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h2 class="text-lg font-semibold text-gray-900">Paciente</h2>
@@ -90,7 +90,7 @@
                                             <input type="number" min="1"
                                                 value="{{ $item['cantidad'] }}"
                                                 wire:change="actualizarCantidad({{ $i }}, $event.target.value)"
-                                                class="w-16 text-center rounded border-gray-300 text-sm">
+                                                class="w-16 text-center rounded-sm border-gray-300 text-sm">
                                         </td>
                                         <td class="px-4 py-2 text-right">${{ number_format($item['precio_unitario'], 2) }}</td>
                                         <td class="px-4 py-2 text-right font-medium">${{ number_format($item['subtotal'], 2) }}</td>
@@ -113,7 +113,7 @@
                         <div class="flex justify-between items-center">
                             <span class="text-gray-500">Descuento:</span>
                             <input type="number" step="0.01" min="0" wire:model.live="descuento"
-                                class="w-28 text-right rounded border-gray-300 text-sm"
+                                class="w-28 text-right rounded-sm border-gray-300 text-sm"
                                 placeholder="0.00">
                         </div>
                         <div class="flex justify-between text-base font-bold border-t pt-2">
@@ -128,12 +128,12 @@
 
             {{-- Step 3: Pago --}}
             @if (count($items) > 0)
-                <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
+                <div class="bg-white rounded-xl shadow-xs border p-6 mb-6">
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Información de pago</h2>
                     <div class="mb-4">
                         <label class="block text-xs font-medium text-gray-600 mb-1">Médico emisor *</label>
                         <select wire:model="medico_id"
-                            class="w-full sm:w-2/3 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                            class="w-full sm:w-2/3 rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                             <option value="">Seleccione el médico...</option>
                             @foreach ($medicos as $m)
                                 <option value="{{ $m->id }}">
@@ -148,7 +148,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Forma de pago *</label>
                             <select wire:model="forma_pago"
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                                 <option value="efectivo">Efectivo</option>
                                 <option value="transferencia">Transferencia</option>
                                 <option value="tarjeta">Tarjeta</option>
@@ -158,13 +158,13 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Referencia (opcional)</label>
                             <input wire:model="referencia_pago" type="text"
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm"
                                 placeholder="Nº cheque, transf...">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Observaciones</label>
                             <input wire:model="observaciones" type="text"
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm"
                                 placeholder="Notas adicionales">
                         </div>
                     </div>
@@ -176,7 +176,7 @@
                         Cancelar
                     </button>
                     <button wire:click="guardar"
-                        class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition shadow-sm text-sm">
+                        class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition shadow-xs text-sm">
                         Crear factura — ${{ number_format($this->total, 2) }}
                     </button>
                 </div>

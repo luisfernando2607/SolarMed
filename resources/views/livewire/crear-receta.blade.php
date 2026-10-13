@@ -1,5 +1,5 @@
 @php
-    $campo = 'w-full rounded-xl border-gray-200 bg-white shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500';
+    $campo = 'w-full rounded-xl border-gray-200 bg-white shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500';
     $etiqueta = 'block text-xs font-medium text-gray-600 mb-1';
     $paciente = $turno->paciente;
     $edad = \App\Models\Receta::edadTexto($paciente?->fecha_nacimiento);
@@ -49,7 +49,7 @@
                         </div>
                     @endif
                     @if ($codigo_cie10)
-                        <p class="mt-1.5 text-xs text-gray-500"><span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-mono">{{ $codigo_cie10 }}</span> {{ $cie10Descripcion }}</p>
+                        <p class="mt-1.5 text-xs text-gray-500"><span class="px-1.5 py-0.5 rounded-sm bg-blue-50 text-blue-700 font-mono">{{ $codigo_cie10 }}</span> {{ $cie10Descripcion }}</p>
                     @endif
                     @error('codigo_cie10') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
@@ -144,7 +144,7 @@
                                 <input wire:model="items.{{ $i }}.indicacion" type="text" class="{{ $campo }}" placeholder="Después de las comidas">
                             </div>
                             <label class="flex items-center gap-2 text-sm text-gray-700 lg:pt-6">
-                                <input wire:model.live="items.{{ $i }}.antimicrobiano" type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                <input wire:model.live="items.{{ $i }}.antimicrobiano" type="checkbox" class="rounded-sm border-gray-300 text-blue-600 focus:ring-blue-500">
                                 Antimicrobiano
                             </label>
                         </div>
@@ -173,7 +173,7 @@
 
         <div class="flex justify-end gap-3">
             <a href="{{ route('turno.atender', $turno->id) }}" wire:navigate class="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">Cancelar</a>
-            <button type="submit" wire:loading.attr="disabled" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-sm transition">Guardar receta</button>
+            <button type="submit" wire:loading.attr="disabled" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-xs transition">Guardar receta</button>
         </div>
     </form>
 </div>

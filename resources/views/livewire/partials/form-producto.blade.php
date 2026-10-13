@@ -1,6 +1,6 @@
 {{-- Campos del producto (usa $form). Compartido por la lista y el detalle del inventario --}}
 @php
-    $campo = 'w-full rounded-xl border-gray-200 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500';
+    $campo = 'w-full rounded-xl border-gray-200 shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500';
     $etiqueta = 'block text-xs font-medium text-gray-600 mb-1';
 @endphp
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

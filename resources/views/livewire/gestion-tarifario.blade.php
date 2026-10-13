@@ -10,7 +10,7 @@
             @endcan
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div class="bg-white rounded-xl shadow-xs border overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
@@ -122,7 +122,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Especialidad *</label>
                             <select wire:model="especialidad_id"
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm">
                                 <option value="">Seleccione...</option>
                                 @foreach ($especialidades as $e)
                                     <option value="{{ $e->id }}">{{ $e->nombre }}</option>
@@ -134,7 +134,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Nombre del servicio *</label>
                             <input wire:model="nombre" type="text"
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm"
                                 placeholder="Ej: Consulta general">
                             @error('nombre') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -142,21 +142,21 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Descripción</label>
                             <textarea wire:model="descripcion" rows="2"
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm"
                                 placeholder="Descripción opcional"></textarea>
                         </div>
 
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Precio * ($)</label>
                             <input wire:model="precio" type="number" step="0.01" min="0"
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                                class="w-full rounded-lg border-gray-300 shadow-xs focus:border-blue-500 focus:ring-blue-500 text-sm"
                                 placeholder="0.00">
                             @error('precio') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
                             <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" wire:model="activo" class="rounded border-gray-300 text-blue-600">
+                                <input type="checkbox" wire:model="activo" class="rounded-sm border-gray-300 text-blue-600">
                                 <span class="text-sm font-medium text-gray-700">Servicio activo</span>
                             </label>
                         </div>
@@ -167,7 +167,7 @@
                                 Cancelar
                             </button>
                             <button type="submit"
-                                class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition shadow-sm text-sm">
+                                class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition shadow-xs text-sm">
                                 {{ $editMode ? 'Guardar cambios' : 'Crear servicio' }}
                             </button>
                         </div>

@@ -23,9 +23,9 @@
                  o session()->flash('notify', [...]) antes de redirigir --}}
             <div x-data x-on:notify.window="window.notificar($event.detail)"></div>
 
-            <div class="transition-all duration-200 lg:pl-64" :class="colapsado ? 'lg:!pl-[72px]' : 'lg:pl-64'">
+            <div class="transition-all duration-200 lg:pl-64" :class="colapsado ? 'lg:pl-[72px]!' : 'lg:pl-64'">
                 @if (isset($header))
-                    <header class="bg-white shadow">
+                    <header class="bg-white shadow-sm">
                         <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
                             {{ $header }}
                         </div>

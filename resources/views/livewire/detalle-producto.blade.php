@@ -1,6 +1,6 @@
 @php
     $p = $producto;
-    $campo = 'w-full rounded-xl border-gray-200 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500';
+    $campo = 'w-full rounded-xl border-gray-200 shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500';
     $etiqueta = 'block text-xs font-medium text-gray-600 mb-1';
     $boton = 'inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition';
     $tonosMov = ['entrada' => 'bg-emerald-50 text-emerald-700', 'salida' => 'bg-blue-50 text-blue-700', 'ajuste' => 'bg-amber-50 text-amber-800', 'baja' => 'bg-red-50 text-red-700'];
@@ -8,16 +8,18 @@
     $error = fn ($k) => $errors->first($k) ? '<p class="text-red-600 text-xs mt-1">' . e($errors->first($k)) . '</p>' : '';
 @endphp
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
-    <a href="{{ route('inventario') }}" wire:navigate class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
-        Inventario
-    </a>
+    <div>
+        <a href="{{ route('inventario') }}" wire:navigate class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            Inventario
+        </a>
+    </div>
 
     <div class="bg-white rounded-2xl border border-gray-200/80 p-5 sm:p-6">
         <div class="flex flex-col lg:flex-row lg:items-center gap-4">
             <div class="flex-1 min-w-0">
                 <p class="text-sm text-gray-500">{{ \App\Models\Producto::TIPOS[$p->tipo] }}{{ $p->presentacion ? ' · ' . $p->presentacion : '' }}{{ $p->dci && $p->dci !== $p->nombre ? ' · ' . $p->dci : '' }}</p>
-                <h1 class="text-xl sm:text-2xl font-bold text-gray-900 break-words">{{ $p->descripcion() }}</h1>
+                <h1 class="text-xl sm:text-2xl font-bold text-gray-900 wrap-break-word">{{ $p->descripcion() }}</h1>
                 @if (!$p->activo)<span class="inline-block mt-1 px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-600">Inactivo</span>@endif
                 @if ($p->notas)<p class="text-sm text-gray-500 mt-1">{{ $p->notas }}</p>@endif
             </div>
@@ -37,7 +39,7 @@
         </div>
         <div class="flex flex-wrap gap-2 mt-5 pt-5 border-t border-gray-100">
             @can('inventario.gestionar')
-                <button wire:click="abrir('entrada')" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-sm">+ Entrada</button>
+                <button wire:click="abrir('entrada')" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-xs">+ Entrada</button>
                 <button wire:click="abrir('salida')" class="{{ $boton }}" @disabled(!$disponible)>− Salida</button>
                 <button wire:click="abrir('editar')" class="{{ $boton }}">Editar</button>
                 <button wire:click="alternarActivo" wire:confirm="{{ $p->activo ? '¿Desactivar este producto? Dejará de aparecer en la lista.' : '¿Reactivar este producto?' }}" class="{{ $boton }}">{{ $p->activo ? 'Desactivar' : 'Reactivar' }}</button>
@@ -136,7 +138,7 @@
 
     {{-- Formularios de movimiento --}}
     @if ($accion)
-        <div class="fixed inset-0 z-50 flex items-start justify-center bg-gray-900/40 backdrop-blur-sm p-4 pt-12 overflow-y-auto" wire:click.self="cerrar">
+        <div class="fixed inset-0 z-50 flex items-start justify-center bg-gray-900/40 backdrop-blur-xs p-4 pt-12 overflow-y-auto" wire:click.self="cerrar">
             <form wire:submit="guardar" class="w-full {{ $accion === 'editar' ? 'max-w-2xl' : 'max-w-lg' }} bg-white rounded-2xl shadow-2xl p-6 space-y-4">
                 <div>
                     <h2 class="text-lg font-semibold text-gray-900">{{ $titulos[$accion] }}</h2>

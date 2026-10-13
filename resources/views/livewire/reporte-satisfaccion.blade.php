@@ -1,5 +1,5 @@
 @php
-    $campo = 'rounded-xl border-gray-200 bg-white shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500';
+    $campo = 'rounded-xl border-gray-200 bg-white shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500';
     $tonoNps = fn ($v) => $v === null ? 'text-gray-400' : ($v >= 50 ? 'text-emerald-700' : ($v >= 0 ? 'text-gray-900' : 'text-red-700'));
 @endphp
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">

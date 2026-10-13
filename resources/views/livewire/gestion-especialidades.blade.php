@@ -10,7 +10,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         @foreach ($especialidades as $e)
-            <div class="bg-white rounded-xl shadow-sm border p-5 {{ $e->activo ? '' : 'opacity-60' }}">
+            <div class="bg-white rounded-xl shadow-xs border p-5 {{ $e->activo ? '' : 'opacity-60' }}">
                 <div class="flex items-start justify-between gap-3">
                     <div class="flex items-center gap-3">
                         <span class="inline-flex items-center justify-center w-10 h-10 rounded-lg text-white font-bold" style="background-color: {{ $e->color_agenda ?: '#3B82F6' }}">{{ $e->prefijo_turno }}</span>
@@ -37,17 +37,17 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="col-span-2">
                         <label class="block text-xs font-medium text-gray-600 mb-1">Nombre *</label>
-                        <input wire:model.live.debounce.400ms="nombre" type="text" class="w-full rounded-lg border-gray-300 shadow-sm text-sm">
+                        <input wire:model.live.debounce.400ms="nombre" type="text" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                         @error('nombre') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Código interno *</label>
-                        <input wire:model="codigo" type="text" @disabled($editId) class="w-full rounded-lg border-gray-300 shadow-sm text-sm disabled:bg-gray-100">
+                        <input wire:model="codigo" type="text" @disabled($editId) class="w-full rounded-lg border-gray-300 shadow-xs text-sm disabled:bg-gray-100">
                         @error('codigo') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-600 mb-1">Prefijo del turno *</label>
-                        <input wire:model="prefijo_turno" type="text" maxlength="3" placeholder="G" class="w-full rounded-lg border-gray-300 shadow-sm text-sm uppercase">
+                        <input wire:model="prefijo_turno" type="text" maxlength="3" placeholder="G" class="w-full rounded-lg border-gray-300 shadow-xs text-sm uppercase">
                         @error('prefijo_turno') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
@@ -57,12 +57,12 @@
                     </div>
                     <div class="flex items-end pb-2">
                         <label class="flex items-center gap-2 text-sm text-gray-700">
-                            <input wire:model="activo" type="checkbox" class="rounded border-gray-300"> Activa
+                            <input wire:model="activo" type="checkbox" class="rounded-sm border-gray-300"> Activa
                         </label>
                     </div>
                     <div class="col-span-2">
                         <label class="block text-xs font-medium text-gray-600 mb-1">Motivos de consulta * <span class="font-normal text-gray-400">(uno por línea)</span></label>
-                        <textarea wire:model="motivosTexto" rows="8" class="w-full rounded-lg border-gray-300 shadow-sm text-sm"></textarea>
+                        <textarea wire:model="motivosTexto" rows="8" class="w-full rounded-lg border-gray-300 shadow-xs text-sm"></textarea>
                         @error('motivosTexto') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>

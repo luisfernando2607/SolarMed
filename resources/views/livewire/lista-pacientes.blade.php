@@ -9,7 +9,7 @@
             <div class="relative w-full sm:w-96">
                 <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
                 <input wire:model.live.debounce.300ms="busqueda" type="search"
-                    class="w-full pl-10 rounded-xl border-gray-200 bg-white shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500"
+                    class="w-full pl-10 rounded-xl border-gray-200 bg-white shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500"
                     placeholder="Buscar por nombre, cédula o teléfono…">
             </div>
         </div>
@@ -107,7 +107,7 @@
                             {{-- Header --}}
                             <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-semibold text-sm flex-shrink-0">
+                                    <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-semibold text-sm shrink-0">
                                         {{ strtoupper(substr($nombres ?? $selected->nombres, 0, 1)) }}{{ strtoupper(substr($apellidos ?? $selected->apellidos, 0, 1)) }}
                                     </div>
                                     <div>
@@ -280,7 +280,7 @@
                                                 </div>
                                             </div>
                                             <label class="flex items-start gap-3 mt-4 p-3 rounded-xl border border-gray-200 bg-gray-50/70 cursor-pointer">
-                                                <input type="checkbox" wire:model="identidad_reservada" class="mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                                <input type="checkbox" wire:model="identidad_reservada" class="mt-0.5 rounded-sm border-gray-300 text-blue-600 focus:ring-blue-500">
                                                 <span class="text-sm">
                                                     <span class="block font-medium text-gray-800">Identidad reservada</span>
                                                     <span class="block text-xs text-gray-500 mt-0.5">Para pacientes con VIH, tuberculosis activa, cáncer u otras enfermedades raras o catastróficas (AM 5216-A, Art. 13). En documentos, sala de espera, agenda y recordatorios se muestra la cédula en lugar del nombre.</span>
@@ -296,7 +296,7 @@
                                          x-transition:enter-end="opacity-100 translate-y-0"
                                          x-cloak>
                                         <div class="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-4 py-2.5 text-xs text-blue-700 mb-6">
-                                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                             Esta sección aplica únicamente para pacientes de sexo femenino.
                                         </div>
 

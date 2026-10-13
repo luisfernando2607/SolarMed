@@ -1,5 +1,5 @@
 @php
-    $campo = 'w-full rounded-xl border-gray-200 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500';
+    $campo = 'w-full rounded-xl border-gray-200 shadow-xs text-sm focus:border-blue-500 focus:ring-blue-500';
     $etiqueta = 'block text-xs font-medium text-gray-600 mb-1';
     $textos = [
         ['en_que_consiste', '¿En qué consiste?', 'Explicación clara del procedimiento, en palabras que el paciente entienda.', 3],
@@ -124,7 +124,7 @@
                 @error('grafico') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 @if ($graficoActual && !$grafico)
                     <label class="mt-2 inline-flex items-center gap-2 text-xs text-gray-600">
-                        <input type="checkbox" wire:model="quitarGrafico" class="rounded border-gray-300"> Quitar el gráfico actual
+                        <input type="checkbox" wire:model="quitarGrafico" class="rounded-sm border-gray-300"> Quitar el gráfico actual
                     </label>
                 @endif
             </div>
@@ -134,7 +134,7 @@
             <button type="button" wire:click="guardarComoPlantilla" class="px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
                 Guardar textos como plantilla
             </button>
-            <button type="submit" wire:loading.attr="disabled" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-sm">
+            <button type="submit" wire:loading.attr="disabled" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-xs">
                 {{ $consentimientoId ? 'Guardar cambios' : 'Guardar y preparar para firma' }}
             </button>
         </div>

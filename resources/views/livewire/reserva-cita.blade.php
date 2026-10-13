@@ -1,7 +1,7 @@
 @php
     $pasos = [1 => 'Especialidad', 2 => 'Médico', 3 => 'Día y hora', 4 => 'Sus datos'];
     $tarjeta = 'w-full text-left rounded-2xl border border-gray-200 bg-white px-4 py-4 hover:border-blue-400 hover:bg-blue-50/40 transition';
-    $campo = 'w-full rounded-xl border-gray-300 shadow-sm text-base sm:text-sm focus:border-blue-500 focus:ring-blue-500';
+    $campo = 'w-full rounded-xl border-gray-300 shadow-xs text-base sm:text-sm focus:border-blue-500 focus:ring-blue-500';
     $etiqueta = 'block text-sm font-medium text-gray-700 mb-1';
 @endphp
 <div>
@@ -91,7 +91,7 @@
                     @foreach ($fechas as $f => $libres)
                         @php $d = \Carbon\Carbon::parse($f)->locale('es'); @endphp
                         <button type="button" wire:click="elegirFecha('{{ $f }}')" wire:key="f-{{ $f }}" @disabled(!$libres)
-                                class="snap-start shrink-0 w-[4.5rem] rounded-xl border px-2 py-2.5 text-center transition disabled:opacity-35 disabled:cursor-not-allowed {{ $fecha === $f ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-200 bg-white text-gray-800 hover:border-blue-400' }}">
+                                class="snap-start shrink-0 w-18 rounded-xl border px-2 py-2.5 text-center transition disabled:opacity-35 disabled:cursor-not-allowed {{ $fecha === $f ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-200 bg-white text-gray-800 hover:border-blue-400' }}">
                             <span class="block text-[11px] uppercase {{ $fecha === $f ? 'text-white/80' : 'text-gray-500' }}">{{ $d->translatedFormat('D') }}</span>
                             <span class="block text-lg font-bold leading-tight">{{ $d->day }}</span>
                             <span class="block text-[11px] {{ $fecha === $f ? 'text-white/80' : 'text-gray-500' }}">{{ $d->translatedFormat('M') }}</span>
@@ -171,7 +171,7 @@
                 </div>
                 <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
                     <button type="button" wire:click="volver(3)" class="text-sm text-gray-500 hover:text-gray-800">Cambiar día u hora</button>
-                    <button type="submit" wire:loading.attr="disabled" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold shadow-sm hover:bg-blue-700 disabled:opacity-60">
+                    <button type="submit" wire:loading.attr="disabled" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold shadow-xs hover:bg-blue-700 disabled:opacity-60">
                         <span wire:loading.remove wire:target="reservar">Reservar cita</span>
                         <span wire:loading wire:target="reservar">Reservando…</span>
                     </button>
