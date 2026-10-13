@@ -440,4 +440,9 @@ Route::get('cuenta/password', \App\Livewire\Cuenta\CambiarPassword::class)
 Route::get('cuenta/confidencialidad', \App\Livewire\Cuenta\AcuerdoConfidencialidad::class)
     ->middleware('auth')->name('cuenta.confidencialidad');
 
+// Estado del servidor (solo admin)
+Route::get('sistema', \App\Livewire\EstadoSistema::class)
+    ->middleware(['auth', 'can:configuracion.editar'])
+    ->name('sistema');
+
 require __DIR__.'/auth.php';

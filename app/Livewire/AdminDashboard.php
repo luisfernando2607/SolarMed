@@ -153,6 +153,7 @@ class AdminDashboard extends Component
         }
 
         return view('livewire.admin-dashboard', [
+            'estadoSistema' => app(\App\Services\EstadoSistemaService::class)->resumen(),
             'kpis' => $kpis,
             'series' => $series,
             'tasaCancelacion' => $tasaCancelacion,

@@ -19,3 +19,8 @@ Schedule::command('citas:recordatorios')->dailyAt(app(\App\Services\AjustesServi
 
 // Integridad del registro de auditoría (AM 5216-A Art. 8: trazabilidad)
 Schedule::command('auditoria:verificar')->dailyAt('02:30')->withoutOverlapping();
+
+// Latidos para el panel Estado del sistema: confirman que el programador y la cola siguen vivos
+Schedule::call(fn () => Illuminate\Support\Facades\Cache::forever(App\Services\EstadoSistemaService::LATIDO_TAREAS, now()->toIso8601String()))
+    ->everyMinute()->name('latido-tareas');
+Schedule::job(new App\Jobs\LatidoCola)->everyFiveMinutes()->name('latido-cola');

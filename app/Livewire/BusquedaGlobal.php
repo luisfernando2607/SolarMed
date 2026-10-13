@@ -39,6 +39,7 @@ class BusquedaGlobal extends Component
         ['Planes de acción', 'auditoria.planes', 'auditoria.ver', 'auditoria mejora hallazgos'],
         ['Solicitudes de información', 'auditoria.solicitudes', 'auditoria.ver', 'copia historia clinica lopdp derechos acceso rectificacion'],
         ['Incidentes de seguridad', 'auditoria.incidentes', 'auditoria.ver', 'vulneracion filtracion datos lopdp'],
+        ['Estado del sistema', 'sistema', 'configuracion.editar', 'servidor respaldos cola salud disco certificados'],
         ['Mi perfil', 'profile', null, 'contraseña clave dos factores 2fa'],
     ];
 

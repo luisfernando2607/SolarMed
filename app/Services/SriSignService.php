@@ -282,6 +282,22 @@ class SriSignService {
         return $dec;
     }
 
+    /** Fecha de vencimiento del certificado .p12 del médico, o null si no tiene o no se puede leer */
+    public function vencimientoCertificado(Medico $medico): ?\Carbon\Carbon
+    {
+        if (!$medico->p12_path || !Storage::disk('private')->exists($medico->p12_path)) {
+            return null;
+        }
+        try {
+            $certs = self::leerP12(Storage::disk('private')->get($medico->p12_path), $this->decryptPassword($medico->p12_password_encrypted));
+            $info = !empty($certs['cert']) ? openssl_x509_parse($certs['cert']) : false;
+
+            return $info && isset($info['validTo_time_t']) ? \Carbon\Carbon::createFromTimestamp($info['validTo_time_t'], config('app.timezone')) : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
     private function decryptPassword(?string $encrypted): string
     {
         if (!$encrypted) return '';
