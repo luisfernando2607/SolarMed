@@ -34,6 +34,10 @@ class RegistroAcceso extends Model
         'aceptar_confidencialidad' => 'Aceptó confidencialidad',
         'dar_permiso' => 'Dio permiso',
         'quitar_permiso' => 'Quitó permiso',
+        'entrada' => 'Entrada de inventario',
+        'salida' => 'Salida de inventario',
+        'ajuste' => 'Ajuste de inventario',
+        'baja' => 'Baja de inventario',
         'auditar' => 'Auditó',
     ];
 
