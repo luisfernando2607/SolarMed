@@ -478,4 +478,7 @@ Route::get('inventario/{producto}/kardex', [\App\Http\Controllers\InventarioExpo
     ->middleware(['auth', 'can:inventario.ver'])
     ->name('inventario.kardex');
 
+// Aviso de privacidad (LOPDP), público
+Route::view('privacidad', 'privacidad')->name('privacidad');
+
 require __DIR__.'/auth.php';

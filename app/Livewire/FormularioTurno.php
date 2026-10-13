@@ -82,6 +82,9 @@ class FormularioTurno extends Component
         $this->motivo = '';
     }
 
+    /** Consentimiento explícito para tratar los datos (incluidos los de salud) — LOPDP */
+    public bool $acepta_privacidad = false;
+
     public function registrar(): void
     {
         $this->validate([
@@ -105,7 +108,8 @@ class FormularioTurno extends Component
             'enfermedades_familiares' => 'nullable|string|max:1000',
             'especialidad_id' => 'required|exists:especialidades,id',
             'motivo' => ['required', 'string', 'max:100', \Illuminate\Validation\Rule::in(array_keys($this->motivosDisponibles ?? []))],
-        ]);
+            'acepta_privacidad' => 'accepted',
+        ], ['acepta_privacidad.accepted' => 'Para registrar el turno debe aceptar el aviso de privacidad.']);
 
         // Límite por IP para evitar que el formulario público se use para llenar la base de datos
         $claveLimite = 'turno-publico:' . request()->ip();
@@ -118,6 +122,7 @@ class FormularioTurno extends Component
 
         try {
             $turno = app(TurnoService::class)->registrarDesdeQR($this->toArray());
+            \App\Models\ConsentimientoDatos::registrar('turno_publico', (string) $turno->cedula, $turno->paciente_id);
 
             $this->turnoAsignado = "{$turno->prefijo}{$turno->numero_turno}";
             $this->error = null;

@@ -96,12 +96,16 @@ class ReservaCita extends Component
         return $motivos ?: ['Consulta'];
     }
 
+    /** Consentimiento explícito para tratar los datos (incluidos los de salud) — LOPDP */
+    public bool $acepta_privacidad = false;
+
     public function reservar(): void
     {
         abort_unless($this->servicio()->habilitada(), 403);
 
         $this->cedula = preg_replace('/\D/', '', $this->cedula);
         $this->validate([
+            'acepta_privacidad' => 'accepted',
             'motivo' => ['required', Rule::in($this->motivos())],
             'cedula' => ['required', function ($attr, $valor, $fallo) {
                 if (!CedulaEcuador::valida($valor)) {
@@ -122,6 +126,7 @@ class ReservaCita extends Component
             'telefono.regex' => 'Ingrese un celular ecuatoriano, por ejemplo 0991234567.',
             'motivo.required' => 'Elija el motivo de la cita.',
             'sexo.required' => 'Seleccione el sexo.',
+            'acepta_privacidad.accepted' => 'Para reservar debe aceptar el aviso de privacidad.',
         ], [
             'nombres' => 'nombres', 'apellidos' => 'apellidos', 'telefono' => 'celular',
             'email' => 'correo', 'fecha_nacimiento' => 'fecha de nacimiento',
@@ -157,6 +162,7 @@ class ReservaCita extends Component
         }
 
         RateLimiter::hit($clave, 3600);
+        \App\Models\ConsentimientoDatos::registrar('reserva_online', $this->cedula, $cita->paciente_id);
         $this->citaId = $cita->id;
         $this->paso = 5;
     }

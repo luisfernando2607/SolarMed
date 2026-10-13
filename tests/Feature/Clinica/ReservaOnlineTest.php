@@ -59,6 +59,7 @@ class ReservaOnlineTest extends TestCase
         return $extra + [
             'motivo' => 'Consulta general', 'cedula' => self::CEDULA_1, 'nombres' => 'Ana', 'apellidos' => 'Pérez',
             'telefono' => '0991234567', 'email' => '', 'sexo' => 'femenino', 'fecha_nacimiento' => '1990-05-01',
+            'acepta_privacidad' => true,
         ];
     }
 

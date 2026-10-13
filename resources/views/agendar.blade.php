@@ -29,7 +29,7 @@
     </main>
 
     <footer class="max-w-3xl mx-auto px-4 pb-8 text-center text-xs text-gray-400">
-        Sus datos se usan solo para gestionar su atención en {{ $marca->nombre() }}.
+        Sus datos se usan solo para gestionar su atención en {{ $marca->nombre() }}. <a href="{{ route('privacidad') }}" class="underline hover:text-gray-600">Aviso de privacidad</a>
     </footer>
     @livewireScripts
 </body>
