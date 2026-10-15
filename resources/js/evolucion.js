@@ -86,6 +86,8 @@ function dibujar() {
         if (!suficientes) continue;
 
         const unaSerie = series.length === 1;
+        // El eje termina en los datos: sin redondeos que muestren fechas futuras
+        const valoresX = series.flatMap((s) => s.datos.map((d) => d.x));
         graficos.push(new Chart(figura.querySelector('canvas'), {
             type: 'line',
             data: {
@@ -123,6 +125,8 @@ function dibujar() {
                 scales: {
                     x: {
                         type: 'linear',
+                        min: Math.min(...valoresX),
+                        max: Math.max(...valoresX),
                         grid: { display: false },
                         border: { display: false },
                         ticks: { color: '#8a8984', maxTicksLimit: 5, maxRotation: 0, autoSkipPadding: 12, callback: (v) => (g.eje === 'fecha' ? fechaCorta(v) : `sem ${v}`) },
