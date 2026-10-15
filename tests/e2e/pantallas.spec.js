@@ -3,7 +3,7 @@ import { test, expect, entrar, sinDesbordeLateral } from './ayuda.js';
 // Todas las pantallas del administrador cargan sin errores (y sin desborde lateral en el celular)
 const PANTALLAS = [
     '/admin/dashboard', '/pacientes', '/pacientes/1', '/expedientes', '/agenda', '/sala-espera', '/turnos/crear',
-    '/referencias', '/facturas', '/facturas/crear', '/reportes/ventas', '/reportes/morbilidad', '/reportes/satisfaccion',
+    '/referencias', '/facturas', '/facturas/crear', '/caja', '/reportes/ventas', '/reportes/morbilidad', '/reportes/satisfaccion',
     '/auditoria', '/auditoria/calidad-hc', '/auditoria/planes-accion', '/auditoria/solicitudes', '/auditoria/incidentes',
     '/usuarios', '/roles', '/especialidades', '/tarifario', '/configuracion', '/sistema', '/sri/configuracion',
     '/consentimientos/plantillas', '/inventario', '/whatsapp', '/ayuda', '/profile',

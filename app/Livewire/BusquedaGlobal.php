@@ -27,6 +27,7 @@ class BusquedaGlobal extends Component
         ['Referencias y contrarreferencias', 'referencias', 'expediente.ver', 'derivacion formulario 053 msp interconsulta'],
         ['Facturas', 'facturas', 'facturas.ver', 'facturacion sri'],
         ['Nueva factura', 'facturas.crear', 'facturas.crear', 'cobrar facturar'],
+        ['Cierre de caja', 'caja', 'caja.cerrar|facturas.ver', 'cuadre efectivo arqueo cerrar caja'],
         ['Reporte de ventas', 'reportes.ventas', 'reportes.ver', 'reportes ingresos'],
         ['Satisfacción de los pacientes', 'reportes.satisfaccion', 'reportes.ver|auditoria.ver', 'encuesta opinion calidad nps'],
         ['Producción y morbilidad', 'reportes.morbilidad', 'reportes.ver|auditoria.ver', 'reportes cie10 diagnosticos estadistica atenciones msp'],

@@ -40,6 +40,14 @@
         </div>
     @endif
 
+    @if ($caja)
+        <a href="{{ route('caja') }}" wire:navigate
+           class="bg-white border border-amber-300 rounded-xl p-4 flex flex-wrap items-center gap-x-6 gap-y-2 hover:bg-gray-50 transition">
+            <h3 class="font-semibold text-gray-800 text-sm">Caja sin cerrar desde {{ $caja['desde']->format('d/m/Y') }}</h3>
+            <span class="text-sm text-amber-800">{{ $caja['facturas'] }} {{ $caja['facturas'] === 1 ? 'factura de días anteriores' : 'facturas de días anteriores' }} pendientes de cierre</span>
+        </a>
+    @endif
+
     @if ($inventario)
         <a href="{{ route('inventario') }}" wire:navigate
            class="bg-white border rounded-xl p-4 flex flex-wrap items-center gap-x-6 gap-y-2 hover:bg-gray-50 transition {{ $inventario['vencidos'] ? 'border-red-300' : '' }}">

@@ -32,6 +32,8 @@ class RolesSeeder extends Seeder {
             'preparacion.registrar',
             // Inventario (también en la migración create_inventario_tables)
             'inventario.ver', 'inventario.gestionar',
+            // Cierre de caja (también en la migración create_cierres_caja)
+            'caja.cerrar',
         ];
 
         foreach ($permisos as $p) {
@@ -51,7 +53,7 @@ class RolesSeeder extends Seeder {
         $secretaria = Role::firstOrCreate(['name' => 'secretaria']);
         $secretaria->syncPermissions([
             'turnos.ver', 'turnos.gestionar',
-            'facturas.ver', 'facturas.crear',
+            'facturas.ver', 'facturas.crear', 'caja.cerrar',
         ]);
 
         $enfermeria = Role::firstOrCreate(['name' => 'enfermeria']);
