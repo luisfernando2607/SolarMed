@@ -147,9 +147,22 @@ class PanelPendientes extends Component
         return array_sum($a) ? $a : null;
     }
 
+    /** Facturas de días anteriores que aún no entran en un cierre de caja */
+    private function caja(): ?array
+    {
+        if (!Auth::user()->can('caja.cerrar')) {
+            return null;
+        }
+        $pendientes = \App\Models\Factura::whereNull('cierre_id')->where('created_at', '<', today());
+        $desde = (clone $pendientes)->min('created_at');
+
+        return $desde ? ['desde' => \Carbon\Carbon::parse($desde), 'facturas' => $pendientes->count()] : null;
+    }
+
     public function render()
     {
         return view('livewire.panel-pendientes', [
+            'caja' => $this->caja(),
             'inventario' => $this->inventario(),
             'cumplimiento' => $this->cumplimiento(),
             'enLinea' => $this->enLinea(),

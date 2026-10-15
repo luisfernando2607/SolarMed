@@ -495,4 +495,37 @@ Route::post('whatsapp/webhook', [\App\Http\Controllers\WhatsappWebhookController
     ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])
     ->middleware('throttle:600,1');
 
+// Cierre de caja: cerrar con caja.cerrar; ver historial con facturas.ver (se valida en el componente)
+Route::get('caja', \App\Livewire\Caja::class)->middleware('auth')->name('caja');
+Route::get('caja/{cierre}/acta', function (App\Models\CierreCaja $cierre) {
+    abort_unless(auth()->user()->canAny(['caja.cerrar', 'facturas.ver']), 403);
+    $cierre->load('user', 'reabiertoPor');
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'cierre_caja', $cierre->id, null, 'Acta de cierre de caja');
+    return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.cierre-caja', ['c' => $cierre])
+        ->setPaper('a4')
+        ->download('cierre_caja_' . $cierre->hasta->format('Ymd_Hi') . '.pdf');
+})->middleware('auth')->name('caja.acta');
+Route::get('caja/exportar', function () {
+    abort_unless(auth()->user()->can('facturas.ver'), 403);
+    app(\App\Services\AuditoriaService::class)->registrar('exportar', 'cierre_caja', null, null, 'CSV de cierres de caja');
+    return response()->streamDownload(function () {
+        $salida = fopen('php://output', 'w');
+        fwrite($salida, "\xEF\xBB\xBF");
+        $seguro = fn ($v) => is_string($v) && preg_match('/^[=+\-@\t\r]/', $v) ? "'" . $v : $v;
+        fputcsv($salida, ['Cierre', 'Desde', 'Hasta', 'Cerró', 'Efectivo', 'Transferencia', 'Tarjeta', 'Devoluciones', 'Fondo inicial',
+            'Efectivo esperado', 'Efectivo contado', 'Diferencia', 'Facturas', 'Anuladas', 'Estado', 'Observaciones'], ';');
+        App\Models\CierreCaja::with('user')->orderBy('id')->chunk(500, function ($cierres) use ($salida, $seguro) {
+            foreach ($cierres as $c) {
+                fputcsv($salida, array_map($seguro, [
+                    $c->id, $c->desde->format('Y-m-d H:i'), $c->hasta->format('Y-m-d H:i'), $c->user?->name,
+                    $c->cobrado['efectivo'] ?? 0, $c->cobrado['transferencia'] ?? 0, $c->cobrado['tarjeta'] ?? 0, $c->notas_credito_total,
+                    $c->fondo_inicial, $c->efectivo_esperado, $c->contado_efectivo, $c->diferencia, $c->facturas_count, $c->anuladas_count,
+                    $c->estado, $c->observaciones,
+                ]), ';');
+            }
+        });
+        fclose($salida);
+    }, 'cierres_caja_' . now()->format('Ymd_His') . '.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+})->middleware('auth')->name('caja.exportar');
+
 require __DIR__.'/auth.php';

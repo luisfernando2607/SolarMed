@@ -27,6 +27,7 @@ class RolesPermisos extends Component
         'usuarios' => 'Usuarios',
         'auditoria' => 'Auditoría',
         'inventario' => 'Inventario',
+        'caja' => 'Caja',
         'preparacion' => 'Preparación de enfermería',
     ];
 
@@ -44,6 +45,7 @@ class RolesPermisos extends Component
         'facturas.ver' => 'Ver facturas',
         'facturas.crear' => 'Emitir facturas',
         'facturas.anular' => 'Anular facturas y emitir notas de crédito',
+        'caja.cerrar' => 'Cerrar la caja diaria (cuadre del efectivo)',
         'reportes.ver' => 'Ver reportes de ventas',
         'configuracion.ver' => 'Ver la configuración',
         'configuracion.editar' => 'Administrar la clínica (configuración, SRI, tarifario, roles)',

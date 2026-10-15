@@ -106,6 +106,7 @@
             <li>La factura se envía sola al SRI y se autoriza en segundo plano. Su estado se ve en la lista: <em>Autorizada, En proceso, Reintentando, Devuelta, No autorizada</em>.</li>
             <li>Si quedó devuelta, abra la factura para ver el mensaje del SRI y use <strong>Reintentar envío al SRI</strong> tras corregir.</li>
             <li>Para anular una factura ya autorizada se emite una <strong>nota de crédito</strong> desde la misma factura.</li>
+            <li>Al final del día, en <strong>Cierre de caja</strong> ingrese el fondo inicial y el efectivo contado (puede usar el contador de billetes y monedas); la app calcula el sobrante o faltante. Pulse <strong>Cerrar caja</strong> e imprima el <strong>Acta PDF</strong> para firmar.</li>
         </ol>
         <p class="{{ $nota }}">Para emitir, cada médico debe tener su RUC y su certificado de firma electrónica (.p12) cargados en Usuarios.</p>
     </section>
