@@ -10,3 +10,4 @@ import esLocale from '@fullcalendar/core/locales/es';
 window.Swal = Swal;
 window.Chart = Chart;
 window.FullCalendar = { Calendar, plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin], esLocale };
+import './evolucion';

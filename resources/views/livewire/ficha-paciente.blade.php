@@ -17,6 +17,8 @@
     $pestanas = array_filter([
         'consultas' => $clinico ? ['Consultas', $consultas->count()] : null,
         'documentos' => $clinico ? ['Documentos', $documentos->count()] : null,
+        // Número de días con alguna medición registrada
+        'evolucion' => $clinico ? ['Evolución', collect($evolucion)->where('eje', 'fecha')->flatMap(fn ($g) => collect($g['series'])->flatMap(fn ($s) => array_column($s['puntos'], 'x')))->unique()->count()] : null,
         'citas' => auth()->user()->can('turnos.ver') ? ['Citas', $citas->count()] : null,
         'facturas' => auth()->user()->can('facturas.ver') ? ['Facturas', $facturas->count()] : null,
     ]);
@@ -206,7 +208,7 @@
             @if ($pestanas)
                 <div class="flex gap-1 px-3 pt-3 border-b border-gray-100 overflow-x-auto">
                     @foreach ($pestanas as $clave => [$texto, $n])
-                        <button type="button" @click="tab = '{{ $clave }}'"
+                        <button type="button" @click="tab = '{{ $clave }}'; $nextTick(() => window.dispatchEvent(new Event('evolucion:visible')))"
                                 :class="tab === '{{ $clave }}' ? 'border-blue-600 text-blue-700 font-medium' : 'border-transparent text-gray-500 hover:text-gray-800'"
                                 class="px-3 py-2.5 text-sm border-b-2 -mb-px whitespace-nowrap transition">
                             {{ $texto }} <span class="ml-1 text-xs text-gray-400">{{ $n }}</span>
@@ -287,6 +289,79 @@
                     @empty
                         <p class="px-5 py-12 text-center text-sm text-gray-400">Sin recetas, certificados, pedidos, ecografías ni consentimientos.</p>
                     @endforelse
+                </div>
+            @endif
+
+            @if ($clinico)
+                {{-- Evolución: un gráfico por medida (los dibuja resources/js/evolucion.js con los datos de abajo) --}}
+                <div x-show="tab === 'evolucion'" x-cloak class="p-4 sm:p-5 space-y-4" data-evolucion>
+                    <script type="application/json" id="evolucion-datos">@json($evolucion)</script>
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <p class="text-xs text-gray-500">Mediciones de enfermería, consultas y controles prenatales. Si un día hay varias, se usa la de enfermería.</p>
+                        <div class="inline-flex rounded-xl border border-gray-200 bg-white p-1 text-sm" role="group" aria-label="Período">
+                            @foreach (['6m' => '6 meses', '1a' => '1 año', 'todo' => 'Todo'] as $valor => $texto)
+                                <button type="button" data-evolucion-rango="{{ $valor }}" aria-pressed="{{ $valor === 'todo' ? 'true' : 'false' }}"
+                                        class="px-3 py-1 rounded-lg text-gray-600 hover:text-gray-900 aria-pressed:bg-blue-50 aria-pressed:text-blue-700 aria-pressed:font-medium">{{ $texto }}</button>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @foreach ($evolucion as $g)
+                            @php
+                                $ultimos = collect($g['series'])->map(fn ($s) => end($s['puntos']) ?: null);
+                                $ultimo = $ultimos->filter()->first();
+                            @endphp
+                            <figure class="rounded-xl border border-gray-100 p-4" data-grafico="{{ $g['id'] }}">
+                                <figcaption class="flex items-baseline justify-between gap-2">
+                                    <span class="text-sm font-semibold text-gray-900">{{ $g['titulo'] }} <span class="font-normal text-gray-400">({{ $g['unidad'] }})</span></span>
+                                    @if ($ultimo)
+                                        <span class="shrink-0 whitespace-nowrap text-xs text-gray-500 tabular-nums" title="Última medición">
+                                            {{ $ultimos->map(fn ($p) => $p['valor'] ?? '—')->implode('/') }} · {{ $ultimo['fecha'] }}
+                                        </span>
+                                    @endif
+                                </figcaption>
+                                @if (count($g['series']) > 1)
+                                    <div class="mt-2 flex gap-4 text-xs text-gray-600">
+                                        @foreach ($g['series'] as $s)
+                                            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-0.5 rounded-full" style="background: {{ $s['color'] }}"></span>{{ $s['nombre'] }}</span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                                <div class="relative mt-3 h-44" data-lienzo><canvas aria-label="{{ $g['titulo'] }}" role="img"></canvas></div>
+                                <p class="hidden h-44 mt-3 items-center justify-center text-sm text-gray-400" data-sin-datos>Sin datos suficientes en este período.</p>
+                                @isset($g['nota'])<p class="mt-2 text-[11px] text-gray-400">{{ $g['nota'] }}</p>@endisset
+                                <details class="mt-2 text-xs">
+                                    <summary class="cursor-pointer text-blue-700 font-medium">Ver tabla</summary>
+                                    <table class="mt-2 w-full tabular-nums">
+                                        <thead class="text-gray-400"><tr><th class="text-left font-medium py-1">{{ $g['eje'] === 'semana' ? 'Semana' : 'Fecha' }}</th>@foreach ($g['series'] as $s)<th class="text-right font-medium py-1">{{ $s['nombre'] }}</th>@endforeach<th class="text-right font-medium py-1">Fuente</th></tr></thead>
+                                        <tbody class="divide-y divide-gray-50 text-gray-700">
+                                            @php
+                                                // Filas por fecha (o semana) uniendo las series del gráfico
+                                                $clave = $g['eje'] === 'semana' ? 'semana' : 'x';
+                                                $filas = [];
+                                                foreach ($g['series'] as $i => $s) {
+                                                    foreach ($s['puntos'] as $pt) {
+                                                        $filas[(string) $pt[$clave]]['pt'] = $pt;
+                                                        $filas[(string) $pt[$clave]]['v'][$i] = $pt['valor'];
+                                                    }
+                                                }
+                                                ksort($filas, SORT_NUMERIC);
+                                            @endphp
+                                            @forelse (array_reverse($filas, true) as $f)
+                                                <tr @if ($g['eje'] === 'fecha') data-x="{{ $f['pt']['x'] }}" @endif>
+                                                    <td class="py-1">{{ $g['eje'] === 'semana' ? $f['pt']['semana'] . ' (' . $f['pt']['fecha'] . ')' : $f['pt']['fecha'] }}</td>
+                                                    @foreach ($g['series'] as $i => $s)<td class="py-1 text-right">{{ $f['v'][$i] ?? '—' }}</td>@endforeach
+                                                    <td class="py-1 text-right text-gray-400">{{ $f['pt']['fuente'] }}</td>
+                                                </tr>
+                                            @empty
+                                                <tr><td colspan="{{ count($g['series']) + 2 }}" class="py-2 text-gray-400">Sin mediciones registradas.</td></tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </details>
+                            </figure>
+                        @endforeach
+                    </div>
                 </div>
             @endif
 
