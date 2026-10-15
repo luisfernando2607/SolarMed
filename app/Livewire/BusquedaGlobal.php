@@ -42,6 +42,7 @@ class BusquedaGlobal extends Component
         ['Incidentes de seguridad', 'auditoria.incidentes', 'auditoria.ver', 'vulneracion filtracion datos lopdp'],
         ['Estado del sistema', 'sistema', 'configuracion.editar', 'servidor respaldos cola salud disco certificados'],
         ['Insumos y medicamentos', 'inventario', 'inventario.ver', 'inventario stock bodega farmacia lotes vencimiento kardex'],
+        ['Ayuda y guías de uso', 'ayuda', null, 'manual como usar instrucciones soporte'],
         ['Mi perfil', 'profile', null, 'contraseña clave dos factores 2fa'],
     ];
 
