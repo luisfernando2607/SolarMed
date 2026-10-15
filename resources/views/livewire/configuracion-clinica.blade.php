@@ -299,5 +299,10 @@
     <div class="mt-6">
         <livewire:configuracion-whatsapp />
     </div>
+
+    {{-- Telemedicina: componente aparte, con su propio guardado --}}
+    <div class="mt-6">
+        <livewire:configuracion-telemedicina />
+    </div>
 </div>
 </div>

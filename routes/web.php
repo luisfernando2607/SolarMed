@@ -528,4 +528,17 @@ Route::get('caja/exportar', function () {
     }, 'cierres_caja_' . now()->format('Ymd_His') . '.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
 })->middleware('auth')->name('caja.exportar');
 
+// Telemedicina (Norma Técnica de Telesalud, MSP 2025): personal con sesión y página pública del paciente con enlace secreto
+Route::get('telemedicina', \App\Livewire\ListaTeleconsultas::class)
+    ->middleware(['auth', 'can:turnos.ver'])
+    ->name('telemedicina');
+Route::get('telemedicina/{teleconsulta}', \App\Livewire\DetalleTeleconsulta::class)
+    ->whereNumber('teleconsulta')
+    ->middleware(['auth', 'can:turnos.ver'])
+    ->name('telemedicina.ver');
+Route::get('teleconsulta/{token}', \App\Livewire\PacienteTeleconsulta::class)
+    ->where('token', '[A-Za-z0-9]{48}')
+    ->middleware('throttle:60,1')
+    ->name('teleconsulta.paciente');
+
 require __DIR__.'/auth.php';

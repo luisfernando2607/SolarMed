@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class ExpedienteConsulta extends Model {
     protected $table    = 'expediente_consultas';
     protected $fillable = [
-        'paciente_id','medico_id','especialidad_id','tipo_consulta','tipo_atencion',
+        'paciente_id','medico_id','especialidad_id','tipo_consulta','modalidad','tipo_atencion',
         'cita_id','turno_id','fecha',
         'motivo_consulta','anamnesis','revision_sistemas','examen_fisico',
         'diagnostico','codigo_cie10','tipo_diagnostico','tratamiento','indicaciones',

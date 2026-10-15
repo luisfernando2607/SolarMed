@@ -87,6 +87,7 @@
             <li>Las citas <strong>"En línea"</strong> las reservan los pacientes desde la página pública: quedan pendientes hasta que usted las confirme. El panel de inicio le avisa cuántas hay.</li>
             <li>El botón <strong>WhatsApp</strong> de una cita abre el mensaje de recordatorio ya escrito para enviarlo desde su WhatsApp. Si el administrador activó el <strong>WhatsApp automático</strong>, el botón dice <strong>Enviar recordatorio por WhatsApp</strong>: el mensaje sale del número de la clínica, y además se envía solo la tarde anterior a cada cita.</li>
             <li>En <strong>WhatsApp</strong> (menú Atención) verá cada mensaje enviado, si fue entregado o leído y las respuestas: cuando el paciente pulsa <strong>Confirmar</strong> o <strong>Cancelar</strong> la cita se actualiza sola; si responde <strong>BAJA</strong> deja de recibir mensajes. Marque como <strong>Revisada</strong> cada respuesta que atienda.</li>
+            <li><strong>Teleconsultas:</strong> si la telemedicina está activa, al agendar elija la modalidad <strong>Telemedicina (video)</strong>. En <strong>Telemedicina</strong> (menú Atención) abra la teleconsulta y envíe al paciente su enlace (<strong>Copiar enlace</strong> o <strong>Enviar por WhatsApp</strong>): ahí acepta el consentimiento y entra a la videollamada a su hora.</li>
         </ol>
         @can('pacientes.ver')
         <h3 class="{{ $h3 }}">Pacientes</h3>
@@ -143,6 +144,13 @@
             <li><strong>Referencia o derivación (formulario 053)</strong>: si marcó "requiere derivación" en la consulta, sale prellenada. Cuando llegue la respuesta del otro establecimiento regístrela en <strong>Referencias → Respuesta</strong>.</li>
             <li><strong>Control prenatal</strong> y <strong>archivos del paciente</strong> (laboratorios, imágenes, referencias) desde la ficha.</li>
         </ul>
+        <h3 class="{{ $h3 }}">Teleconsultas (videoconsulta)</h3>
+        <ol class="{{ $lista }}">
+            <li>En <strong>Telemedicina</strong> abra la teleconsulta. Antes de conectarse, el paciente debe autorizar la atención por video y aceptar el tratamiento de sus datos (Norma Técnica de Telesalud, num. 7.2.2). Si no puede hacerlo en su enlace, léale el texto y use <strong>Registrar consentimiento verbal</strong>.</li>
+            <li><strong>Iniciar videoconsulta</strong> abre la sala en otra pestaña. Con Jitsi público (meet.jit.si) entre antes que el paciente: le pedirá iniciar sesión para abrir la sala.</li>
+            <li>Durante o después de la llamada use <strong>Registrar la consulta</strong>: queda en la historia clínica con la modalidad <em>Telemedicina</em>. Las recetas y certificados se emiten igual que en la consulta presencial.</li>
+            <li>Al terminar, <strong>Finalizar teleconsulta</strong> indicando si la conexión fue efectiva, parcial o fallida (indicador del num. 7.3.4); si el paciente no entró, <strong>No se conectó</strong>.</li>
+        </ol>
         <h3 class="{{ $h3 }}">Encuesta de satisfacción</h3>
         <p>Cada consulta genera una encuesta corta. En la consulta use <strong>Responder aquí</strong> para que el paciente la llene en una tableta de la clínica, o <strong>WhatsApp</strong> para enviarle el enlace. Usted ve su promedio en su inicio.</p>
         <p class="{{ $nota }}">En <strong>Mi perfil</strong> cargue la imagen de su firma. Su cédula, registro profesional ACESS y teléfono de contacto los registra el administrador en Usuarios. Todo eso aparece en recetas y certificados.</p>
@@ -182,7 +190,7 @@
         <ul class="list-disc pl-5 space-y-1.5">
             <li><strong>Usuarios</strong>: cree cuentas con su rol. Si asigna una clave, la persona deberá cambiarla al entrar. Para médicos, cargue cédula, registro ACESS, RUC y certificado .p12.</li>
             <li><strong>Roles y permisos</strong>: qué puede hacer cada rol. El rol Administrador no se puede recortar. Para la empresa auditora cree un usuario con rol <strong>Auditor</strong> (solo lectura).</li>
-            <li><strong>Configuración</strong>: datos y logo de la clínica, <strong>establecimiento de salud</strong> (unicódigo y ubicación para los formularios MSP), agenda y reserva en línea, encuestas, catálogo de exámenes, alertas prenatales y horarios de tareas automáticas.</li>
+            <li><strong>Configuración</strong>: datos y logo de la clínica, <strong>establecimiento de salud</strong> (unicódigo y ubicación para los formularios MSP), agenda y reserva en línea, encuestas, catálogo de exámenes, alertas prenatales y horarios de tareas automáticas. En la sección <strong>Telemedicina</strong> se activan las videoconsultas (una vez que la clínica tenga el permiso de ACESS para telesalud) y se elige la plataforma: Jitsi Meet o un enlace propio.</li>
             <li><strong>WhatsApp automático</strong> (Configuración → WhatsApp): necesita una cuenta de WhatsApp Business en Meta. Cree allí las plantillas que muestra la pantalla (categoría Utilidad), copie el identificador del número, el token y el app secret, guarde, use <strong>Enviar prueba</strong> y luego active el envío. Los avisos de entrega y las respuestas requieren la dirección pública HTTPS.</li>
             <li><strong>Estado del sistema</strong>: respaldos, tareas, cola, auditoría, SRI, certificados, inventario y disco. Si algo sale en rojo, el inicio del administrador lo avisa. <strong>Respaldar ahora</strong> crea una copia al instante.</li>
         </ul>

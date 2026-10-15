@@ -230,6 +230,9 @@
                                     <p class="text-sm text-gray-600 mt-0.5">{{ $c->diagnostico }}</p>
                                 @endif
                                 <div class="flex flex-wrap items-center gap-2 mt-1.5 text-xs text-gray-400">
+                                    @if ($c->modalidad === 'telemedicina')
+                                        <span class="px-2 py-0.5 rounded-full bg-violet-50 text-violet-700">Telemedicina</span>
+                                    @endif
                                     @if ($c->tipo_atencion)
                                         <span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">{{ \App\Models\ExpedienteConsulta::TIPOS_ATENCION[$c->tipo_atencion] ?? $c->tipo_atencion }}</span>
                                     @endif

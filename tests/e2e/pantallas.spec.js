@@ -6,7 +6,7 @@ const PANTALLAS = [
     '/referencias', '/facturas', '/facturas/crear', '/caja', '/reportes/ventas', '/reportes/morbilidad', '/reportes/satisfaccion',
     '/auditoria', '/auditoria/calidad-hc', '/auditoria/planes-accion', '/auditoria/solicitudes', '/auditoria/incidentes',
     '/usuarios', '/roles', '/especialidades', '/tarifario', '/configuracion', '/sistema', '/sri/configuracion',
-    '/consentimientos/plantillas', '/inventario', '/whatsapp', '/ayuda', '/profile',
+    '/consentimientos/plantillas', '/inventario', '/whatsapp', '/telemedicina', '/ayuda', '/profile',
 ];
 
 test('pantallas del administrador', async ({ page }, info) => {

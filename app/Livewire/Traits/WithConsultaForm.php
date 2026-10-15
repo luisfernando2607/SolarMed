@@ -22,6 +22,9 @@ trait WithConsultaForm
     public $indicaciones;
     public $requiere_derivacion = false;
     public $derivacion_especialidad;
+    /** presencial | telemedicina: la fija la teleconsulta, no el formulario (Norma Técnica de Telesalud) */
+    #[\Livewire\Attributes\Locked]
+    public $modalidad = 'presencial';
 
     public $examen_fisico_pa;
     public $examen_fisico_fc;
@@ -87,7 +90,7 @@ trait WithConsultaForm
         $this->reset([
             'tipo_consulta', 'tipo_atencion', 'tipo_diagnostico', 'revision_sistemas',
             'motivo_consulta', 'anamnesis', 'diagnostico', 'codigo_cie10',
-            'tratamiento', 'indicaciones', 'requiere_derivacion', 'derivacion_especialidad',
+            'tratamiento', 'indicaciones', 'requiere_derivacion', 'derivacion_especialidad', 'modalidad',
             'examen_fisico_pa', 'examen_fisico_fc', 'examen_fisico_fr', 'examen_fisico_temp',
             'examen_fisico_peso', 'examen_fisico_talla', 'examen_fisico_imc', 'examen_fisico_notas',
         ]);
@@ -97,6 +100,7 @@ trait WithConsultaForm
     protected function llenarDesdeConsulta(ExpedienteConsulta $consulta): void
     {
         $this->tipo_consulta = $consulta->tipo_consulta;
+        $this->modalidad = $consulta->modalidad ?? 'presencial';
         $this->tipo_atencion = $consulta->tipo_atencion;
         $this->tipo_diagnostico = $consulta->tipo_diagnostico;
         $this->revision_sistemas = $consulta->revision_sistemas;
@@ -147,6 +151,7 @@ trait WithConsultaForm
     {
         return [
             'tipo_consulta' => $this->tipo_consulta,
+            'modalidad' => $this->modalidad === 'telemedicina' ? 'telemedicina' : 'presencial',
             'tipo_atencion' => $this->tipo_atencion,
             'motivo_consulta' => $this->motivo_consulta,
             'anamnesis' => $this->anamnesis,
