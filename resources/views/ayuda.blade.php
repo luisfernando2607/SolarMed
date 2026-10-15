@@ -151,6 +151,8 @@
             <li>Durante o después de la llamada use <strong>Registrar la consulta</strong>: queda en la historia clínica con la modalidad <em>Telemedicina</em>. Las recetas y certificados se emiten igual que en la consulta presencial.</li>
             <li>Al terminar, <strong>Finalizar teleconsulta</strong> indicando si la conexión fue efectiva, parcial o fallida (indicador del num. 7.3.4); si el paciente no entró, <strong>No se conectó</strong>.</li>
         </ol>
+        <h3 class="{{ $h3 }}">Evolución del paciente</h3>
+        <p>En la ficha, la pestaña <strong>Evolución</strong> muestra gráficos de presión arterial, peso, IMC, glucosa, saturación y pulso (y en embarazadas, ganancia de peso y altura uterina por semana), con su rango habitual sombreado. Use <strong>Ver tabla</strong> para ver los valores y el filtro de 6 meses, 1 año o todo.</p>
         <h3 class="{{ $h3 }}">Encuesta de satisfacción</h3>
         <p>Cada consulta genera una encuesta corta. En la consulta use <strong>Responder aquí</strong> para que el paciente la llene en una tableta de la clínica, o <strong>WhatsApp</strong> para enviarle el enlace. Usted ve su promedio en su inicio.</p>
         <p class="{{ $nota }}">En <strong>Mi perfil</strong> cargue la imagen de su firma. Su cédula, registro profesional ACESS y teléfono de contacto los registra el administrador en Usuarios. Todo eso aparece en recetas y certificados.</p>
