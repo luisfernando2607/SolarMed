@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Cita extends Model
 {
     protected $fillable = [
-        'paciente_id', 'medico_id', 'especialidad_id', 'tipo', 'fecha_hora',
+        'paciente_id', 'medico_id', 'especialidad_id', 'tipo', 'modalidad', 'fecha_hora',
         'duracion_min', 'estado', 'origen', 'codigo_reserva', 'color', 'notas', 'recordatorio_enviado_at', 'whatsapp_recordatorio_at',
     ];
 
@@ -27,4 +27,5 @@ class Cita extends Model
     public function paciente(): BelongsTo     { return $this->belongsTo(Paciente::class); }
     public function medico(): BelongsTo       { return $this->belongsTo(Medico::class); }
     public function especialidad(): BelongsTo { return $this->belongsTo(Especialidad::class); }
+    public function teleconsulta(): \Illuminate\Database\Eloquent\Relations\HasOne { return $this->hasOne(Teleconsulta::class); }
 }

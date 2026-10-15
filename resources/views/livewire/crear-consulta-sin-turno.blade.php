@@ -3,6 +3,11 @@
         <div class="mb-6">
             <a href="{{ route('expedientes') }}" wire:navigate class="text-sm text-blue-600 hover:text-blue-800">&larr; Volver a Expedientes</a>
             <h1 class="text-2xl font-bold text-gray-900 mt-1">Nueva consulta</h1>
+            @if ($teleconsultaId)
+                <p class="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-violet-50 px-2.5 py-1 text-xs font-medium text-violet-800">
+                    Modalidad: telemedicina · se registrará en la historia clínica como teleconsulta
+                </p>
+            @endif
         </div>
 
         @if (session('error'))

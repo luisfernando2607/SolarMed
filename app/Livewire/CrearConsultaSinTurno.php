@@ -7,6 +7,7 @@ use App\Models\Paciente;
 use App\Models\ExpedienteConsulta;
 use App\Models\Medico;
 use App\Models\Especialidad;
+use App\Models\Teleconsulta;
 use App\Livewire\Traits\WithCie10Autocomplete;
 use App\Livewire\Traits\WithConsultaForm;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,26 @@ class CrearConsultaSinTurno extends Component
     public string $busqueda = '';
     public ?Paciente $selectedPaciente = null;
     public bool $showForm = false;
+    /** Teleconsulta de la que viene esta consulta (registro en la HCU con modalidad telemedicina) */
+    #[\Livewire\Attributes\Locked]
+    public ?int $teleconsultaId = null;
+
+    public function mount(): void
+    {
+        $id = request()->integer('teleconsulta');
+        if (!$id) {
+            return;
+        }
+        $tc = Teleconsulta::with('paciente')->findOrFail($id);
+        $medicoId = Medico::where('user_id', Auth::id())->value('id');
+        abort_unless($tc->medico_id === $medicoId && in_array($tc->estado, ['en_curso', 'finalizada'], true) && !$tc->consulta_id, 403);
+
+        $this->teleconsultaId = $tc->id;
+        $this->selectedPaciente = $tc->paciente;
+        $this->iniciarConsulta();
+        $this->modalidad = 'telemedicina';
+        $this->motivo_consulta = 'Teleconsulta';
+    }
 
     public function seleccionarPaciente(Paciente $paciente): void
     {
@@ -29,6 +50,9 @@ class CrearConsultaSinTurno extends Component
 
     public function resetPaciente(): void
     {
+        if ($this->teleconsultaId) {
+            return; // la consulta de una teleconsulta es de ese paciente
+        }
         $this->selectedPaciente = null;
         $this->showForm = false;
         $this->resetForm();
@@ -61,6 +85,12 @@ class CrearConsultaSinTurno extends Component
         app(\App\Services\AuditoriaService::class)->registrar('crear', 'consulta', $consulta->id, $consulta->paciente_id);
         // Aviso que sobrevive a la redirección (lo muestra el layout)
         session()->flash('notify', ['message' => 'Consulta registrada exitosamente.', 'type' => 'success']);
+
+        if ($this->teleconsultaId) {
+            Teleconsulta::whereKey($this->teleconsultaId)->whereNull('consulta_id')->update(['consulta_id' => $consulta->id]);
+            $this->redirect(route('telemedicina.ver', $this->teleconsultaId), navigate: true);
+            return;
+        }
         $this->redirect(route('expedientes'), navigate: true);
     }
 

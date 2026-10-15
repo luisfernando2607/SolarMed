@@ -79,6 +79,12 @@ class AjustesService
         'whatsapp.plantilla_confirmacion' => 'confirmacion_reserva',
         'whatsapp.usar_encuesta' => true,
         'whatsapp.plantilla_encuesta' => 'encuesta_satisfaccion',
+        // Telemedicina (Norma Técnica de Telesalud, MSP 2025). Apagada hasta que la clínica cuente con el permiso de ACESS (num. 7.1.6)
+        'telemedicina.activa' => false,
+        'telemedicina.plataforma' => 'jitsi',
+        'telemedicina.jitsi_url' => 'https://meet.jit.si',
+        'telemedicina.minutos_antes' => 15,
+        'telemedicina.minutos_despues' => 60,
         // Tareas automáticas
         // Encuesta de satisfacción del usuario externo
         'encuestas.activas' => true,

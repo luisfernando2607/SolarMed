@@ -105,6 +105,19 @@
                         <label class="block text-xs font-medium text-gray-600 mb-1">Notas</label>
                         <input wire:model="notas" type="text" maxlength="500" class="w-full rounded-lg border-gray-300 shadow-xs text-sm">
                     </div>
+                    @if ($telemedicinaActiva)
+                        <div class="col-span-2">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Modalidad</label>
+                            <div class="inline-flex rounded-lg border border-gray-200 p-0.5 text-sm">
+                                <button type="button" wire:click="$set('modalidad', 'presencial')" class="px-3 py-1.5 rounded-md {{ $modalidad === 'presencial' ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600' }}">Presencial</button>
+                                <button type="button" wire:click="$set('modalidad', 'telemedicina')" class="px-3 py-1.5 rounded-md {{ $modalidad === 'telemedicina' ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-600' }}">Telemedicina (video)</button>
+                            </div>
+                            @if ($modalidad === 'telemedicina')
+                                <p class="text-xs text-gray-500 mt-1">Se creará la sala de video y un enlace para el paciente, donde aceptará el consentimiento antes de conectarse.</p>
+                            @endif
+                            @error('modalidad') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        </div>
+                    @endif
                 </div>
 
                 <div class="flex justify-end gap-3 mt-6">
@@ -142,6 +155,14 @@
                     @if ($cita->notas)<div><dt class="inline text-gray-500">Notas:</dt> <dd class="inline">{{ $cita->notas }}</dd></div>@endif
                 </dl>
 
+                @if ($cita->teleconsulta)
+                    <div class="mt-3 rounded-lg bg-violet-50 px-3 py-2 text-sm text-violet-900">
+                        <p class="font-medium">Videoconsulta · {{ $cita->teleconsulta->estadoTexto() }}</p>
+                        <p class="text-xs mt-0.5">{{ $cita->teleconsulta->tieneConsentimiento() ? 'El paciente ya aceptó el consentimiento.' : 'El paciente aún no acepta el consentimiento.' }}
+                            <a href="{{ route('telemedicina.ver', $cita->teleconsulta) }}" wire:navigate class="font-medium underline">Abrir teleconsulta</a></p>
+                    </div>
+                @endif
+
                 @if ($ultimoWhatsapp)
                     @php [$waTexto, $waTono] = \App\Models\WhatsappMensaje::ESTADOS[$ultimoWhatsapp->estado] ?? [$ultimoWhatsapp->estado, 'bg-gray-100 text-gray-600']; @endphp
                     <p class="mt-3 text-xs text-gray-500">
@@ -174,7 +195,7 @@
                             @if ($cita->estado === 'pendiente')
                                 <button wire:click="cambiarEstado('confirmada')" class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700">Confirmar</button>
                             @endif
-                            @if ($cita->fecha_hora->isToday())
+                            @if ($cita->fecha_hora->isToday() && $cita->modalidad !== 'telemedicina')
                                 <button wire:click="registrarLlegada" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">Registrar llegada</button>
                             @endif
                         @elseif ($cita->estado === 'cancelada')

@@ -7,6 +7,7 @@ use App\Models\Cita;
 use App\Models\Medico;
 use App\Models\Paciente;
 use App\Services\AjustesService;
+use App\Services\TelemedicinaService;
 use App\Services\TurnoService;
 use App\Models\WhatsappMensaje;
 use App\Services\WhatsappCloudService;
@@ -33,6 +34,7 @@ class Agenda extends Component
     public $tipo;
     public $duracion_min;
     public $notas;
+    public string $modalidad = 'presencial';
 
     // Paciente
     public string $busquedaPaciente = '';
@@ -65,7 +67,7 @@ class Agenda extends Component
             ->get()
             ->map(fn (Cita $c) => [
                 'id' => $c->id,
-                'title' => ($c->origen === 'web' && $c->estado === 'pendiente' ? 'En línea · ' : '') . ($c->paciente?->nombre_visible ?? 'Paciente') . ' · ' . $c->tipo,
+                'title' => ($c->modalidad === 'telemedicina' ? 'Video · ' : '') . ($c->origen === 'web' && $c->estado === 'pendiente' ? 'En línea · ' : '') . ($c->paciente?->nombre_visible ?? 'Paciente') . ' · ' . $c->tipo,
                 'start' => $c->fecha_hora->toIso8601String(),
                 'end' => $c->fecha_hora->copy()->addMinutes($c->duracion_min)->toIso8601String(),
                 'backgroundColor' => $c->estado === 'cancelada' ? '#9CA3AF' : ($c->color ?: $c->especialidad?->color_agenda ?: '#3B82F6'),
@@ -128,6 +130,7 @@ class Agenda extends Component
             'tipo' => ['required', Rule::in($this->tipos())],
             'duracion_min' => 'required|integer|min:10|max:240',
             'notas' => 'nullable|string|max:500',
+            'modalidad' => ['required', Rule::in(app(TelemedicinaService::class)->activa() ? ['presencial', 'telemedicina'] : ['presencial'])],
         ];
         if ($this->pacienteNuevo) {
             $reglas += [
@@ -161,7 +164,7 @@ class Agenda extends Component
         }
 
         $medico = Medico::findOrFail($this->medico_id);
-        Cita::create([
+        $cita = Cita::create([
             'paciente_id' => $this->paciente_id,
             'medico_id' => $medico->id,
             'especialidad_id' => $medico->especialidad_id,
@@ -169,8 +172,13 @@ class Agenda extends Component
             'fecha_hora' => $inicio,
             'duracion_min' => (int) $this->duracion_min,
             'estado' => 'pendiente',
+            'modalidad' => $this->modalidad,
             'notas' => $this->notas,
         ]);
+        // Videoconsulta: se crea la sala y el enlace del paciente (Norma Técnica de Telesalud, num. 7.1.3)
+        if ($this->modalidad === 'telemedicina') {
+            app(TelemedicinaService::class)->crearParaCita($cita, Auth::id());
+        }
 
         $this->cerrarModal();
         $this->dispatch('agenda-actualizada');
@@ -203,6 +211,7 @@ class Agenda extends Component
             'recordatorio_enviado_at' => $cita->fecha_hora->isSameDay($nuevoInicio) ? $cita->recordatorio_enviado_at : null,
             'whatsapp_recordatorio_at' => $cita->fecha_hora->isSameDay($nuevoInicio) ? $cita->whatsapp_recordatorio_at : null,
         ]);
+        $cita->teleconsulta()->where('estado', 'programada')->update(['fecha_hora' => $nuevoInicio, 'duracion_min' => $duracion]);
         $this->dispatch('notify', message: 'Cita reprogramada para el ' . $nuevoInicio->format('d/m/Y H:i') . '.', type: 'success');
         return true;
     }
@@ -215,6 +224,12 @@ class Agenda extends Component
         $cita = Cita::findOrFail($this->citaId);
         $confirmaReservaWeb = $estado === 'confirmada' && $cita->estado === 'pendiente' && $cita->origen === 'web';
         $cita->update(['estado' => $estado]);
+        // La teleconsulta sigue a la cita: cancelada si se cancela, programada de nuevo si se reactiva
+        if ($estado === 'cancelada') {
+            $cita->teleconsulta()->where('estado', 'programada')->update(['estado' => 'cancelada']);
+        } elseif ($estado === 'pendiente') {
+            $cita->teleconsulta()->where('estado', 'cancelada')->update(['estado' => 'programada']);
+        }
 
         // La cita la reservó el paciente en línea: se le avisa por WhatsApp que quedó confirmada
         $aviso = '';
@@ -304,7 +319,7 @@ class Agenda extends Component
     private function resetFormulario(): void
     {
         $this->reset([
-            'citaId', 'fecha_hora', 'medico_id', 'tipo', 'duracion_min', 'notas', 'busquedaPaciente', 'paciente_id',
+            'citaId', 'fecha_hora', 'medico_id', 'tipo', 'duracion_min', 'notas', 'modalidad', 'busquedaPaciente', 'paciente_id',
             'pacienteNuevo', 'nuevo_nombres', 'nuevo_apellidos', 'nuevo_cedula', 'nuevo_telefono', 'nuevo_sexo',
         ]);
         $this->resetValidation();
@@ -334,7 +349,8 @@ class Agenda extends Component
             'medicos' => Medico::where('activo', true)->with('especialidad')->orderBy('apellidos')->get(),
             'pacientes' => $pacientes,
             'pacienteSeleccionado' => $this->paciente_id ? Paciente::find($this->paciente_id) : null,
-            'cita' => $cita = $this->citaId ? Cita::with('paciente', 'medico.especialidad')->find($this->citaId) : null,
+            'cita' => $cita = $this->citaId ? Cita::with('paciente', 'medico.especialidad', 'teleconsulta')->find($this->citaId) : null,
+            'telemedicinaActiva' => app(TelemedicinaService::class)->activa(),
             // Recordatorio solo para citas por venir
             'enlaceWhatsapp' => $cita && in_array($cita->estado, ['pendiente', 'confirmada'], true) && $cita->fecha_hora->isFuture()
                 ? app(WhatsappService::class)->enlaceRecordatorio($cita) : null,

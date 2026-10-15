@@ -84,7 +84,7 @@
         <h2>Fichas médicas ({{ $paciente->consultas->count() }})</h2>
         @forelse ($paciente->consultas as $consulta)
             <div class="consulta">
-                <div class="fecha">{{ $consulta->fecha->format('d/m/Y H:i') }}{{ $consulta->tipo_atencion ? ' · ' . (\App\Models\ExpedienteConsulta::TIPOS_ATENCION[$consulta->tipo_atencion] ?? '') : '' }}</div>
+                <div class="fecha">{{ $consulta->fecha->format('d/m/Y H:i') }}{{ $consulta->tipo_atencion ? ' · ' . (\App\Models\ExpedienteConsulta::TIPOS_ATENCION[$consulta->tipo_atencion] ?? '') : '' }}{{ $consulta->modalidad === 'telemedicina' ? ' · Telemedicina' : '' }}</div>
                 <div class="medico">{{ $consulta->medico?->nombre_completo ?? '--' }} @if ($consulta->especialidad)&middot; {{ $consulta->especialidad->nombre }}@endif</div>
                 <div class="dx">@if ($consulta->codigo_cie10)[{{ $consulta->codigo_cie10 }}] @endif{{ $consulta->diagnostico }}{{ $consulta->tipo_diagnostico ? ' (' . mb_strtolower(\App\Models\ExpedienteConsulta::TIPOS_DIAGNOSTICO[$consulta->tipo_diagnostico] ?? '') . ')' : '' }}</div>
                 <div><strong>Motivo:</strong> {{ $consulta->motivo_consulta ?? '--' }}</div>

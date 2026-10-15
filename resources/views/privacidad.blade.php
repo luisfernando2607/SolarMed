@@ -51,6 +51,9 @@
             </ul>
             <p class="mt-2">Los datos de salud son datos sensibles: solo los usa el personal que interviene en su atención, bajo deber de confidencialidad, y cada acceso a su historia clínica queda registrado.</p>
 
+            <h2 class="{{ $titulo }}">Videoconsultas (telemedicina)</h2>
+            <p>Si usted elige una videoconsulta, antes de conectarse se le pide autorizar la atención por este medio y aceptar el tratamiento de sus datos, conforme a la Norma Técnica de Telesalud del Ministerio de Salud Pública. La videollamada se realiza en una plataforma de video externa, en una sala con un nombre aleatorio que no contiene sus datos. La clínica no graba las videoconsultas; lo que se registra es la consulta en su historia clínica, como en una atención presencial.</p>
+
             <h2 class="{{ $titulo }}">Con quién se comparten</h2>
             <p>No vendemos ni cedemos sus datos. Solo se comunican cuando la ley lo exige o usted lo autoriza: autoridad sanitaria o judicial, el SRI para la facturación, u otro establecimiento de salud al que usted sea referido.</p>
 
