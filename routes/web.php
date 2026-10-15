@@ -484,4 +484,15 @@ Route::view('privacidad', 'privacidad')->name('privacidad');
 // Ayuda y guías de uso (cada sección se muestra según los permisos del usuario)
 Route::view('ayuda', 'ayuda')->middleware('auth')->name('ayuda');
 
+// WhatsApp por la API oficial de Meta: historial (recepción) y webhook público firmado por Meta
+Route::get('whatsapp', \App\Livewire\WhatsappMensajes::class)
+    ->middleware(['auth', 'can:turnos.gestionar'])
+    ->name('whatsapp.mensajes');
+Route::get('whatsapp/webhook', [\App\Http\Controllers\WhatsappWebhookController::class, 'verificar'])
+    ->middleware('throttle:60,1')
+    ->name('whatsapp.webhook');
+Route::post('whatsapp/webhook', [\App\Http\Controllers\WhatsappWebhookController::class, 'recibir'])
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class])
+    ->middleware('throttle:600,1');
+
 require __DIR__.'/auth.php';

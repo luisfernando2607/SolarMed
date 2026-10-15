@@ -142,9 +142,29 @@
                     @if ($cita->notas)<div><dt class="inline text-gray-500">Notas:</dt> <dd class="inline">{{ $cita->notas }}</dd></div>@endif
                 </dl>
 
+                @if ($ultimoWhatsapp)
+                    @php [$waTexto, $waTono] = \App\Models\WhatsappMensaje::ESTADOS[$ultimoWhatsapp->estado] ?? [$ultimoWhatsapp->estado, 'bg-gray-100 text-gray-600']; @endphp
+                    <p class="mt-3 text-xs text-gray-500">
+                        WhatsApp ({{ \App\Models\WhatsappMensaje::TIPOS[$ultimoWhatsapp->tipo] ?? $ultimoWhatsapp->tipo }}, {{ $ultimoWhatsapp->created_at->format('d/m H:i') }}):
+                        <span class="px-1.5 py-0.5 rounded-md font-medium {{ $waTono }}">{{ $waTexto }}</span>
+                        @if ($ultimoWhatsapp->respuesta_payload || $ultimoWhatsapp->respuesta_texto)
+                            · respondió: <span class="font-medium text-gray-700">{{ $ultimoWhatsapp->respuesta_texto ?: $ultimoWhatsapp->respuesta_payload }}</span>
+                        @elseif ($ultimoWhatsapp->estado === 'fallido')
+                            · {{ $ultimoWhatsapp->error_mensaje }}
+                        @endif
+                    </p>
+                @endif
+
                 <div class="flex flex-wrap justify-end gap-2 mt-6">
                     <button wire:click="cerrarModal" class="px-4 py-2 border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50">Cerrar</button>
-                    @if ($enlaceWhatsapp)
+                    @if ($enlaceWhatsapp && $whatsappApi)
+                        @can('turnos.gestionar')
+                            <button wire:click="enviarWhatsapp" wire:loading.attr="disabled"
+                                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700">
+                                Enviar recordatorio por WhatsApp
+                            </button>
+                        @endcan
+                    @elseif ($enlaceWhatsapp)
                         <x-boton-whatsapp :href="$enlaceWhatsapp" />
                     @endif
                     @can('turnos.gestionar')

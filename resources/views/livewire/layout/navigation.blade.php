@@ -24,6 +24,7 @@ new class extends Component
                 ['Agenda', 'agenda', 'agenda*', 'turnos.ver', 'agenda'],
                 ['Registrar turno', 'turnos.crear', 'turnos.crear*', 'turnos.ver', 'turno'],
                 ['Sala de espera', 'sala-espera', 'sala-espera*|turno.atender', 'turnos.ver', 'sala'],
+                ['WhatsApp', 'whatsapp.mensajes', 'whatsapp.mensajes', 'turnos.gestionar', 'whatsapp'],
             ]],
             ['Pacientes', [
                 ['Pacientes', 'pacientes', 'pacientes|pacientes.ver|pacientes.archivos|prenatal|certificados.*|pedidos.*', 'pacientes.ver', 'pacientes'],
@@ -68,6 +69,7 @@ new class extends Component
     // Íconos (Heroicons outline, 24px)
     $iconos = [
         'inicio' => 'M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25',
+        'whatsapp' => 'M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z',
         'agenda' => 'M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5',
         'turno' => 'M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z',
         'sala' => 'M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z',

@@ -46,7 +46,7 @@
             <ul class="list-disc pl-5 space-y-1">
                 <li>Asignar su turno o cita y atenderle.</li>
                 <li>Llevar su historia clínica, que es obligatoria según la normativa sanitaria.</li>
-                <li>Enviarle recordatorios de citas e indicaciones médicas, y la encuesta de satisfacción.</li>
+                <li>Enviarle recordatorios de citas e indicaciones médicas, y la encuesta de satisfacción, por correo o por WhatsApp desde el número de la clínica. Si no desea recibir mensajes por WhatsApp, responda <strong>BAJA</strong> a cualquiera de ellos.</li>
                 <li>Emitir los comprobantes electrónicos exigidos por el SRI cuando corresponda.</li>
             </ul>
             <p class="mt-2">Los datos de salud son datos sensibles: solo los usa el personal que interviene en su atención, bajo deber de confidencialidad, y cada acceso a su historia clínica queda registrado.</p>

@@ -8,6 +8,8 @@ use App\Models\Medico;
 use App\Models\Paciente;
 use App\Services\AjustesService;
 use App\Services\TurnoService;
+use App\Models\WhatsappMensaje;
+use App\Services\WhatsappCloudService;
 use App\Services\WhatsappService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -199,6 +201,7 @@ class Agenda extends Component
             'duracion_min' => $duracion,
             // Si cambió el día, el recordatorio debe enviarse de nuevo con la nueva fecha
             'recordatorio_enviado_at' => $cita->fecha_hora->isSameDay($nuevoInicio) ? $cita->recordatorio_enviado_at : null,
+            'whatsapp_recordatorio_at' => $cita->fecha_hora->isSameDay($nuevoInicio) ? $cita->whatsapp_recordatorio_at : null,
         ]);
         $this->dispatch('notify', message: 'Cita reprogramada para el ' . $nuevoInicio->format('d/m/Y H:i') . '.', type: 'success');
         return true;
@@ -209,9 +212,41 @@ class Agenda extends Component
         $this->authorize('turnos.gestionar');
         abort_unless(in_array($estado, ['confirmada', 'cancelada', 'pendiente'], true), 422);
 
-        Cita::findOrFail($this->citaId)->update(['estado' => $estado]);
+        $cita = Cita::findOrFail($this->citaId);
+        $confirmaReservaWeb = $estado === 'confirmada' && $cita->estado === 'pendiente' && $cita->origen === 'web';
+        $cita->update(['estado' => $estado]);
+
+        // La cita la reservó el paciente en línea: se le avisa por WhatsApp que quedó confirmada
+        $aviso = '';
+        $wa = app(WhatsappCloudService::class);
+        if ($confirmaReservaWeb && $wa->usoActivo('confirmacion')) {
+            [$mensaje, $motivo] = $wa->confirmacionReserva($cita);
+            $aviso = $mensaje ? ' Se avisó al paciente por WhatsApp.' : " No se avisó por WhatsApp: {$motivo}";
+        }
+
         $this->dispatch('agenda-actualizada');
-        $this->dispatch('notify', message: 'Cita ' . ($estado === 'cancelada' ? 'cancelada' : 'actualizada') . '.', type: 'success');
+        $this->dispatch('notify', message: 'Cita ' . ($estado === 'cancelada' ? 'cancelada' : 'actualizada') . '.' . $aviso, type: 'success');
+    }
+
+    /** Recordatorio por la API oficial de WhatsApp (cuando el módulo está activo) */
+    public function enviarWhatsapp(): void
+    {
+        $this->authorize('turnos.gestionar');
+        $cita = Cita::with('paciente', 'medico')->findOrFail($this->citaId);
+        $wa = app(WhatsappCloudService::class);
+
+        if (!$wa->usoActivo('recordatorio') || !in_array($cita->estado, ['pendiente', 'confirmada'], true) || !$cita->fecha_hora->isFuture()) {
+            $this->dispatch('notify', message: 'No se puede enviar el recordatorio de esta cita.', type: 'error');
+            return;
+        }
+
+        [$mensaje, $motivo] = $wa->recordatorioCita($cita);
+        if (!$mensaje) {
+            $this->dispatch('notify', message: $motivo, type: 'error');
+            return;
+        }
+        $cita->update(['whatsapp_recordatorio_at' => now()]);
+        $this->dispatch('notify', message: 'Recordatorio en cola para enviarse por WhatsApp.', type: 'success');
     }
 
     /** El paciente llegó: se crea su turno y pasa a la sala de espera */
@@ -303,6 +338,9 @@ class Agenda extends Component
             // Recordatorio solo para citas por venir
             'enlaceWhatsapp' => $cita && in_array($cita->estado, ['pendiente', 'confirmada'], true) && $cita->fecha_hora->isFuture()
                 ? app(WhatsappService::class)->enlaceRecordatorio($cita) : null,
+            // Con el módulo de WhatsApp activo, el recordatorio sale por la API y se muestra su último estado
+            'whatsappApi' => app(WhatsappCloudService::class)->usoActivo('recordatorio'),
+            'ultimoWhatsapp' => $cita ? WhatsappMensaje::where('cita_id', $cita->id)->latest('id')->first() : null,
         ])->layout('layouts.app');
     }
 }

@@ -64,6 +64,21 @@ class AjustesService
         'prenatal.movimientos_desde_semana' => 28,
         'prenatal.dias_sin_control' => 28,
         'prenatal.aviso_fpp_dias' => 14,
+        // WhatsApp por la API oficial de Meta (apagado hasta configurarlo). El token y el app secret se guardan cifrados.
+        'whatsapp.activo' => false,
+        'whatsapp.api_version' => 'v23.0',
+        'whatsapp.phone_number_id' => '',
+        'whatsapp.waba_id' => '',
+        'whatsapp.token' => '',
+        'whatsapp.app_secret' => '',
+        'whatsapp.verify_token' => '',
+        'whatsapp.idioma' => 'es',
+        'whatsapp.usar_recordatorio' => true,
+        'whatsapp.plantilla_recordatorio' => 'recordatorio_cita',
+        'whatsapp.usar_confirmacion' => true,
+        'whatsapp.plantilla_confirmacion' => 'confirmacion_reserva',
+        'whatsapp.usar_encuesta' => true,
+        'whatsapp.plantilla_encuesta' => 'encuesta_satisfaccion',
         // Tareas automáticas
         // Encuesta de satisfacción del usuario externo
         'encuestas.activas' => true,

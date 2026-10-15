@@ -13,7 +13,8 @@ class Paciente extends Model {
         'fum','gestas','partos','cesareas','abortos','metodo_anticonceptivo',
         'identidad_reservada',
     ];
-    protected $casts = ['fecha_nacimiento' => 'date', 'fum' => 'date', 'identidad_reservada' => 'boolean'];
+    protected $casts = ['fecha_nacimiento' => 'date', 'fum' => 'date', 'identidad_reservada' => 'boolean',
+        'whatsapp_baja' => 'boolean', 'whatsapp_baja_at' => 'datetime'];
 
     /** Archivo pasivo: historias sin atención por más de 5 años (AM 5216-A Art. 17) */
     public const ANIOS_ARCHIVO_ACTIVO = 5;

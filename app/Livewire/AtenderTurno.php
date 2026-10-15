@@ -85,6 +85,23 @@ class AtenderTurno extends Component
         $this->dispatch('notify', message: 'Consulta registrada exitosamente.', type: 'success');
     }
 
+    /** Envía el enlace de la encuesta por la API oficial de WhatsApp */
+    public function enviarEncuestaWhatsapp(int $encuestaId): void
+    {
+        $this->authorize('expediente.crear');
+        $encuesta = \App\Models\Encuesta::where('paciente_id', $this->turno->paciente_id)->findOrFail($encuestaId);
+        $wa = app(\App\Services\WhatsappCloudService::class);
+
+        if (!$wa->usoActivo('encuesta') || !$encuesta->disponible()) {
+            $this->dispatch('notify', message: 'No se puede enviar esta encuesta por WhatsApp.', type: 'error');
+            return;
+        }
+
+        [$mensaje, $motivo] = $wa->encuesta($encuesta);
+        $mensaje && $encuesta->update(['enviada_at' => now(), 'canal_envio' => 'whatsapp']);
+        $this->dispatch('notify', message: $mensaje ? 'Encuesta en cola para enviarse por WhatsApp.' : $motivo, type: $mensaje ? 'success' : 'error');
+    }
+
     public function marcarCompletado(): void
     {
         $this->authorize('turnos.gestionar');
