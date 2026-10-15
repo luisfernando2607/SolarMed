@@ -54,12 +54,12 @@ class RecordatorioCitasTest extends TestCase
         $this->cita(null, $manana);
         $this->cita('pasado@example.com', today()->addDays(2)->setTime(10, 0));
 
-        $this->artisan('citas:recordatorios')->expectsOutput('Recordatorios enviados: 2')->assertSuccessful();
+        $this->artisan('citas:recordatorios')->expectsOutput('Recordatorios enviados: 2 por correo, 0 por WhatsApp')->assertSuccessful();
         Mail::assertQueued(RecordatorioCitaMail::class, 2);
         Mail::assertQueued(RecordatorioCitaMail::class, fn ($m) => $m->hasTo('ana@example.com'));
         $this->assertNotNull($ok->fresh()->recordatorio_enviado_at);
 
-        $this->artisan('citas:recordatorios')->expectsOutput('Recordatorios enviados: 0');
+        $this->artisan('citas:recordatorios')->expectsOutput('Recordatorios enviados: 0 por correo, 0 por WhatsApp');
         Mail::assertQueued(RecordatorioCitaMail::class, 2);
     }
 

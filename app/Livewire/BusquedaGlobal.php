@@ -18,6 +18,7 @@ class BusquedaGlobal extends Component
     /** [texto, ruta, permiso, palabras clave] */
     private const PANTALLAS = [
         ['Agenda', 'agenda', 'turnos.ver', 'citas calendario'],
+        ['WhatsApp: mensajes y respuestas', 'whatsapp.mensajes', 'turnos.gestionar', 'whatsapp mensajes recordatorios respuestas'],
         ['Registrar turno', 'turnos.crear', 'turnos.ver', 'nuevo turno'],
         ['Sala de espera', 'sala-espera', 'turnos.ver', 'turnos cola'],
         ['Pacientes', 'pacientes', 'pacientes.ver', 'lista'],

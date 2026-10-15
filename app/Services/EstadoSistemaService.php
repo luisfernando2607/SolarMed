@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Factura;
 use App\Models\Medico;
 use App\Models\User;
+use App\Models\WhatsappMensaje;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -35,9 +36,36 @@ class EstadoSistemaService
             'sri' => $this->sri(),
             'certificados' => $this->certificados(),
             'inventario' => $this->inventario(),
+            'whatsapp' => $this->whatsapp(),
             'disco' => $this->disco(),
             'configuracion' => $this->configuracion(),
         ];
+    }
+
+    private function whatsapp(): array
+    {
+        $wa = app(WhatsappCloudService::class);
+        $titulo = 'WhatsApp automático';
+        if (!$wa->activo()) {
+            return ['titulo' => $titulo, 'estado' => 'ok', 'detalle' => 'Desactivado: los recordatorios se envían con el botón de WhatsApp desde un teléfono de la clínica.'];
+        }
+        if (!$wa->configurado()) {
+            return ['titulo' => $titulo, 'estado' => 'aviso', 'detalle' => 'Activado, pero falta el identificador del número o el token de Meta.', 'accion' => route('configuracion') . '#whatsapp'];
+        }
+
+        $semana = WhatsappMensaje::where('created_at', '>=', now()->subDays(7))->where('tipo', '!=', 'prueba');
+        $total = (clone $semana)->whereIn('estado', ['enviado', 'entregado', 'leido', 'fallido'])->count();
+        $fallidos = (clone $semana)->where('estado', 'fallido')->count();
+        $tokenInvalido = (clone $semana)->where('error_codigo', '190')->exists();
+
+        if ($tokenInvalido) {
+            return ['titulo' => $titulo, 'estado' => 'error', 'detalle' => 'Meta rechazó el token de acceso: reemplácelo en Configuración → WhatsApp.', 'accion' => route('configuracion') . '#whatsapp'];
+        }
+        if ($total && $fallidos * 100 / $total > 20) {
+            return ['titulo' => $titulo, 'estado' => 'error', 'detalle' => "{$fallidos} de {$total} mensajes fallaron en los últimos 7 días.", 'accion' => route('whatsapp.mensajes')];
+        }
+
+        return ['titulo' => $titulo, 'estado' => 'ok', 'detalle' => $total ? "{$total} mensajes en los últimos 7 días, {$fallidos} fallidos." : 'Activo. Aún no se han enviado mensajes esta semana.', 'accion' => route('whatsapp.mensajes')];
     }
 
     private function inventario(): array

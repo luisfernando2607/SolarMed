@@ -85,7 +85,8 @@
             <li>Menú <strong>Agenda</strong>: haga clic en un horario libre, busque al paciente (<strong>Buscar existente</strong> o <strong>+ Paciente nuevo</strong>) y pulse <strong>Agendar</strong>.</li>
             <li>Arrastre una cita para cambiarla de hora. Al abrirla puede <strong>Confirmar</strong> o <strong>Cancelar cita</strong>; el día de la cita, <strong>Registrar llegada</strong> envía al paciente a la sala de espera con su turno.</li>
             <li>Las citas <strong>"En línea"</strong> las reservan los pacientes desde la página pública: quedan pendientes hasta que usted las confirme. El panel de inicio le avisa cuántas hay.</li>
-            <li>El botón <strong>WhatsApp</strong> de una cita abre el mensaje de recordatorio ya escrito para enviarlo desde su WhatsApp.</li>
+            <li>El botón <strong>WhatsApp</strong> de una cita abre el mensaje de recordatorio ya escrito para enviarlo desde su WhatsApp. Si el administrador activó el <strong>WhatsApp automático</strong>, el botón dice <strong>Enviar recordatorio por WhatsApp</strong>: el mensaje sale del número de la clínica, y además se envía solo la tarde anterior a cada cita.</li>
+            <li>En <strong>WhatsApp</strong> (menú Atención) verá cada mensaje enviado, si fue entregado o leído y las respuestas: cuando el paciente pulsa <strong>Confirmar</strong> o <strong>Cancelar</strong> la cita se actualiza sola; si responde <strong>BAJA</strong> deja de recibir mensajes. Marque como <strong>Revisada</strong> cada respuesta que atienda.</li>
         </ol>
         @can('pacientes.ver')
         <h3 class="{{ $h3 }}">Pacientes</h3>
@@ -181,6 +182,7 @@
             <li><strong>Usuarios</strong>: cree cuentas con su rol. Si asigna una clave, la persona deberá cambiarla al entrar. Para médicos, cargue cédula, registro ACESS, RUC y certificado .p12.</li>
             <li><strong>Roles y permisos</strong>: qué puede hacer cada rol. El rol Administrador no se puede recortar. Para la empresa auditora cree un usuario con rol <strong>Auditor</strong> (solo lectura).</li>
             <li><strong>Configuración</strong>: datos y logo de la clínica, <strong>establecimiento de salud</strong> (unicódigo y ubicación para los formularios MSP), agenda y reserva en línea, encuestas, catálogo de exámenes, alertas prenatales y horarios de tareas automáticas.</li>
+            <li><strong>WhatsApp automático</strong> (Configuración → WhatsApp): necesita una cuenta de WhatsApp Business en Meta. Cree allí las plantillas que muestra la pantalla (categoría Utilidad), copie el identificador del número, el token y el app secret, guarde, use <strong>Enviar prueba</strong> y luego active el envío. Los avisos de entrega y las respuestas requieren la dirección pública HTTPS.</li>
             <li><strong>Estado del sistema</strong>: respaldos, tareas, cola, auditoría, SRI, certificados, inventario y disco. Si algo sale en rojo, el inicio del administrador lo avisa. <strong>Respaldar ahora</strong> crea una copia al instante.</li>
         </ul>
     </section>

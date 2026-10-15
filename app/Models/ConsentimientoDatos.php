@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ConsentimientoDatos extends Model
 {
     /** Cambie la versión cada vez que se modifique el texto de resources/views/privacidad.blade.php */
-    public const VERSION_AVISO = '2026-10';
+    public const VERSION_AVISO = '2026-11';
 
     protected $table = 'consentimientos_datos';
 
