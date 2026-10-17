@@ -84,7 +84,7 @@ new #[Layout('layouts.guest')] class extends Component
     <form wire:submit="verificar" class="space-y-5">
         <div>
             <label for="codigo" class="form-label">{{ $usarRecuperacion ? 'Código de recuperación' : 'Código' }}</label>
-            <input wire:model="codigo" id="codigo" type="text" :inputmode="$usarRecuperacion ? 'text' : 'numeric'"
+            <input wire:model="codigo" id="codigo" type="text" inputmode="{{ $usarRecuperacion ? 'text' : 'numeric' }}"
                 autocomplete="one-time-code" required autofocus
                 class="form-input text-center font-mono text-2xl tracking-[0.4em] {{ $errors->has('codigo') ? 'border-red-300' : '' }}">
             <x-input-error :messages="$errors->get('codigo')" class="form-error" />
