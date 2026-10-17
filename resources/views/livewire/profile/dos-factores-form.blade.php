@@ -7,6 +7,9 @@ use Livewire\Volt\Component;
 
 new class extends Component
 {
+    /** En la compuerta de activación se oculta el encabezado y el aviso (ya los muestra la página). */
+    public bool $compacto = false;
+
     public ?string $qr = null;
     #[Locked]
     public ?string $secretoPendiente = null;
@@ -45,6 +48,7 @@ new class extends Component
 
         $this->reset('qr', 'codigo', 'secretoPendiente');
         app(\App\Services\AuditoriaService::class)->registrar('editar', 'usuario', Auth::id(), null, 'Activó verificación en dos pasos');
+        $this->dispatch('dos-factores-cambiado');
     }
 
     public function cancelar(): void
@@ -82,19 +86,21 @@ new class extends Component
 }; ?>
 
 <section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">Verificación en dos pasos</h2>
-        <p class="mt-1 text-sm text-gray-600">
-            Además de la contraseña, al iniciar sesión se pedirá un código de 6 dígitos de una app autenticadora
-            (Google Authenticator, Microsoft Authenticator o Authy) instalada en su teléfono.
-        </p>
-    </header>
+    @unless ($compacto)
+        <header>
+            <h2 class="text-lg font-medium text-gray-900">Verificación en dos pasos</h2>
+            <p class="mt-1 text-sm text-gray-600">
+                Además de la contraseña, al iniciar sesión se pedirá un código de 6 dígitos de una app autenticadora
+                (Google Authenticator, Microsoft Authenticator o Authy) instalada en su teléfono.
+            </p>
+        </header>
 
-    @if (auth()->user()->requiereDosFactores() && !auth()->user()->tieneDosFactores())
-        <div class="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
-            Su rol requiere verificación en dos pasos. Actívela para continuar usando el sistema.
-        </div>
-    @endif
+        @if (auth()->user()->requiereDosFactores() && !auth()->user()->tieneDosFactores())
+            <div class="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
+                Su rol requiere verificación en dos pasos. Actívela para continuar usando el sistema.
+            </div>
+        @endif
+    @endunless
 
     @if ($codigosRecuperacion)
         <div class="mt-4 rounded-lg border border-green-300 bg-green-50 p-4">

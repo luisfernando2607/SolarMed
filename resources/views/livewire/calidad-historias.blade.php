@@ -13,12 +13,20 @@
             <h1 class="text-2xl font-bold text-gray-900">Calidad de la historia clínica</h1>
             <p class="text-sm text-gray-500 mt-1">Llenado de la consulta externa según el formulario SNS-MSP/HCU-form.002/2021 (AM 00115-2021)</p>
         </div>
-        <a href="{{ route('auditoria.planes') }}" wire:navigate class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition self-start">
-            Planes de acción
-            @if ($planesVencidos)
-                <span class="px-1.5 py-0.5 rounded-full bg-red-50 text-red-700 text-xs">{{ $planesVencidos }} vencidos</span>
-            @endif
-        </a>
+        <div class="flex items-center gap-2 self-start">
+            <a href="{{ route('auditoria.informe-periodo', array_filter(['desde' => $desde, 'hasta' => $hasta, 'medico' => $medico, 'especialidad' => $especialidad])) }}"
+               target="_blank"
+               class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 transition shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                Informe del período
+            </a>
+            <a href="{{ route('auditoria.planes') }}" wire:navigate class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                Planes de acción
+                @if ($planesVencidos)
+                    <span class="px-1.5 py-0.5 rounded-full bg-red-50 text-red-700 text-xs">{{ $planesVencidos }} vencidos</span>
+                @endif
+            </a>
+        </div>
     </div>
 
     {{-- Filtros --}}

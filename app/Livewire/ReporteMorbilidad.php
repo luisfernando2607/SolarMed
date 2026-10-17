@@ -120,6 +120,31 @@ class ReporteMorbilidad extends Component
         }, 'morbilidad_' . $desde->format('Ymd') . '_' . $hasta->format('Ymd') . '.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
+    /** Exporta el reporte RDACAA del MSP (una fila por atención, bloques A–D) */
+    public function exportarRdacaa(\App\Services\RdacaaService $rdacaa)
+    {
+        abort_unless(auth()->user()->canAny(['reportes.ver', 'auditoria.ver']), 403);
+        [$desde, $hasta] = $this->periodo();
+        $medicoId = $this->medico !== '' ? (int) $this->medico : null;
+        $especialidadId = $this->especialidad !== '' ? (int) $this->especialidad : null;
+        $filas = $rdacaa->filas($desde, $hasta, $medicoId, $especialidadId);
+
+        app(AuditoriaService::class)->registrar('exportar', 'rdacaa', null, null,
+            "RDACAA {$desde->format('d/m/Y')}–{$hasta->format('d/m/Y')} ({$filas->count()} atenciones)");
+
+        $seguro = fn ($v) => is_string($v) && preg_match('/^[=+\-@\t\r]/', $v) ? "'" . $v : $v;
+
+        return response()->streamDownload(function () use ($filas, $seguro) {
+            $salida = fopen('php://output', 'w');
+            fwrite($salida, "\xEF\xBB\xBF");
+            fputcsv($salida, \App\Services\RdacaaService::CABECERA, ';');
+            foreach ($filas as $fila) {
+                fputcsv($salida, array_map($seguro, $fila), ';');
+            }
+            fclose($salida);
+        }, 'rdacaa_' . $desde->format('Ymd') . '_' . $hasta->format('Ymd') . '.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
     public function render()
     {
         $consultas = $this->consultas();

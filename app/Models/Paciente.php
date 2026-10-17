@@ -7,6 +7,7 @@ use Carbon\Carbon;
 class Paciente extends Model {
     protected $fillable = [
         'nombres','apellidos','cedula','fecha_nacimiento','sexo',
+        'etnia','nacionalidad','discapacidad','seguro',
         'telefono','telefono_secundario','direccion','ciudad','provincia','canton','parroquia','email','foto_path',
         'ocupacion','referido_por',
         'grupo_sanguineo','peso','altura','medicamentos','cirugias','alergias','antecedentes','enfermedades_familiares',
@@ -15,6 +16,17 @@ class Paciente extends Model {
     ];
     protected $casts = ['fecha_nacimiento' => 'date', 'fum' => 'date', 'identidad_reservada' => 'boolean',
         'whatsapp_baja' => 'boolean', 'whatsapp_baja_at' => 'datetime'];
+
+    /* Catálogos del RDACAA / MSP (bloque C del paciente). Valores estándar INEC/MSP. */
+    public const ETNIAS = ['mestizo' => 'Mestizo/a', 'indigena' => 'Indígena', 'afroecuatoriano' => 'Afroecuatoriano/a',
+        'negro' => 'Negro/a', 'mulato' => 'Mulato/a', 'montubio' => 'Montubio/a', 'blanco' => 'Blanco/a', 'otro' => 'Otro/a'];
+
+    public const DISCAPACIDADES = ['ninguna' => 'Ninguna', 'fisica' => 'Física', 'intelectual' => 'Intelectual',
+        'visual' => 'Visual', 'auditiva' => 'Auditiva', 'psicosocial' => 'Psicosocial', 'lenguaje' => 'De lenguaje'];
+
+    public const SEGUROS = ['ninguno' => 'Sin seguro', 'iess_general' => 'IESS seguro general', 'iess_campesino' => 'IESS seguro campesino',
+        'iess_voluntario' => 'IESS voluntario', 'issfa' => 'ISSFA', 'isspol' => 'ISSPOL', 'publico' => 'MSP / Público',
+        'privado' => 'Privado', 'otro' => 'Otro'];
 
     /** Archivo pasivo: historias sin atención por más de 5 años (AM 5216-A Art. 17) */
     public const ANIOS_ARCHIVO_ACTIVO = 5;

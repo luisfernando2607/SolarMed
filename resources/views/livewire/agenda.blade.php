@@ -212,6 +212,25 @@
     #calendario-citas .fc-event.cita-cancelada { text-decoration: line-through; opacity: .7; }
     #calendario-citas .fc-event.cita-completada { opacity: .55; }
     #calendario-citas .fc-event { cursor: pointer; font-size: .75rem; }
+
+    /* Botones de la barra de la agenda con el color de la clínica (API de variables de FullCalendar) */
+    #calendario-citas {
+        --fc-button-bg-color: rgb(var(--marca-600));
+        --fc-button-border-color: rgb(var(--marca-600));
+        --fc-button-hover-bg-color: rgb(var(--marca-700));
+        --fc-button-hover-border-color: rgb(var(--marca-700));
+        --fc-button-active-bg-color: rgb(var(--marca-800));
+        --fc-button-active-border-color: rgb(var(--marca-800));
+        --fc-today-bg-color: rgb(var(--marca-500) / 0.10);
+        --fc-border-color: var(--color-gray-100);
+    }
+    #calendario-citas .fc .fc-button { text-transform: capitalize; font-weight: 600; box-shadow: none !important; }
+    #calendario-citas .fc .fc-button-primary:focus { box-shadow: 0 0 0 3px rgb(var(--marca-500) / .35) !important; }
+    #calendario-citas .fc .fc-button-primary:disabled { opacity: .5; }
+    #calendario-citas .fc .fc-toolbar-title { font-size: 1.15rem; font-weight: 700; color: var(--color-gray-800); }
+    #calendario-citas .fc .fc-col-header-cell-cushion { color: var(--color-gray-600); font-weight: 600; padding: .5rem; }
+    #calendario-citas .fc .fc-timegrid-slot, #calendario-citas .fc .fc-daygrid-day-number { color: var(--color-gray-500); }
+    #calendario-citas .fc-theme-standard td, #calendario-citas .fc-theme-standard th { border-color: var(--color-gray-100); }
 </style>
 </div>
 

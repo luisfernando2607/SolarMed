@@ -30,6 +30,10 @@ class ListaPacientes extends Component
     public $cedula;
     public $fecha_nacimiento;
     public $sexo;
+    public $etnia;
+    public $nacionalidad;
+    public $discapacidad;
+    public $seguro;
     public $telefono;
     public $telefono_secundario;
     public $direccion;
@@ -64,6 +68,10 @@ class ListaPacientes extends Component
             'cedula' => ['required', 'string', 'max:13', Rule::unique('pacientes', 'cedula')->ignore($this->editId)],
             'fecha_nacimiento' => 'nullable|date',
             'sexo' => 'required|in:masculino,femenino',
+            'etnia' => 'nullable|in:' . implode(',', array_keys(\App\Models\Paciente::ETNIAS)),
+            'nacionalidad' => 'nullable|string|max:60',
+            'discapacidad' => 'nullable|in:' . implode(',', array_keys(\App\Models\Paciente::DISCAPACIDADES)),
+            'seguro' => 'nullable|in:' . implode(',', array_keys(\App\Models\Paciente::SEGUROS)),
             'telefono' => 'nullable|string|max:20',
             'telefono_secundario' => 'nullable|string|max:20',
             'direccion' => 'nullable|string|max:500',
@@ -142,6 +150,10 @@ class ListaPacientes extends Component
         $this->cedula = $paciente->cedula;
         $this->fecha_nacimiento = $paciente->fecha_nacimiento?->format('Y-m-d');
         $this->sexo = $paciente->sexo;
+        $this->etnia = $paciente->etnia;
+        $this->nacionalidad = $paciente->nacionalidad;
+        $this->discapacidad = $paciente->discapacidad;
+        $this->seguro = $paciente->seguro;
         $this->telefono = $paciente->telefono;
         $this->telefono_secundario = $paciente->telefono_secundario;
         $this->direccion = $paciente->direccion;
@@ -188,6 +200,10 @@ class ListaPacientes extends Component
             'cedula' => $this->cedula,
             'fecha_nacimiento' => $this->fecha_nacimiento,
             'sexo' => $this->sexo,
+            'etnia' => $this->etnia ?: null,
+            'nacionalidad' => $this->nacionalidad ?: null,
+            'discapacidad' => $this->discapacidad ?: null,
+            'seguro' => $this->seguro ?: null,
             'telefono' => $this->telefono,
             'telefono_secundario' => $this->telefono_secundario,
             'direccion' => $this->direccion,

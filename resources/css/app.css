@@ -68,6 +68,27 @@
 
 [x-cloak] { display: none !important; }
 
+/* Detalles finos de toda la app: selección y barras de desplazamiento con el color de la clínica */
+@layer base {
+    ::selection {
+        background-color: rgb(var(--marca-500) / 0.22);
+    }
+    /* Firefox */
+    * {
+        scrollbar-color: var(--color-gray-300) transparent;
+    }
+    /* WebKit/Blink */
+    *::-webkit-scrollbar { width: 10px; height: 10px; }
+    *::-webkit-scrollbar-track { background: transparent; }
+    *::-webkit-scrollbar-thumb {
+        background-color: var(--color-gray-300);
+        border-radius: 9999px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+    }
+    *::-webkit-scrollbar-thumb:hover { background-color: var(--color-gray-400); }
+}
+
 /* Respaldo: tonos de azul de Tailwind. Los layouts los reemplazan por el color de la clínica (MarcaService::paletaCss). */
 :where(:root) {
     --marca-50: 239 246 255; --marca-100: 219 234 254; --marca-200: 191 219 254; --marca-300: 147 197 253;
@@ -101,4 +122,115 @@
     .form-error {
         @apply mt-1.5 text-xs text-red-500 font-medium;
     }
+}
+
+/*
+  ─────────────────────────────────────────────────────────────────────────────
+  Tema nocturno
+  ─────────────────────────────────────────────────────────────────────────────
+  Se activa con data-theme="dark" en <html>. En vez de tocar cada vista, se
+  redefinen los tonos de gris (texto, fondos sutiles y bordes se invierten solos)
+  y se ajustan unas pocas clases que usan blanco o tintes de color.
+*/
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root[data-theme="dark"] {
+    /* Escala de grises invertida: lo oscuro pasa a claro y viceversa */
+    --color-gray-50:  #131b2c;
+    --color-gray-100: #1a2436;
+    --color-gray-200: #2a3450;
+    --color-gray-300: #3b4660;
+    --color-gray-400: #7e8aa3;
+    --color-gray-500: #9aa5bd;
+    --color-gray-600: #b6bfd2;
+    --color-gray-700: #ccd3e1;
+    --color-gray-800: #e2e7f0;
+    --color-gray-900: #f1f4f9;
+    --color-gray-950: #ffffff;
+
+    /* Tintes de estado en versión oscura (el texto de color se aclara para contraste) */
+    --color-red-50:    #3a1d27;   --color-red-100:   #4a2430;
+    --color-green-50:  #10281f;   --color-green-100: #163a2c;
+    --color-emerald-50:#10281f;   --color-emerald-100:#163a2c;
+    --color-amber-50:  #332207;   --color-amber-100: #43300d;
+    --color-yellow-50: #332207;   --color-yellow-100:#43300d;
+    --color-orange-50: #3a2410;   --color-orange-100:#4a2f15;
+
+    color-scheme: dark;
+}
+
+/* Superficies: lo que era blanco pasa a una superficie oscura (no se toca el token
+   --color-white para que text-white siga funcionando en botones de color) */
+:root[data-theme="dark"] .bg-white { background-color: #161f30 !important; }
+:root[data-theme="dark"] .bg-white\/95 { background-color: rgb(22 31 48 / 0.95) !important; }
+:root[data-theme="dark"] .bg-\[\#f7f7f5\] { background-color: #0b1120 !important; }
+:root[data-theme="dark"] body { background-color: #0b1120; }
+
+/* Campos de formulario */
+:root[data-theme="dark"] .form-input {
+    background-color: #1b2740;
+    color: #e2e7f0;
+    border-color: #2a3450;
+}
+:root[data-theme="dark"] .form-input::placeholder { color: #7e8aa3; }
+:root[data-theme="dark"] .form-input[readonly] { background-color: #131b2c; }
+:root[data-theme="dark"] select.form-input,
+:root[data-theme="dark"] input[type="date"],
+:root[data-theme="dark"] input:not([type]),
+:root[data-theme="dark"] input[type="text"],
+:root[data-theme="dark"] input[type="email"],
+:root[data-theme="dark"] input[type="password"],
+:root[data-theme="dark"] input[type="number"],
+:root[data-theme="dark"] input[type="search"],
+:root[data-theme="dark"] input[type="tel"],
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] select {
+    background-color: #1b2740;
+    color: #e2e7f0;
+    border-color: #2a3450;
+}
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder { color: #7e8aa3; }
+/* El ícono del selector de fecha se ve en oscuro */
+:root[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.8); }
+
+/* Fondos translúcidos que deben seguir oscuros (modales, superposiciones) */
+:root[data-theme="dark"] .bg-gray-900\/40 { background-color: rgb(3 7 18 / 0.6) !important; }
+:root[data-theme="dark"] .bg-gray-900\/50 { background-color: rgb(3 7 18 / 0.65) !important; }
+:root[data-theme="dark"] .bg-black\/40 { background-color: rgb(0 0 0 / 0.6) !important; }
+:root[data-theme="dark"] .bg-black\/50 { background-color: rgb(0 0 0 / 0.65) !important; }
+
+/* Enlaces y textos con el color de la clínica: se aclaran para leerse sobre fondo oscuro */
+:root[data-theme="dark"] .text-blue-600,
+:root[data-theme="dark"] .text-blue-700 { color: rgb(var(--marca-400)) !important; }
+:root[data-theme="dark"] .hover\:text-blue-700:hover { color: rgb(var(--marca-300)) !important; }
+
+/* Ítem activo del menú lateral: tinte de marca sobre fondo oscuro */
+:root[data-theme="dark"] .sb-item.activo { background: color-mix(in srgb, var(--m) 24%, transparent); color: rgb(var(--marca-300)); }
+
+/* Sombras más suaves (las claras se ven como halos sobre oscuro) */
+:root[data-theme="dark"] .shadow-sm,
+:root[data-theme="dark"] .shadow,
+:root[data-theme="dark"] .shadow-md,
+:root[data-theme="dark"] .shadow-xs { box-shadow: 0 1px 3px rgb(0 0 0 / 0.5) !important; }
+:root[data-theme="dark"] .shadow-lg,
+:root[data-theme="dark"] .shadow-xl,
+:root[data-theme="dark"] .shadow-2xl { box-shadow: 0 10px 30px rgb(0 0 0 / 0.6) !important; }
+
+/* Tarjetas con fondo blanco fijo en los <style> de cada vista (dashboard, inicio, ficha, calidad, evaluar) */
+:root[data-theme="dark"] .dash .tarjeta,
+:root[data-theme="dark"] .inicio .tarjeta,
+:root[data-theme="dark"] .ficha .tarjeta,
+:root[data-theme="dark"] .calidad .tarjeta,
+:root[data-theme="dark"] .evaluar .tarjeta {
+    background: #161f30;
+    border-color: #2a3450;
+}
+/* Variables de los gráficos del dashboard: tinta y bordes legibles en oscuro */
+:root[data-theme="dark"] .dash {
+    --tinta-1: #e2e7f0;
+    --tinta-2: #b6bfd2;
+    --tinta-3: #8a95ad;
+    --borde: #2a3450;
+    --serie-neutra: #3b4660;
 }

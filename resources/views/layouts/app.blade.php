@@ -4,6 +4,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        {{-- Aplica el tema guardado antes de pintar para que no parpadee --}}
+        <script>(function(){try{if(localStorage.getItem('tema')==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();</script>
         <title>{{ $marca->nombre() }}</title>
         <link rel="icon" href="{{ $marca->logoUrl() }}">
         <link rel="preconnect" href="https://fonts.bunny.net">

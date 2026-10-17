@@ -191,6 +191,37 @@
                                         </div>
 
                                         <div>
+                                            <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3 pb-2 border-b border-gray-100">Datos para el reporte MSP (RDACAA)</p>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-500 mb-1">Autoidentificación étnica</label>
+                                                    <select wire:model="etnia" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm py-2">
+                                                        <option value="">Sin registrar</option>
+                                                        @foreach (\App\Models\Paciente::ETNIAS as $k => $v)<option value="{{ $k }}">{{ $v }}</option>@endforeach
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-500 mb-1">Nacionalidad</label>
+                                                    <input wire:model="nacionalidad" type="text" placeholder="Ecuatoriana" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm py-2">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-500 mb-1">Discapacidad</label>
+                                                    <select wire:model="discapacidad" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm py-2">
+                                                        <option value="">Sin registrar</option>
+                                                        @foreach (\App\Models\Paciente::DISCAPACIDADES as $k => $v)<option value="{{ $k }}">{{ $v }}</option>@endforeach
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-500 mb-1">Tipo de seguro</label>
+                                                    <select wire:model="seguro" class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm py-2">
+                                                        <option value="">Sin registrar</option>
+                                                        @foreach (\App\Models\Paciente::SEGUROS as $k => $v)<option value="{{ $k }}">{{ $v }}</option>@endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div>
                                             <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3 pb-2 border-b border-gray-100">Contacto</p>
                                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
                                                 <div>

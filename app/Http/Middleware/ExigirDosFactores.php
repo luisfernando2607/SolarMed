@@ -18,8 +18,7 @@ class ExigirDosFactores
 
         if ($user && $user->requiereDosFactores() && !$user->tieneDosFactores()
             && !$request->routeIs('profile', 'logout', 'cuenta.*', '*livewire.*', 'verification.*', 'password.*')) {
-            return redirect()->to(route('profile') . '#dos-factores')
-                ->with('status', 'Active la verificación en dos pasos para continuar.');
+            return redirect()->route('cuenta.dos-factores');
         }
 
         return $next($request);

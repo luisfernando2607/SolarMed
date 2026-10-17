@@ -71,26 +71,34 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
-    <div class="text-center mb-6">
+    <div class="mb-7 text-center">
+        <span class="mx-auto mb-4 flex items-center justify-center w-12 h-12 rounded-xl bg-blue-50 text-blue-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </span>
         <h1 class="text-2xl font-bold text-gray-900">Verificación en dos pasos</h1>
         <p class="text-sm text-gray-500 mt-1">
-            {{ $usarRecuperacion ? 'Ingrese uno de sus códigos de recuperación.' : 'Ingrese el código de 6 dígitos de su app autenticadora.' }}
+            {{ $usarRecuperacion ? 'Ingresa uno de tus códigos de recuperación.' : 'Ingresa el código de 6 dígitos de tu app autenticadora.' }}
         </p>
     </div>
 
-    <form wire:submit="verificar">
+    <form wire:submit="verificar" class="space-y-5">
         <div>
-            <x-input-label for="codigo" :value="$usarRecuperacion ? 'Código de recuperación' : 'Código'" />
-            <x-text-input wire:model="codigo" id="codigo" class="block mt-1 w-full font-mono text-center tracking-widest" type="text"
-                :inputmode="$usarRecuperacion ? 'text' : 'numeric'" autocomplete="one-time-code" required autofocus />
-            <x-input-error :messages="$errors->get('codigo')" class="mt-2" />
+            <label for="codigo" class="form-label">{{ $usarRecuperacion ? 'Código de recuperación' : 'Código' }}</label>
+            <input wire:model="codigo" id="codigo" type="text" :inputmode="$usarRecuperacion ? 'text' : 'numeric'"
+                autocomplete="one-time-code" required autofocus
+                class="form-input text-center font-mono text-2xl tracking-[0.4em] {{ $errors->has('codigo') ? 'border-red-300' : '' }}">
+            <x-input-error :messages="$errors->get('codigo')" class="form-error" />
         </div>
 
-        <div class="flex items-center justify-between mt-4">
-            <button type="button" wire:click="$toggle('usarRecuperacion')" class="text-sm text-gray-600 underline hover:text-gray-900">
+        <button type="submit"
+            class="w-full inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-3 px-4 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:ring-offset-2">
+            Verificar
+        </button>
+
+        <div class="text-center">
+            <button type="button" wire:click="$toggle('usarRecuperacion')" class="text-sm font-medium text-blue-600 hover:text-blue-700">
                 {{ $usarRecuperacion ? 'Usar código de la app' : 'Perdí mi teléfono' }}
             </button>
-            <x-primary-button>Verificar</x-primary-button>
         </div>
     </form>
 </div>

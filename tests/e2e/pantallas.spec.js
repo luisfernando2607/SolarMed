@@ -4,7 +4,7 @@ import { test, expect, entrar, sinDesbordeLateral } from './ayuda.js';
 const PANTALLAS = [
     '/admin/dashboard', '/pacientes', '/pacientes/1', '/expedientes', '/agenda', '/sala-espera', '/turnos/crear',
     '/referencias', '/facturas', '/facturas/crear', '/caja', '/reportes/ventas', '/reportes/morbilidad', '/reportes/satisfaccion',
-    '/auditoria', '/auditoria/calidad-hc', '/auditoria/planes-accion', '/auditoria/solicitudes', '/auditoria/incidentes',
+    '/auditoria/panel', '/auditoria', '/auditoria/calidad-hc', '/auditoria/planes-accion', '/auditoria/solicitudes', '/auditoria/incidentes',
     '/usuarios', '/roles', '/especialidades', '/tarifario', '/configuracion', '/sistema', '/sri/configuracion',
     '/consentimientos/plantillas', '/inventario', '/whatsapp', '/telemedicina', '/ayuda', '/profile',
 ];

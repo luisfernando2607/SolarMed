@@ -343,6 +343,9 @@ Route::get('reportes/morbilidad', \App\Livewire\ReporteMorbilidad::class)
     ->name('reportes.morbilidad');
 
 // Auditoría de accesos a datos clínicos (solo admin)
+Route::get('auditoria/panel', \App\Livewire\PanelAuditoria::class)
+    ->middleware(['auth', 'can:auditoria.ver'])
+    ->name('auditoria.panel');
 Route::get('auditoria', \App\Livewire\Auditoria::class)
     ->middleware(['auth', 'can:auditoria.ver'])
     ->name('auditoria');
@@ -405,6 +408,68 @@ Route::get('auditoria/calidad-hc/informe/{auditoria}', function (App\Models\Audi
         ->setPaper('a4', 'portrait')
         ->stream("informe_auditoria_{$auditoria->numero()}.pdf");
 })->middleware(['auth', 'can:auditoria.ver'])->name('auditoria.informe');
+Route::get('auditoria/calidad-hc/informe-periodo', function (Illuminate\Http\Request $request) {
+    $calidad = app(\App\Services\CalidadHistoriaService::class);
+
+    $desde = $request->date('desde') ?? now()->subDays(30)->startOfDay();
+    $hasta = $request->date('hasta') ?? now()->endOfDay();
+    $medicoId = $request->integer('medico') ?: null;
+    $especialidadId = $request->integer('especialidad') ?: null;
+
+    $consultas = \App\Models\ExpedienteConsulta::query()
+        ->with('medico.user', 'especialidad')
+        ->whereDate('fecha', '>=', $desde->toDateString())
+        ->whereDate('fecha', '<=', $hasta->toDateString())
+        ->when($medicoId, fn ($q) => $q->where('medico_id', $medicoId))
+        ->when($especialidadId, fn ($q) => $q->where('especialidad_id', $especialidadId))
+        ->latest('fecha')->take(2000)->get();
+
+    $evaluaciones = $calidad->evaluarVarias($consultas);
+    $n = $consultas->count();
+
+    $porCriterio = collect(\App\Services\CalidadHistoriaService::CRITERIOS)->map(fn ($c, $clave) => [
+        'clave' => $clave,
+        'titulo' => $c[0],
+        'pct' => $n ? (int) round($evaluaciones->filter(fn ($e) => $e['criterios'][$clave]['ok'])->count() / $n * 100) : 0,
+    ])->sortBy('pct')->values();
+
+    $porMedico = $consultas->groupBy('medico_id')->map(fn ($grupo) => [
+        'medico' => $grupo->first()->medico?->nombre_completo ?? '—',
+        'consultas' => $grupo->count(),
+        'pct' => (int) round($grupo->avg(fn ($c) => $evaluaciones[$c->id]['puntaje'])),
+    ])->sortBy('pct')->values();
+
+    $puntajes = $evaluaciones->pluck('puntaje');
+    $distribucion = [
+        'bueno' => $puntajes->filter(fn ($p) => $p >= \App\Services\CalidadHistoriaService::UMBRAL_BUENO)->count(),
+        'aceptable' => $puntajes->filter(fn ($p) => $p >= \App\Services\CalidadHistoriaService::UMBRAL_ACEPTABLE && $p < \App\Services\CalidadHistoriaService::UMBRAL_BUENO)->count(),
+        'deficiente' => $puntajes->filter(fn ($p) => $p < \App\Services\CalidadHistoriaService::UMBRAL_ACEPTABLE)->count(),
+    ];
+
+    $auditadas = \App\Models\AuditoriaHc::with('consulta.paciente', 'consulta.medico', 'auditor')
+        ->where('estado', 'cerrada')
+        ->whereDate('fecha', '>=', $desde->toDateString())
+        ->whereDate('fecha', '<=', $hasta->toDateString())
+        ->when($medicoId, fn ($q) => $q->whereHas('consulta', fn ($c) => $c->where('medico_id', $medicoId)))
+        ->latest('cerrada_at')->get();
+
+    app(\App\Services\AuditoriaService::class)->registrar('descargar', 'auditoria_hc', null, null,
+        'Informe de calidad del período ' . $desde->format('d/m/Y') . ' – ' . $hasta->format('d/m/Y'));
+
+    return Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.informe-calidad-periodo', [
+        'desde' => $desde, 'hasta' => $hasta,
+        'medico' => $medicoId ? \App\Models\Medico::find($medicoId) : null,
+        'especialidad' => $especialidadId ? \App\Models\Especialidad::find($especialidadId) : null,
+        'n' => $n,
+        'promedio' => $n ? (int) round($puntajes->avg()) : 0,
+        'distribucion' => $distribucion,
+        'porCriterio' => $porCriterio,
+        'porMedico' => $porMedico,
+        'auditadas' => $auditadas,
+        'limitado' => $n >= 2000,
+    ])->setPaper('a4', 'portrait')
+        ->stream('informe_calidad_hc_' . $desde->format('Ymd') . '_' . $hasta->format('Ymd') . '.pdf');
+})->middleware(['auth', 'can:auditoria.ver'])->name('auditoria.informe-periodo');
 Route::get('auditoria/planes-accion', \App\Livewire\PlanesAccion::class)
     ->middleware(['auth', 'can:auditoria.ver'])
     ->name('auditoria.planes');
@@ -447,6 +512,8 @@ Route::get('cuenta/password', \App\Livewire\Cuenta\CambiarPassword::class)
     ->middleware('auth')->name('cuenta.password');
 Route::get('cuenta/confidencialidad', \App\Livewire\Cuenta\AcuerdoConfidencialidad::class)
     ->middleware('auth')->name('cuenta.confidencialidad');
+Route::get('cuenta/dos-factores', \App\Livewire\Cuenta\ConfigurarDosFactores::class)
+    ->middleware('auth')->name('cuenta.dos-factores');
 
 // Estado del servidor (solo admin)
 Route::get('sistema', \App\Livewire\EstadoSistema::class)

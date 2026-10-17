@@ -121,7 +121,8 @@ class DosFactoresTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole('medico');
 
-        $this->actingAs($user)->get('/pacientes')->assertRedirect(route('profile') . '#dos-factores');
+        $this->actingAs($user)->get('/pacientes')->assertRedirect(route('cuenta.dos-factores'));
+        $this->actingAs($user)->get(route('cuenta.dos-factores'))->assertOk();
         $this->actingAs($user)->get('/profile')->assertOk();
 
         Volt::test('profile.dos-factores-form')->assertSee('Su rol requiere');
